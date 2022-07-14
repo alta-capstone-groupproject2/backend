@@ -3,6 +3,7 @@ package helper
 import (
 	"fmt"
 	_config "lami/app/config"
+	"log"
 	"mime/multipart"
 	"os"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-func UploadFileToS3(fileName string, fileData multipart.File) (string, error) {
+func UploadFileToS3(directory string, fileName string, fileData multipart.File) (string, error) {
 	// The session the S3 Uploader will use
 	sess := _config.GetSession()
 
@@ -21,13 +22,14 @@ func UploadFileToS3(fileName string, fileData multipart.File) (string, error) {
 	// Upload the file to S3.
 	result, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket:      aws.String(os.Getenv("AWS_BUCKET")),
-		Key:         aws.String(fileName),
+		Key:         aws.String("/" + directory + "/" + fileName),
 		Body:        fileData,
 		ContentType: aws.String("image"),
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("failed to upload file, %v", err)
+		log.Print(err.Error())
+		return "", fmt.Errorf("failed to upload file")
 	}
 	return result.Location, nil
 }

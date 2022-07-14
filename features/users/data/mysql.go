@@ -1,8 +1,8 @@
 package data
 
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
 
 	"lami/app/features/users"
 
@@ -30,45 +30,59 @@ func NewUserRepository(conn *gorm.DB) users.Data {
 
 func (repo *mysqlUserRepository) SelectDataById(id int) (response users.Core, err error) {
 	datauser := User{}
-	result := repo.db.Find(&datauser, id)
+	result := repo.db.Preload("Role").Find(&datauser, id)
 	if result.Error != nil {
 		return users.Core{}, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return users.Core{}, errors.New("user not found")
 	}
 	return toCore(datauser), nil
 }
 
-func (repo *mysqlUserRepository) InsertData(userData users.Core) (row int, err error) {
+func (repo *mysqlUserRepository) InsertData(userData users.Core) (err error) {
 	userModel := fromCore(userData)
+	var newError map[string]interface{}
 
 	result := repo.db.Create(&userModel)
+
 	if result.Error != nil {
-		return -1, result.Error
+		errByte, _ := json.Marshal(result.Error)
+		json.Unmarshal((errByte), &newError)
+
+		if newError["Number"] == float64(1062) {
+			return errors.New("email already used")
+		}
+
+		return errors.New("failed insert data")
 	}
 	if result.RowsAffected == 0 {
-		return 0, errors.New("failed insert data")
+		return errors.New("failed insert data")
 	}
-	return int(result.RowsAffected), nil
+	return nil
 }
 
-func (repo *mysqlUserRepository) DeleteData(id int) (row int, err error) {
+func (repo *mysqlUserRepository) DeleteData(id int) (err error) {
 	datauser := User{}
 	result := repo.db.Delete(&datauser, id)
 	if result.Error != nil {
-		return 0, result.Error
-	}
-	return int(result.RowsAffected), nil
-}
-
-func (repo *mysqlUserRepository) UpdateData(dataReq map[string]interface{}, id int) (row int, err error) {
-	model := User{}
-	model.ID = uint(id)
-	fmt.Println(dataReq["url"])
-	result := repo.db.Model(model).Updates(dataReq)
-	if result.Error != nil {
-		return 0, result.Error
+		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return -1, errors.New("failed update data")
+		return errors.New("failed to delete data")
 	}
-	return int(result.RowsAffected), nil
+	return nil
+}
+
+func (repo *mysqlUserRepository) UpdateData(dataReq map[string]interface{}, id int) (err error) {
+	model := User{}
+	model.ID = uint(id)
+	result := repo.db.Model(model).Updates(dataReq)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("failed to update data")
+	}
+	return nil
 }
