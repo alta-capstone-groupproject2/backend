@@ -1,0 +1,2308 @@
+openapi: "3.0.0"
+info:
+  version: "1.0"
+  title: lamApp API
+  description: lamiApp OpenAPI
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Alfin7007/lamiApp/1.0
+tags:
+  - name: Login
+    description: Authentication
+  - name: Register
+    description: Register
+  - name: User
+    description: User data management
+  - name: Submissions
+    description: Pengajuan UMKM dan Event for admin only
+  - name: Culture
+    description: Budaya
+  - name: Events
+    description: Event
+  - name: Participations
+    description: Participation
+  - name: Comments
+    description: Comment
+  - name: Products
+    description: Product for UMKM only
+  - name: Carts
+    description: Carts
+  - name: Orders
+    description: Orders
+  - name: Payments
+    description: Payments
+paths:
+  #############################
+  #           LOGIN           #
+  #############################
+  /login:
+    post:
+      tags:
+        - Login
+      summary: Login user
+      description: login user description
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestLogin"
+            examples:
+              userData:
+                description: data user for login
+                value:
+                  email: user@gmail.com
+                  password: password123
+      responses:
+        "200":
+          description: login success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseLoginSuccess"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Login Success
+                    data:
+                      id: 1
+                      role: user
+                      token: >-
+                        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MzgzMjYxODAsInVzZXJJZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.AebFR-oQjUSOMez2ucDWkiMrS2eQIPmcYm5c71qZ_co
+        "400":
+          description: failed login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponseLogin"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Login Failed
+  #############################
+  #         REGISTER          #
+  #############################
+  /register:
+    post:
+      tags:
+        - Register
+      summary: Register user
+      description: register user description
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestRegister"
+            examples:
+              userData:
+                description: data user for register
+                value:
+                  name: Budi Setiawan
+                  email: budi@gmail.com
+                  password: inibudi
+      responses:
+        "200":
+          description: register success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseRegisterSuccess"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Register Success
+        "400":
+          description: register failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponseRegister"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Register Failed
+  ###############################
+  #            USER             #
+  ###############################
+  /users:
+    get:
+      tags:
+        - User
+      summary: profile user
+      description: Profile user description
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: Get Profile Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success get your data
+                    data:
+                      ID: 1
+                      image: URL File
+                      name: budi
+                      role: user
+                      email: budi@gmail.com
+        "400":
+          description: Failed Get Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get your data
+    put:
+      tags:
+        - User
+      summary: update user
+      description: Updated user description
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestUpdateUser"
+            example:
+              description: Data user
+              value:
+                name: Angga pramaja
+                email: angga@gmail.com
+                password: ituangga
+      responses:
+        "200":
+          description: Update Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Updated Success
+        "400":
+          description: Failed Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed Updated
+    delete:
+      tags:
+        - User
+      summary: delete user
+      description: Delete user description
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: Delete Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Delete Success
+        "400":
+          description: Failed Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed deleted
+  /users/stores:
+    post:
+      tags:
+        - User
+      summary: Upgrade account
+      description: description upgrade account
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestUserUMKM"
+
+      responses:
+        "200":
+          description: upgrade account success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Submit success
+        "400":
+          description: failed upgrade account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed submit
+  ###############################
+  #            APPLY            #
+  ###############################
+  /stores/submissions:
+    get:
+      tags:
+        - Submissions
+      summary: All apply UMKM
+      description: mengambil semua apply UMKM
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: get all apply UMKM success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get all apply UMKM
+                    data:
+                      - userID: 1
+                        username: budi.setiawan
+                        storeName: storeBudi
+                        owner: ownerBudi
+                        phone: "081234567899"
+                        address: Jalan Apel no.911, Kota Medan
+                        document: url.example.document.com
+                        status: approve
+
+        "400":
+          description: failed get all apply UMKM
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get all apply UMKM
+  /stores/submissions/{userID}:
+    put:
+      tags:
+        - Submissions
+      summary: Update apply UMKM
+      description: memperbarui apply UMKM
+      parameters:
+        - in: path
+          name: userID
+          required: true
+          schema:
+            type: number
+            example: 1
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestUpdateApply"
+            example:
+              description: data for apply UMKM
+              value:
+                status: decline
+      responses:
+        "200":
+          description: update apply UMKM success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to update apply UMKM
+        "400":
+          description: failed update apply UMKM
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to update apply UMKM
+
+  /events/submissions:
+    get:
+      tags:
+        - Submissions
+      summary: All apply events
+      description: mengambil semua apply events
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: get all apply events success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get all apply events
+                    data:
+                      - eventID: 1
+                        nameEvent: Event Budaya Cirebon
+                        username: budi.setiawan
+                        city: Cirebon
+                        date: 2022-07-05T09:04
+                        status: waiting
+
+        "400":
+          description: failed get all apply events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get all apply events
+  /events/submissions/{eventID}:
+    get:
+      tags:
+        - Submissions
+      summary: Get apply events
+      description: description get detail pengajuan event
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: eventID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: get detail pengajuan events success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get apply events
+                    data:
+                      {
+                        eventID: 1,
+                        image: url.image.event.com,
+                        document: url.document.event.com,
+                        name: Event Budaya Malang,
+                        userName: raden.andi,
+                        hostedBy: Siti Amaliah,
+                        phone: "083289073452",
+                        date: 2022-07-05T09:04,
+                        city: Malang,
+                        location: "1.5, 2",
+                        details: Ini details eventnya,
+                        price: 90000,
+                      }
+
+        "400":
+          description: failed detail pengajuan events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get apply events
+    put:
+      tags:
+        - Submissions
+      summary: Put apply events
+      description: description put detail pengajuan event
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: eventID
+          required: true
+          schema:
+            type: number
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestUpdateApply"
+            example:
+              description: detail data pengajuan event
+              value:
+                status: approve
+      responses:
+        "200":
+          description: detail pengajuan event success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to apply event
+        "400":
+          description: failed detail pengajuan event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to apply event
+
+  ############################
+  #         CULTURE          #
+  ############################
+  /cultures:
+    post:
+      tags:
+        - Culture
+      summary: Create culture for admin only
+      description: description create culture
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestCulture"
+      responses:
+        "200":
+          description: create culture success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to create culture
+        "400":
+          description: failed create culture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to create culture
+    get:
+      tags:
+        - Culture
+      summary: Culture List
+      description: Get All Culture
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: number
+            example: 1
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: number
+            example: 12
+        - in: query
+          name: name
+          required: false
+          schema:
+            type: string
+            example: Reog
+        - in: query
+          name: city
+          required: false
+          schema:
+            type: string
+            example: ponorogo
+      responses:
+        "200":
+          description: get all list culture success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get all list culture
+                    data:
+                      [
+                        {
+                          cultureID: 34,
+                          image: url.example.image.culture.com,
+                          cultureName: Reog,
+                          city: Ponorogo,
+                        },
+                      ]
+        "400":
+          description: failed get all list culture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get all list culture
+  /cultures/{cultureID}:
+    get:
+      tags:
+        - Culture
+      summary: Culture detail
+      description: Get culture by idCulture
+      parameters:
+        - in: path
+          name: cultureID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: get culture by idCulture success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get culture by idCulture
+                    data:
+                      cultureID: 34
+                      image: url.example.image.culture.com
+                      cultureName: Reog
+                      city: Ponorogo
+                      details: ini_detail_culture_reog
+        "400":
+          description: failed get culture by idCulture success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get culture by idCulture
+    put:
+      tags:
+        - Culture
+      summary: Culture Edit for admin only
+      description: Put culture by idCulture
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: cultureID
+          required: true
+          schema:
+            type: number
+            example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestCulture"
+
+      responses:
+        "200":
+          description: culture edit success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to edit culture
+        "400":
+          description: failed culture edit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to edit culture
+    delete:
+      tags:
+        - Culture
+      summary: Delete Culture for admin only
+      description: Delete culture by idCulture
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: cultureID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "204":
+          description: delete culture list success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 204
+                    message: Success delete culture
+        "400":
+          description: failed delete culture list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed delete culture
+  /cultures/reports/{cultureID}:
+    post:
+      tags:
+        - Culture
+      summary: Report Culture
+      description: Post cultures report
+      parameters:
+        - in: path
+          name: cultureID
+          required: true
+          schema:
+            type: number
+            example: 1
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestReportCulture"
+            example:
+              message: info budaya salah
+      responses:
+        "200":
+          description: create culture reports success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to send reports
+        "400":
+          description: failed create culture reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to send reports
+    get:
+      tags:
+        - Culture
+      summary: Culture report list for admin only
+      description: Get culture_reports by idCulture (get all event)
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: cultureID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: get culture_reports by idCulture success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get culture by idCulture
+                    data:
+                      - message: reports_angklung
+        "400":
+          description: failed get culture_reports by idCulture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get culture by idCulture
+
+  ###########################
+  #         EVENTS          #
+  ###########################
+  /events:
+    post:
+      tags:
+        - Events
+      summary: Create Event
+      description: Post Events
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestEvent"
+
+      responses:
+        "200":
+          description: create event success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to insert event
+        "400":
+          description: failed create event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to insert event
+    get:
+      tags:
+        - Events
+      summary: Event List
+      description: Get all events list
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: number
+            example: 1
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: number
+            example: 12
+        - in: query
+          name: name
+          schema:
+            type: string
+            example: Wayang Kulit
+        - in: query
+          name: city
+          schema:
+            type: string
+            example: Semarang
+      responses:
+        "200":
+          description: get all event list success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get all event list
+                    currentTime: 2022-07-05T09:04
+                    totalPage: 1
+                    data:
+                      - eventID: 3
+                        image: image.url.com
+                        eventName: Wayang Kulit
+                        price: 21000
+                        date: 2022-07-05T09:04
+                        city: Semarang
+        "400":
+          description: failed get all event list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get all event list
+  /events/{eventID}:
+    get:
+      tags:
+        - Events
+      summary: detail event
+      description: get events by idUser
+      parameters:
+        - in: path
+          name: eventID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: get events by idUser Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get all your events
+                    currentTime: 2022-07-05T09:04
+                    data:
+                      eventID: 2
+                      image: url.image.example.com
+                      name: Wayang Kulit
+                      hostedBy: Pablo
+                      date: 2022-07-05T09:04
+                      city: Jakarta
+                      location: 1.2,2
+                      details: ini_detail_myevent
+                      participants:
+                        - name: Andi,
+                          image: url.image.example.com
+
+        "400":
+          description: get events by idUser Failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed get all your events
+    delete:
+      tags:
+        - Events
+      summary: delete Event
+      description: delete my event by idEvent
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: eventID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "204":
+          description: delete my event by idEvent success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 204
+                    message: Delete events success
+        "400":
+          description: failed delete my event by idEvent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed events deleted
+  /users/events:
+    get:
+      tags:
+        - Events
+      summary: my Event
+      description: get events by idEvent
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: get events by idEvent success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get all event list
+                    currentTime: 2022-07-05T09:04
+                    totalPage: 1
+                    data:
+                      - eventID: 3
+                        image: image.url.com
+                        eventName: Wayang Kulit
+                        price: 21000
+                        date: 2022-07-05T09:04
+                        city: Semarang
+        "400":
+          description: failed get events by idEvent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get events
+  ##################################
+  #         PARTICIPATION          #
+  ##################################
+  /events/participations:
+    post:
+      tags:
+        - Participations
+      summary: Join Event
+      description: post events/participation
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestJoin"
+            example:
+              eventID: 23
+      responses:
+        "200":
+          description: create events/participation success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success insert events participants
+        "400":
+          description: failed create events/participation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed insert events participants
+    get:
+      tags:
+        - Participations
+      summary: Joined Event
+      description: Get events/participation
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: get events/participation success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success get your all joined events
+                    currentTime: 2022-07-05T09:04
+                    data:
+                      - eventID: 24
+                        participantID: 2
+                        image: url.image.event.com
+                        name: Tari Jaipong
+                        hostedBy: Michael
+                        date: 2022-07-05T09:04
+                        location: 1, 1
+                        city: Semarang
+                        details: ini_detail_event_by_idEvent
+                        price: 20000
+        "400":
+          description: failed get events/participation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed get your all events participants
+
+  ############################
+  #         COMMENT          #
+  ############################
+  /events/comments:
+    post:
+      tags:
+        - Comments
+      summary: Detail Event
+      description: post events/comments
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requesCreateComment"
+            example:
+              eventID: 23
+              comment: bla bla bla
+      responses:
+        "200":
+          description: create events/comments success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success insert your comments
+        "400":
+          description: failed create events/comments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed insert your comments
+  /events/comments/(eventID):
+    get:
+      tags:
+        - Comments
+      summary: get comments
+      description: Get event/comments/id_event (get all event by id_event)
+      responses:
+        "200":
+          description: get event/comments/id_event success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get all your event comments
+                    data:
+                      - commentID: 12
+                        name: Angga
+                        image: https://soundfest.site/image/user.jpg
+                        comment: Ini spesifik alamat eventnya dimana gimana ya kak?
+                        updated_at: 2022-07-05T17:43:30.097Z
+        "400":
+          description: failed get events/participation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get all your event comments
+  ############################
+  #         PRODUCT          #
+  ############################
+  /products:
+    post:
+      tags:
+        - Products
+      summary: Add product
+      description: Post product
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestProduct"
+      responses:
+        "200":
+          description: add product success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to insert product
+        "400":
+          description: failed add product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to insert product
+    get:
+      tags:
+        - Products
+      summary: Product List
+      description: Get All Product List
+      parameters:
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: number
+            example: 4
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: number
+            example: 5
+        - in: query
+          name: name
+          schema:
+            type: string
+            example: Batik Semarang
+        - in: query
+          name: city
+          schema:
+            type: string
+            example: Semarang
+      responses:
+        "200":
+          description: get all product list success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success get all product list
+                    totalPage: 3
+                    data:
+                      - productID: 11
+                        image: url.image.com
+                        productName: Jaket khas Bandung
+                        price: 280000
+                        city: Bandung
+
+        "400":
+          description: failed get all product list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed get all product list
+  /products/{productID}:
+    get:
+      tags:
+        - Products
+      summary: detail Product
+      description: get product by idProduct
+      parameters:
+        - in: path
+          name: productID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: get product by idProduct success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success get product by idProduct
+                    data:
+                      productID: 11
+                      image: url.image.com
+                      productName: Jaket khas Bandung
+                      storeName: Jaketku
+                      price: 280000
+                      city: Bandung
+                      meanRating: 4.8
+                      details: ini_detail_edit_product
+        "400":
+          description: failed get product by idProduct
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed get product by idProduct
+    put:
+      tags:
+        - Products
+      summary: Edit product
+      description: put product by idProduct
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: productID
+          required: true
+          schema:
+            type: number
+            example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestUpdateProduct"
+
+      responses:
+        "200":
+          description: update product by idProduct success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to update product by idProduct
+        "400":
+          description: failed update product by idProduct
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to update product by idProduct
+    delete:
+      tags:
+        - Products
+      summary: delete Product
+      description: delete product by idProduct
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: productID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "204":
+          description: delete product by idProduct success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 204
+                    message: Success delete product
+        "400":
+          description: failed delete product by idProduct
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed delete product
+  /users/products:
+    get:
+      tags:
+        - Products
+      summary: My Product
+      description: Get My Product
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: get my product success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success get all product list
+                    totalPage: 3
+                    data:
+                      - productID: 11
+                        image: url.image.com
+                        productName: Jaket khas Bandung
+                        price: 280000
+                        city: Bandung
+        "400":
+          description: failed get my product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed get all your product
+  /products/ratings/{productID}:
+    post:
+      tags:
+        - Products
+      summary: Post product ratings
+      description: Post product_ratings (give rating by productID)
+      parameters:
+        - in: path
+          name: productID
+          required: true
+          schema:
+            type: number
+            example: 1
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestPostReview"
+            example:
+              productID: 12
+              review: ini_review
+              rating: 4
+      responses:
+        "200":
+          description: product ratings success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to insert product ratings
+        "400":
+          description: failed product ratings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to insert product ratings
+    get:
+      tags:
+        - Products
+      summary: Get product ratings
+      description: Get product_ratings (get all event by productID)
+      parameters:
+        - in: path
+          name: productID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: get product_ratings success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get product_ratings
+                    data:
+                      ratingID: 1
+                      image: url.image.example.com
+                      name: userA
+                      rating: 4
+                      review: bla bla bla
+        "400":
+          description: failed get product_ratings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get product_ratings
+  #########################
+  #         CART          #
+  #########################
+  /carts:
+    post:
+      tags:
+        - Carts
+      summary: Add Cart
+      description: Post Cart
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestaddCarts"
+            example:
+              productID: 23
+      responses:
+        "200":
+          description: add cart success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success add to cart
+        "400":
+          description: failed add cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed add to cart
+    get:
+      tags:
+        - Carts
+      summary: Get Cart
+      description: Get Cart
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: get your cart success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get your cart
+                    data:
+                      - cartID: 2
+                        image: url.image.com
+                        name: Jaket khas Bandung
+                        price: 280000
+                        qty: 3
+        "400":
+          description: failed get your cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get your cart
+  /carts/{cartID}:
+    put:
+      tags:
+        - Carts
+      summary: Put Cart
+      description: Update cart by idCart
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: cartID
+          required: true
+          schema:
+            type: number
+            example: 1
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              $ref: "#/components/schemas/requestUpdateCart"
+            example:
+              qty: 2
+      responses:
+        "200":
+          description: update vart by idCart success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to update your cart
+        "400":
+          description: failed update vart by idCart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to update your cart
+    delete:
+      tags:
+        - Carts
+      summary: Delete Carts
+      description: delete cart by idCart
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: cartID
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "204":
+          description: delete cart by idCart success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 204
+                    message: Success to delete your cart
+        "400":
+          description: failed cart by idCart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to delete your cart
+  ##########################
+  #         ORDER          #
+  ##########################
+  /orders:
+    post:
+      tags:
+        - Orders
+      summary: Add Order
+      description: post order
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestOrders"
+            example:
+              cartid: [1, 2]
+              address:
+                { receiver: "joko", phone: "082302xxxx", address: "malang dkk" }
+      responses:
+        "200":
+          description: add order success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to add your order
+        "400":
+          description: failed add order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to add your order
+    get:
+      tags:
+        - Orders
+      summary: History Order
+      description: get history order
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: get your history order success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseGetHistoryOrders"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to get your history order
+                    data:
+                      - receiver: namaku
+                        address: Jl. Jeruk no.189 - Kota Bandung
+                        date: 2022-07-05T09:04
+                        price: 90000
+                        status: selesai
+                        product:
+                          - productID: 7
+                            name: Batik Semarang
+                            image: ini_image_file*
+                            qty: 1
+
+        "400":
+          description: failed get your history order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get your history order
+
+  #############################
+  #         PAYMENTS          #
+  #############################
+  /payments/{orderID}/orders:
+    post:
+      tags:
+        - Payments
+      summary: Add Payments for order product
+      description: post orders/{idorder}/payments
+      parameters:
+        - in: path
+          name: orderID
+          required: true
+          schema:
+            type: number
+            example: 1
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestOrderPayments"
+            example:
+              totalAmount: 100000
+              productID: 11
+      responses:
+        "200":
+          description: add cart success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to checkout
+        "400":
+          description: failed add cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to checkout
+  /payments/{eventID}/events:
+    post:
+      tags:
+        - Payments
+      summary: Add Payments for join event
+      description: post orders/{idorder}/payments
+      parameters:
+        - in: path
+          name: eventID
+          required: true
+          schema:
+            type: number
+            example: 1
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestEventPayments"
+            example:
+              totalAmount: 100000
+              eventID: 1
+      responses:
+        "200":
+          description: add cart success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success to checkout
+        "400":
+          description: failed add cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to checkout
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "use Token"
+  schemas:
+    requestLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    responseLoginSuccess:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+        data:
+          type: object
+    failedResponseLogin:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+    requestRegister:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    responseRegisterSuccess:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+    failedResponseRegister:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+    responseWithData:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        currentTime:
+          type: string
+        data:
+          type: object
+    requestUpdateUser:
+      type: object
+      properties:
+        image:
+          type: string
+          format: binary
+          description: "allowed file extension: jpg, png, jpeg && size <= 1050000 byte"
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    failedResponse:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+    responseWithNoData:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+    requestUserUMKM:
+      type: object
+      required:
+        - storeName
+        - owner
+        - phone
+        - address
+        - document
+      properties:
+        storeName:
+          type: string
+          minLength: 1
+        owner:
+          type: string
+          minLength: 1
+        phone:
+          type: string
+          minLength: 1
+        address:
+          type: string
+          minLength: 1
+        document:
+          type: string
+          format: binary
+          description: "allowed file extension: pdf && size <= 5050000 byte"
+    requestUpdateApply:
+      type: object
+      properties:
+        status:
+          type: string
+          minLength: 1
+    requestCulture:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        image:
+          type: string
+          format: binary
+          description: "allowed file extension: jpg, png, jpeg && size <= 1050000 byte"
+        city:
+          type: string
+          minLength: 1
+        details:
+          type: string
+          minLength: 1
+    requestReportCulture:
+      type: object
+      properties:
+        cultureID:
+          type: number
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+    requestEvent:
+      type: object
+      required:
+        - image
+        - document
+        - name
+        - hostedBy
+        - phone
+        - date
+        - city
+        - location
+        - details
+        - price
+      properties:
+        image:
+          type: string
+          format: binary
+          description: "allowed file extension: jpg, png, jpeg && size <= 1050000 byte"
+        document:
+          type: string
+          format: binary
+          description: "allowed file extension: pdf && size <= 5050000 byte"
+        name:
+          type: string
+          minLength: 1
+        hostedBy:
+          type: string
+          minLength: 1
+        phone:
+          type: string
+          minLength: 1
+        date:
+          type: string
+          minLength: 1
+        city:
+          type: string
+          minLength: 1
+        location:
+          type: string
+          minLength: 1
+        details:
+          type: string
+          minLength: 1
+        price:
+          type: number
+          minLength: 1
+    requestJoin:
+      type: object
+      properties:
+        eventID:
+          type: number
+    requesCreateComment:
+      type: object
+      properties:
+        eventID:
+          type: number
+          minLength: 1
+        comment:
+          type: string
+    responseComment:
+      type: object
+      properties:
+        name:
+          type: string
+        comment:
+          type: string
+    requestProduct:
+      type: object
+      required:
+        - image
+        - name
+        - city
+        - details
+        - price
+        - stock
+      properties:
+        image:
+          type: string
+          format: binary
+          description: "allowed file extension: jpg, png, jpeg && size <= 1050000 byte"
+        name:
+          type: string
+          minLength: 1
+        details:
+          type: string
+          minLength: 1
+        price:
+          type: number
+          minLength: 1
+        stock:
+          type: number
+          minLength: 1
+    requestUpdateProduct:
+      type: object
+      properties:
+        image:
+          type: string
+          format: binary
+          description: "allowed file extension: jpg, png, jpeg && size <= 1050000 byte"
+        details:
+          type: string
+          minLength: 1
+        price:
+          type: number
+          minLength: 1
+        stock:
+          type: number
+          minLength: 1
+    requestPostReview:
+      type: object
+      properties:
+        details:
+          type: string
+          minLength: 1
+        price:
+          type: number
+          minLength: 1
+    requestaddCarts:
+      type: object
+      properties:
+        productID:
+          type: number
+    requestUpdateCart:
+      type: object
+      properties:
+        qty:
+          type: number
+    requestOrderPayments:
+      type: object
+      properties:
+        productID:
+          type: number
+    requestEventPayments:
+      type: object
+      properties:
+        eventID:
+          type: number
+
+    requestOrders:
+      type: object
+      properties:
+        cartID:
+          type: number
+        address:
+          type: object
+          properties:
+            receiver:
+              type: string
+            phone:
+              type: string
+            address:
+              type: string
+    # Get History Orders
+    responseGetHistoryOrders:
+      type: object
+      properties:
+        data:
+          type: object
+        code:
+          type: number
+        message:
+          type: string

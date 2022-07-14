@@ -17,10 +17,10 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            cd /home/ubuntu/eventapp/backend
+            cd /home/ubuntu/lamiapp/backend
             git pull origin main
-            sudo docker stop groupproject3
-            sudo docker rm groupproject3
-            sudo docker rmi eventapp-api:latest
+            sudo docker stop capstone
+            sudo docker rm capstone
+            sudo docker rmi lamiapp-api:latest
             sudo docker build -t eventapp-api:latest .
-            sudo docker run -d -p 80:8000 -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_PORT=${{ secrets.DB_PORT }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e SECRET_JWT=${{ secrets.SECRET_JWT }} -e S3_KEY=${{ secrets.S3_KEY }} -e S3_SECRET=${{ secrets.S3_SECRET }} -e AWS_REGION=${{ secrets.AWS_REGION }} -e AWS_BUCKET=${{ secrets.AWS_BUCKET }} --name groupproject3 eventapp-api:latest
+            sudo docker run -d -p 80:8000 -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_PORT=${{ secrets.DB_PORT }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e SECRET_JWT=${{ secrets.SECRET_JWT }} -e S3_KEY=${{ secrets.S3_KEY }} -e S3_SECRET=${{ secrets.S3_SECRET }} -e AWS_REGION=${{ secrets.AWS_REGION }} -e AWS_BUCKET=${{ secrets.AWS_BUCKET }} --name capstone lamiapp-api:latest

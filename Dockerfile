@@ -9,6 +9,6 @@ WORKDIR /app
 # copy all files to /app
 COPY ./ /app
 
-RUN go build -o eventapp-api
+RUN go build -o lamiapp-api
 
-CMD ./eventapp-api
+CMD ./lamiapp-api
