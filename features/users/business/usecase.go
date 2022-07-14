@@ -3,7 +3,7 @@ package business
 import (
 	"errors"
 	"lami/app/features/users"
-	"regexp"
+	"mime/multipart"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -28,70 +28,75 @@ func (uc *userUseCase) GetDataById(id int) (response users.Core, err error) {
 	return resp, errData
 }
 
-func (uc *userUseCase) InsertData(userRequest users.Core) (row int, err error) {
+func (uc *userUseCase) InsertData(userRequest users.Core) (err error) {
 
 	if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" {
-		return -2, errors.New("all data must be filled")
+		return errors.New("all data must be filled")
 	}
 
-	//	Check syntax email address
-	pattern := `^\w+@\w+\.\w+$`
-	matched, _ := regexp.Match(pattern, []byte(userRequest.Email))
-	if !matched {
-		return -1, errors.New("failed syntax email address")
+	errEmailFormat := emailFormatValidation(userRequest.Email)
+	if errEmailFormat != nil {
+		return errors.New(errEmailFormat.Error())
 	}
 
 	passWillBcrypt := []byte(userRequest.Password)
 	hash, err_hash := bcrypt.GenerateFromPassword(passWillBcrypt, bcrypt.DefaultCost)
 	if err_hash != nil {
-		return -1, errors.New("hashing password failed")
+		return errors.New("hashing password failed")
 	}
 	userRequest.Password = string(hash)
 
 	//default role user
 	userRequest.RoleID = 2
 	userRequest.Image = "https://lamiapp.s3.amazonaws.com/userimages/default_user.png"
-	result, err := uc.userData.InsertData(userRequest)
+	err = uc.userData.InsertData(userRequest)
 	if err != nil {
-		return 0, errors.New("failed to insert data")
+		return errors.New(err.Error())
 	}
-	return result, nil
+	return nil
 }
 
-func (uc *userUseCase) DeleteData(id int) (row int, err error) {
-	result, err := uc.userData.DeleteData(id)
+func (uc *userUseCase) DeleteData(id int) (err error) {
+	err = uc.userData.DeleteData(id)
 	if err != nil {
-		return 0, errors.New("no data user for deleted")
+		return err
 	}
-	return result, nil
+	return nil
 }
 
-func (uc *userUseCase) UpdateData(userReq users.Core, id int) (row int, err error) {
+func (uc *userUseCase) UpdateData(userReq users.Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) (err error) {
 	updateMap := make(map[string]interface{})
 
 	if userReq.Name != "" {
 		updateMap["name"] = &userReq.Name
 	}
-
 	if userReq.Email != "" {
+		errEmailFormat := emailFormatValidation(userReq.Email)
+		if errEmailFormat != nil {
+			return errors.New(errEmailFormat.Error())
+		}
 		updateMap["email"] = &userReq.Email
 	}
-
 	if userReq.Password != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
 		if err != nil {
-			return -1, errors.New("hasing password failed")
+			return errors.New("hasing password failed")
 		}
 		updateMap["password"] = &hash
 	}
 
-	if userReq.Image != "" {
-		updateMap["url"] = &userReq.Image
+	if fileInfo != nil {
+		urlImage, errFile := uploadFileValidation(userReq, id, fileInfo, fileData)
+		if err != nil {
+			return errors.New(errFile.Error())
+		}
+
+		updateMap["image"] = urlImage
 	}
 
-	result, err := uc.userData.UpdateData(updateMap, id)
+	err = uc.userData.UpdateData(updateMap, id)
 	if err != nil {
-		return 0, errors.New("no data user for updated")
+		return err
 	}
-	return result, nil
+	return nil
 }

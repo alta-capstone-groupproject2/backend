@@ -93,7 +93,7 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 	// memberikan nama file
 	fileName := strconv.Itoa(userID_token) + "_" + event.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-	url, errUploadImg := helper.UploadFileToS3(fileName, fileData)
+	url, errUploadImg := helper.UploadFileToS3("eventimages", fileName, fileData)
 
 	if errUploadImg != nil {
 		fmt.Println(errUploadImg)
@@ -170,7 +170,7 @@ func (h *EventHandler) UpdateData(c echo.Context) error {
 		// memberikan nama file
 		fileName := strconv.Itoa(userID_token) + "_" + eventReq.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-		url, errUploadImg := helper.UploadFileToS3(fileName, fileData)
+		url, errUploadImg := helper.UploadFileToS3("eventimages", fileName, fileData)
 
 		if errUploadImg != nil {
 			fmt.Println(errUploadImg)

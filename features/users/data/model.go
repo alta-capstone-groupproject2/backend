@@ -10,7 +10,7 @@ type User struct {
 	gorm.Model
 	Image       string `json:"image"`
 	Name        string `json:"name"`
-	Email       string `json:"email"`
+	Email       string `json:"email" gorm:"unique"`
 	Password    string `json:"password"`
 	RoleID      int    `json:"role_id"`
 	storeName   string `json:"store_name"`
@@ -39,6 +39,9 @@ func (data *User) toCore() users.Core {
 		Password:  data.Password,
 		CreatedAt: data.CreatedAt,
 		UpdatedAt: data.UpdatedAt,
+		Role: users.Role{
+			RoleName: data.Role.RoleName,
+		},
 	}
 
 }

@@ -6,11 +6,12 @@ import (
 )
 
 type User struct {
-	ID        int       `json:"id" form:"id"`
-	Image     string    `json:"image" form:"image"`
-	Name      string    `json:"name" form:"name"`
-	Email     string    `json:"email" form:"email"`
-	CreatedAt time.Time `json:"created_at" form:"created_at"`
+	ID        int       `json:"id"`
+	Image     string    `json:"image"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Role      string    `json:"role"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type UserStore struct {
@@ -20,6 +21,7 @@ type UserStore struct {
 	Email      string    `json:"email" form:"email"`
 	StoreName  string    `json:"store_name"`
 	Phone      string    `json:"phone"`
+	Role       string    `json:"role"`
 	StoreOwner string    `json:"store_owner"`
 	City       string    `json:"city"`
 	CreatedAt  time.Time `json:"created_at" form:"created_at"`
@@ -31,6 +33,7 @@ func FromCore(data users.Core) User {
 		Image:     data.Image,
 		Name:      data.Name,
 		Email:     data.Email,
+		Role:      data.Role.RoleName,
 		CreatedAt: data.CreatedAt,
 	}
 }
