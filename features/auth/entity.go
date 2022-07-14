@@ -6,6 +6,7 @@ import (
 
 type Core struct {
 	ID        int
+	Role      string
 	Name      string
 	Email     string
 	Password  string
@@ -14,7 +15,7 @@ type Core struct {
 }
 
 type Business interface {
-	Login(data Core) (token string, ID int, err error)
+	Login(data Core) (token string, ID int, role string, err error)
 }
 
 type Data interface {

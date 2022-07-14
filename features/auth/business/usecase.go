@@ -1,6 +1,7 @@
 package business
 
 import (
+	"errors"
 	"lami/app/features/auth"
 	"lami/app/middlewares"
 
@@ -17,16 +18,16 @@ func NewAuthBusiness(usrData auth.Data) auth.Business {
 	}
 }
 
-func (uc *authUseCase) Login(data auth.Core) (string, int, error) {
+func (uc *authUseCase) Login(data auth.Core) (string, int, string, error) {
 	response, errFind := uc.userData.FindUser(data.Email)
 	if errFind != nil {
-		return "", 0, errFind
+		return "", 0, "", errors.New("user not found")
 	}
 	errCompare := bcrypt.CompareHashAndPassword([]byte(response.Password), []byte(data.Password))
 	if errCompare != nil {
-		return "", 0, errCompare
+		return "", 0, "", errors.New("wrong password")
 	}
 	token, err := middlewares.CreateToken(int(response.ID))
 
-	return token, response.ID, err
+	return token, response.ID, response.Role, err
 }

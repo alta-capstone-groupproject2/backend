@@ -3,7 +3,6 @@ package data
 import (
 	"errors"
 	"fmt"
-	"regexp"
 
 	"lami/app/features/users"
 
@@ -41,14 +40,6 @@ func (repo *mysqlUserRepository) SelectDataById(id int) (response users.Core, er
 func (repo *mysqlUserRepository) InsertData(userData users.Core) (row int, err error) {
 	userModel := fromCore(userData)
 
-	//	Check syntax email address
-	pattern := `^\w+@\w+\.\w+$`
-	matched, _ := regexp.Match(pattern, []byte(userData.Email))
-	if !matched {
-		return -1, errors.New("failed syntax email address")
-	}
-
-	userModel.URL = "https://infinitysport.s3.amazonaws.com/default-user.png"
 	result := repo.db.Create(&userModel)
 	if result.Error != nil {
 		return -1, result.Error

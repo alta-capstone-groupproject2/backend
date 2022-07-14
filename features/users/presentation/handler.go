@@ -66,7 +66,7 @@ func (h *UserHandler) Insert(c echo.Context) error {
 	_, err := h.userBusiness.InsertData(userCore)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed("failed to insert data"))
+			helper.ResponseFailed(err.Error()))
 	}
 	return c.JSON(http.StatusOK,
 		helper.ResponseSuccessNoData("success insert data"))
@@ -120,7 +120,7 @@ func (h *UserHandler) Update(c echo.Context) error {
 	//	Memberikan nama file
 	fileName := strconv.Itoa(userID_token) + "_" + userReq.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-	url, errUploadImg := helper.UploadImageToS3(fileName, fileData)
+	url, errUploadImg := helper.UploadFileToS3(fileName, fileData)
 
 	if errUploadImg != nil {
 		fmt.Println(errUploadImg)
@@ -128,8 +128,7 @@ func (h *UserHandler) Update(c echo.Context) error {
 	}
 
 	userCore := _requestUser.ToCore(userReq)
-	userCore.URL = url
-	fmt.Println(userCore.URL)
+	userCore.Image = url
 
 	_, err := h.userBusiness.UpdateData(userCore, userID_token)
 	if err != nil {

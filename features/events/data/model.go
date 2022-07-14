@@ -84,7 +84,7 @@ func (data *Participant) toParticipantCore() events.Participant {
 	return events.Participant{
 		ID:    data.ID,
 		Name:  data.User.Name,
-		Image: data.User.URL,
+		Image: data.User.Image,
 	}
 }
 

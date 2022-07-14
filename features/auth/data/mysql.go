@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"lami/app/features/auth"
 
 	// "project3/eventapp/features/auth/data"
@@ -20,9 +21,9 @@ func NewAuthRepository(conn *gorm.DB) auth.Data {
 
 func (repo *mysqlAuthRepository) FindUser(email string) (response auth.Core, err error) {
 	dataUser := User{}
-	result := repo.db.Where("email = ?", email).Find(&dataUser)
-	if result.Error != nil {
-		return auth.Core{}, result.Error
+	result := repo.db.Preload("Role").Where("email = ?", email).Find(&dataUser)
+	if result.Error != nil || dataUser.ID == 0 {
+		return auth.Core{}, errors.New("user not found")
 	}
 
 	return dataUser.toCore(), nil

@@ -3,6 +3,7 @@ package business
 import (
 	"errors"
 	"lami/app/features/users"
+	"regexp"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -33,12 +34,23 @@ func (uc *userUseCase) InsertData(userRequest users.Core) (row int, err error) {
 		return -2, errors.New("all data must be filled")
 	}
 
+	//	Check syntax email address
+	pattern := `^\w+@\w+\.\w+$`
+	matched, _ := regexp.Match(pattern, []byte(userRequest.Email))
+	if !matched {
+		return -1, errors.New("failed syntax email address")
+	}
+
 	passWillBcrypt := []byte(userRequest.Password)
 	hash, err_hash := bcrypt.GenerateFromPassword(passWillBcrypt, bcrypt.DefaultCost)
 	if err_hash != nil {
 		return -1, errors.New("hashing password failed")
 	}
 	userRequest.Password = string(hash)
+
+	//default role user
+	userRequest.RoleID = 2
+	userRequest.Image = "https://lamiapp.s3.amazonaws.com/userimages/default_user.png"
 	result, err := uc.userData.InsertData(userRequest)
 	if err != nil {
 		return 0, errors.New("failed to insert data")
@@ -73,8 +85,8 @@ func (uc *userUseCase) UpdateData(userReq users.Core, id int) (row int, err erro
 		updateMap["password"] = &hash
 	}
 
-	if userReq.URL != "" {
-		updateMap["url"] = &userReq.URL
+	if userReq.Image != "" {
+		updateMap["url"] = &userReq.Image
 	}
 
 	result, err := uc.userData.UpdateData(updateMap, id)

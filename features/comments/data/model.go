@@ -24,7 +24,7 @@ func (data *Comment) toCore() comments.Core {
 		UserID:  data.UserID,
 		User: comments.User{
 			Name:   data.User.Name,
-			Avatar: data.User.URL,
+			Avatar: data.User.Image,
 		},
 		Comment:   data.Comment,
 		CreatedAt: data.CreatedAt,

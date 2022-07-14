@@ -8,10 +8,24 @@ import (
 
 type User struct {
 	gorm.Model
-	URL      string `json:"url" form:"url"`
-	Name     string `json:"name" form:"name"`
-	Email    string `json:"email" form:"email" gorm:"unique"`
-	Password string `json:"password" form:"password"`
+	Image       string `json:"image"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	RoleID      int    `json:"role_id"`
+	storeName   string `json:"store_name"`
+	phone       string `json:"phone"`
+	storeOwner  string `json:"store_owner"`
+	city        string `json:"city"`
+	Address     string `json:"address"`
+	Document    string `json:"document"`
+	StoreStatus string `json:"store_status"`
+	Role        Role
+}
+
+type Role struct {
+	ID       int    `json:"id"`
+	RoleName string `json:"role_name"`
 }
 
 //DTO
@@ -19,7 +33,7 @@ type User struct {
 func (data *User) toCore() users.Core {
 	return users.Core{
 		ID:        int(data.ID),
-		URL:       data.URL,
+		Image:     data.Image,
 		Name:      data.Name,
 		Email:     data.Email,
 		Password:  data.Password,
@@ -39,10 +53,11 @@ func (data *User) toCore() users.Core {
 
 func fromCore(core users.Core) User {
 	return User{
-		URL:      core.URL,
+		Image:    core.Image,
 		Name:     core.Name,
 		Email:    core.Email,
 		Password: core.Password,
+		RoleID:   core.RoleID,
 	}
 }
 

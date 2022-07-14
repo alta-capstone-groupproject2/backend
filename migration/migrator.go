@@ -11,6 +11,7 @@ import (
 
 func Migration(db *gorm.DB) {
 	db.AutoMigrate(_mUser.User{})
+	db.AutoMigrate(_mUser.Role{})
 	db.AutoMigrate(_mEvent.Event{})
 	db.AutoMigrate(_mParticipant.Participant{})
 	db.AutoMigrate(_mComment.Comment{})
