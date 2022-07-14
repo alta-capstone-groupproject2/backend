@@ -25,11 +25,11 @@ type Event struct {
 }
 
 type Participant struct {
-	ID       int    `json:"participant_id" form:"participant_id"`
-	User_ID  int    `json:"user_id" form:"user_id"`
-	Event_ID int    `json:"event_id" form:"event_id"`
-	Name     string `json:"name" form:"name"`
-	Url      string `json:"url" form:"url"`
+	ID       int
+	User_ID  int
+	Event_ID int
+	Name     string
+	Image    string
 	User     data.User
 }
 
