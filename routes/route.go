@@ -35,5 +35,22 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.GET("/events/participations", presenter.ParticipantPresenter.GetAllEventParticipant, middlewares.JWTMiddleware())
 	e.DELETE("/events/participations/:id", presenter.ParticipantPresenter.DeleteEventbyParticipant, middlewares.JWTMiddleware())
 
+	// Product
+	e.POST("/products", presenter.ProductPresenter.PostProduct, middlewares.JWTMiddleware())
+	e.PUT("/products/:productID", presenter.ProductPresenter.PutProduct, middlewares.JWTMiddleware())
+	e.DELETE("/products/:productID", presenter.ProductPresenter.DeleteProduct, middlewares.JWTMiddleware())
+	e.GET("/products/:productID", presenter.ProductPresenter.GetProductbyIDProduct)
+	e.GET("/users/products", presenter.ProductPresenter.GetMyProduct, middlewares.JWTMiddleware())
+
+	// Rating
+	e.POST("/products/ratings/:productID", presenter.ProductPresenter.PostProductRating, middlewares.JWTMiddleware())
+	e.GET("/products/ratings/:productID", presenter.ProductPresenter.GetProductRating)
+
+	// Cart
+	e.POST("/carts", presenter.CartPresenter.PostCart, middlewares.JWTMiddleware())
+	e.GET("/carts", presenter.CartPresenter.GetCart, middlewares.JWTMiddleware())
+	e.PUT("/carts/:cartID", presenter.CartPresenter.PutCart, middlewares.JWTMiddleware())
+	e.DELETE("carts/:cartID", presenter.CartPresenter.DeletedCart, middlewares.JWTMiddleware())
+
 	return e
 }

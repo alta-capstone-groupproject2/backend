@@ -13,10 +13,10 @@ type User struct {
 	Email       string `json:"email"`
 	Password    string `json:"password"`
 	RoleID      int    `json:"role_id"`
-	storeName   string `json:"store_name"`
+	StoreName   string `json:"store_name"`
 	phone       string `json:"phone"`
 	storeOwner  string `json:"store_owner"`
-	city        string `json:"city"`
+	City        string `json:"city"`
 	Address     string `json:"address"`
 	Document    string `json:"document"`
 	StoreStatus string `json:"store_status"`
