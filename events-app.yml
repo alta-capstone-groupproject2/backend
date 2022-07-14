@@ -1,0 +1,946 @@
+openapi: "3.0.1"
+info: # Belum ditentukan data info dan servers
+  title: Events App
+  version: 1.0.0
+  description: "API Documentation for Soundfest"
+  contact:
+    name: Soundfest Official
+    url: https://soundfest.site
+    email: alfin.7007@gmail.com
+externalDocs:
+  description: "GitHub Repository of Group Project 3 : soundfest"
+  url: https://github.com/project-online-shop/backend/
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Alfin7007/soundfest/1.0.0
+  - description: base url api
+    url: 44.208.20.97:80
+tags:
+  - name: Login
+    description: User Authentication
+  - name: Register
+    description: Register User
+  - name: User
+    description: User data management
+  - name: Event
+    description: Event data management
+  - name: Participation
+    description: Participation data management
+paths:
+  /login:
+    post:
+      tags:
+        - Login
+      summary: login user
+      description: Login user description
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestLogin"
+            examples:
+              userData:
+                description: Data user
+                value:
+                  email: alta@alterra.id
+                  password: inipassword
+      responses:
+        "200":
+          description: Login Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseLoginSuccess"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Login Success
+                    data:
+                      id: 1
+                      token: >-
+                        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MzgzMjYxODAsInVzZXJJZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.AebFR-oQjUSOMez2ucDWkiMrS2eQIPmcYm5c71qZ_co
+        "400":
+          description: Login Failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponseLogin"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Login Failed
+  /register:
+    post:
+      tags:
+        - Register
+      summary: Register user
+      description: Register user description
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestRegister"
+            examples:
+              userData:
+                description: Data user
+                value:
+                  name: Budi Setiawan
+                  email: budi@gmail.com
+                  password: inibudi
+      responses:
+        "200":
+          description: Register Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseRegisterSuccess"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Register Success
+        "400":
+          description: Register Failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponseRegister"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: All input data must be filled
+  /users:
+    get:
+      tags:
+        - User
+      summary: profile user
+      description: Profile user description
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: Get Profile Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success get your data
+                    data:
+                      ID: 1
+                      avatar: URL File
+                      name: budi
+                      email: budi@gmail.com
+        "400":
+          description: Failed Get Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed to get your data
+    put:
+      tags:
+        - User
+      summary: update user
+      description: Updated user description
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestUpdateUser"
+            example:            
+              description: Data user
+              value:
+                name: Angga pramaja
+                email: angga@gmail.com
+                password: ituangga
+      responses:
+        "200":
+          description: Update Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Updated Success
+        "400":
+          description: Failed Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed Updated
+    delete:
+      tags:
+        - User
+      summary: delete user
+      description: Delete user description
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: Delete Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Delete Success
+        "400":
+          description: Failed Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed deleted
+  /myevents:
+    get:
+      tags:
+        - Event
+      summary: get all myevents
+      description: My Event description
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: Get all myevents success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseEvent"
+              examples:
+                responseHome:
+                  description: response myevents success
+                  value:
+                    code: 200
+                    message: Success get all myevents
+                    currenttime: "2009-11-10T23:00:00.000Z"
+                    totalpage: 1 
+                    data:
+                      - id_event: 23
+                        image_url: URL
+                        name: Webinar Pendidikan
+                        hostedby: Company Surya Kencana
+                        performers: kotak
+                        date: 2022-07-05T09:04:43.527Z
+                        city: Jakarta
+                        location: (longitude and latitude)
+                        details: Ini adalah description webinar bertema pendidikan
+        "400":
+          description: Failed to get all myevents
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response home failed
+                  value:
+                    code: 400
+                    message: Failed get all myevents
+  /events:
+    post:
+      tags:
+        - Event
+      summary: create events
+      description: Create events description
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestEvent"
+            example:
+              eventData:
+                description: Create event description by user
+                value:
+                  name: Webinar Pendidikan
+                  hostedby: Company Surya Kencana
+                  performers: kotak
+                  date: 2022-07-05T09:04:43.527Z
+                  city: Jakarta
+                  location: 1.2,1.5
+                  details: Ini adalah description webinar bertema pendidikan
+      responses:
+        "200":
+          description: Success to create event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success insert event
+        "400":
+          description: Failed to create event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed insert event
+    get:
+      tags:
+        - Event
+      summary: get all events
+      description: Home description
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: number
+            example: 1
+        - in: query
+          name: city
+          schema:
+            type: string
+            example: malang
+        - in: query
+          name: name
+          schema:
+            type: string
+            example: festival A
+      responses:
+        "200":
+          description: Get all events success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseEvent"
+              examples:
+                responseHome:
+                  description: response home success
+                  value:
+                    code: 200
+                    message: Success get all events
+                    currenttime: "2009-11-10T23:00:00.000Z"
+                    totalpage: 2
+                    data:
+                      - id_event: 12
+                        image_url: URL
+                        name: Webinar Pendidikan
+                        hostedby: Company Surya Kencana
+                        performers: kotak
+                        date: 2022-07-05T09:04:43.527Z
+                        city: Jakarta
+                        location: (longitude and latitude)
+                        details: Ini adalah description webinar bertema pendidikan
+        "400":
+          description: Failed to get all events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response home failed
+                  value:
+                    code: 400
+                    message: Failed get all events
+  /events/{id_event}:
+    get:
+      tags:
+        - Event
+      summary: get event
+      description: Show one event
+      parameters:
+        - in: path
+          name: id_event
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: Get events success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseEvent"
+              examples:
+                responseData:
+                  description: response event success
+                  value:
+                    code: 200
+                    message: Success get event
+                    currenttime: "2009-11-10T23:00:00.000Z"
+                    data:
+                      id_event: 10
+                      image_url: URL
+                      name: Webinar Pendidikan
+                      hostedby: Company Surya Kencana
+                      performer: kotak
+                      date: 2022-07-05T09:04:43.527Z
+                      city: Jakarta
+                      location: (longitude and latitude)
+                      details: Ini adalah description webinar bertema pendidikan
+                      participant:
+                        - id: 1
+                          name: Budi
+                          avatar: image.example.com
+                        - id: 2
+                          name: Bidu
+                          avatar: image.example.com
+        "400":
+          description: Failed to get events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response event failed
+                  value:
+                    code: 400
+                    message: Failed to get event
+    put:
+      tags:
+        - Event
+      summary: update event
+      description: Updated event description
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: id_event
+          required: true
+          schema:
+            type: number
+            example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/requestEvent"
+            examples:
+              eventData:
+                description: Update event Description by user
+                value:
+                  image_url: URL
+                  name: Webinar Pendidikan
+                  hostedby: Company Surya Kencana
+                  performers: kotak
+                  date: 2022-07-05T09:04:43.527Z
+                  city: Jakarta
+                  location: (longitude and latitude)
+                  details: Ini adalah description webinar bertema pendidikan
+      responses:
+        "200":
+          description: Update Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success update event
+        "400":
+          description: Failed Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed update event
+    delete:
+      tags:
+        - Event
+      summary: delete event
+      description: Delete event description
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: id_event
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: Delete Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Delete event success
+        "400":
+          description: Failed Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed event deleted
+  /events/participations:
+    post:
+      tags:
+        - Participation
+      summary: join event
+      description: Join event description
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestJoin"
+            examples:
+              joinData:
+                description: Data join
+                value:
+                  id_event: 2
+      responses:
+        "200":
+          description: Join Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Success insert event participation
+        "400":
+          description: Failed Join
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed insert event participation
+    get:
+      tags:
+        - Participation
+      summary: get all event by participation
+      description: Participation Event description
+      security:
+        - JWTAuth: []
+      responses:
+        "200":
+          description: Get all events participation success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseEvent"
+              examples:
+                responseJoin:
+                  description: response event participation success
+                  value:
+                    code: 200
+                    message: Success get all your events
+                    currenttime: "2009-11-10T23:00:00.000Z"
+                    data:
+                      - id_participant: 23
+                        image_url: URL
+                        name: Webinar Pendidikan
+                        hostedby: Company Surya Kencana
+                        performers: kotak
+                        date: 2022-07-05T09:04:43.527Z
+                        city: Jakarta
+                        location: (longitude and latitude)
+                        details: Ini adalah description webinar bertema pendidikan
+        "400":
+          description: Failed to get all events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseJoin:
+                  description: failed response event participation success
+                  value:
+                    code: 400
+                    message: Failed get all your events
+  /events/participations/{id_participant}:
+    delete:
+      tags:
+        - Participation
+      summary: cancel participation
+      description: Delete participation description
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: id_participant
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: Delete Participation Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response success
+                  value:
+                    code: 200
+                    message: Delete Success
+        "400":
+          description: Failed Deleted Participation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: response failed
+                  value:
+                    code: 400
+                    message: Failed deleted
+  /events/comments:
+    post:
+      tags:
+        - Participation
+      summary: comment event
+      description: Create comment event description
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requesCreateComment"
+            examples:
+              commentData:
+                description: Data comment
+                value:
+                  id_event: 2
+                  comment: Ini spesifik alamat eventnya dimana gimana ya kak?
+      responses:
+        "200":
+          description: Comment Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseWithNoData"
+              examples:
+                responseData:
+                  description: response comment success
+                  value:
+                    code: 200
+                    message: Success insert your comment
+        "400":
+          description: Failed Comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseData:
+                  description: failed response comment
+                  value:
+                    code: 400
+                    message: Failed insert your comment
+  /events/comments/{id_event}:
+    get:
+      tags:
+        - Participation
+      summary: get all comment event
+      description: Comment event description
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: id_event
+          required: true
+          schema:
+            type: number
+            example: 1
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: Get all comment events success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseComment"
+              examples:
+                responseComment:
+                  description: response comment event success
+                  value:
+                    code: 200
+                    message: Success get all comment events
+                    data:
+                      - id: 12
+                        name: Angga
+                        avatar: https://soundfest.site/image/user.jpg
+                        comment: Ini spesifik alamat eventnya dimana gimana ya kak?
+                        updated_at: 2022-07-05T17:43:30.097Z
+                    totalpage: 1
+        "400":
+          description: Failed to get all comment events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failedResponse"
+              examples:
+                responseComment:
+                  description: failed response comment event success
+                  value:
+                    code: 400
+                    message: Failed get all comment events
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "use Token"
+  schemas:
+    requestLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    responseLoginSuccess:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+        data:
+          type: object
+    failedResponseLogin:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+    requestRegister:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    responseRegisterSuccess:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+    failedResponseRegister:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+    responseWithData:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        data:
+          type: object
+    requestUpdateUser:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: "allowed file extension: jpg, png, jpeg && size <= 1050000 byte"
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+    requestEvent:
+      type: object
+      required:
+        - file
+        - name
+        - performers
+        - hostedby
+        - date
+        - city
+        - location
+        - details
+      properties:
+        file:
+          type: string
+          format: binary
+          description: "allowed file extension: jpg, png, jpeg && size <= 1050000 byte"
+        name:
+          type: string
+          minLength: 1
+        performers:
+          type: string
+          minLength: 1
+        hostedby:
+          type: string
+          minLength: 1
+        date:
+          type: string
+        city:
+          type: string
+          minLength: 1
+        location:
+          type: string
+          minLength: 1
+        details:
+          type: string
+          minLength: 1
+    responseEvent:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+        currenttime:
+          type: string
+        totalpage:
+          type: number
+        data:
+          type: array
+          items:
+            type: object
+    requestJoin:
+      type: object
+      properties:
+        id:
+          type: number
+    responseWithNoData:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+    failedResponse:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+    requesCreateComment:
+      type: object
+      properties:
+        id_event:
+          type: number
+          minLength: 1
+        comment:
+          type: string
+    responseComment:
+      type: object
+      properties:
+        name:
+          type: string
+        comment:
+          type: string

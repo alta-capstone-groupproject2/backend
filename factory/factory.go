@@ -1,0 +1,64 @@
+package factory
+
+import (
+	_userBusiness "lami/app/features/users/business"
+	_userData "lami/app/features/users/data"
+	_userPresentation "lami/app/features/users/presentation"
+
+	_authBusiness "lami/app/features/auth/business"
+	_authData "lami/app/features/auth/data"
+	_authPresentation "lami/app/features/auth/presentation"
+
+	_eventBusiness "lami/app/features/events/bussiness"
+	_eventData "lami/app/features/events/data"
+	_eventPresentation "lami/app/features/events/presentation"
+
+	_commentBusiness "lami/app/features/comments/business"
+	_commentData "lami/app/features/comments/data"
+	_commentPresentation "lami/app/features/comments/presentation"
+
+	_participantBusiness "lami/app/features/participants/business"
+	_participantData "lami/app/features/participants/data"
+	_participantPresentation "lami/app/features/participants/presentation"
+
+	"gorm.io/gorm"
+)
+
+type Presenter struct {
+	UserPresenter        *_userPresentation.UserHandler
+	AuthPresenter        *_authPresentation.AuthHandler
+	EventPresenter       *_eventPresentation.EventHandler
+	ParticipantPresenter *_participantPresentation.ParticipantHandler
+	CommentPresenter     *_commentPresentation.CommentHandler
+}
+
+func InitFactory(dbConn *gorm.DB) Presenter {
+
+	userData := _userData.NewUserRepository(dbConn)
+	userBusiness := _userBusiness.NewUserBusiness(userData)
+	userPresentation := _userPresentation.NewUserHandler(userBusiness)
+
+	authData := _authData.NewAuthRepository(dbConn)
+	authBusiness := _authBusiness.NewAuthBusiness(authData)
+	authPresentation := _authPresentation.NewAuthHandler(authBusiness)
+
+	eventData := _eventData.NewEventRepository(dbConn)
+	eventBusiness := _eventBusiness.NewEventBusiness(eventData)
+	eventPresentation := _eventPresentation.NewEventHandler(eventBusiness)
+
+	commentData := _commentData.NewCommentRepository(dbConn)
+	commentBusiness := _commentBusiness.NewCommentBusiness(commentData)
+	commentPresentation := _commentPresentation.NewCommentHandler(commentBusiness)
+
+	participantData := _participantData.NewParticipantRepository(dbConn)
+	participantBusiness := _participantBusiness.NewParticipantBusiness(participantData)
+	participantPresentation := _participantPresentation.NewParticipantHandler(participantBusiness)
+
+	return Presenter{
+		UserPresenter:        userPresentation,
+		AuthPresenter:        authPresentation,
+		EventPresenter:       eventPresentation,
+		ParticipantPresenter: participantPresentation,
+		CommentPresenter:     commentPresentation,
+	}
+}
