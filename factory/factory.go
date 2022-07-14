@@ -21,6 +21,14 @@ import (
 	_participantData "lami/app/features/participants/data"
 	_participantPresentation "lami/app/features/participants/presentation"
 
+	_productBusiness "lami/app/features/products/business"
+	_productData "lami/app/features/products/data"
+	_productPresentation "lami/app/features/products/presentation"
+
+	_cartBusiness "lami/app/features/carts/business"
+	_cartData "lami/app/features/carts/data"
+	_cartPresentation "lami/app/features/carts/presentation"
+
 	"gorm.io/gorm"
 )
 
@@ -30,6 +38,8 @@ type Presenter struct {
 	EventPresenter       *_eventPresentation.EventHandler
 	ParticipantPresenter *_participantPresentation.ParticipantHandler
 	CommentPresenter     *_commentPresentation.CommentHandler
+	ProductPresenter     *_productPresentation.ProductHandler
+	CartPresenter        *_cartPresentation.CartHandler
 }
 
 func InitFactory(dbConn *gorm.DB) Presenter {
@@ -54,11 +64,21 @@ func InitFactory(dbConn *gorm.DB) Presenter {
 	participantBusiness := _participantBusiness.NewParticipantBusiness(participantData)
 	participantPresentation := _participantPresentation.NewParticipantHandler(participantBusiness)
 
+	productData := _productData.NewProductRepository(dbConn)
+	productBusiness := _productBusiness.NewProductBusiness(productData)
+	productPresentation := _productPresentation.NewProductHandler(productBusiness)
+
+	cartData := _cartData.NewCartRepository(dbConn)
+	cartBusiness := _cartBusiness.NewCartBusiness(cartData)
+	cartPresentation := _cartPresentation.NewCartHandler(cartBusiness)
+
 	return Presenter{
 		UserPresenter:        userPresentation,
 		AuthPresenter:        authPresentation,
 		EventPresenter:       eventPresentation,
 		ParticipantPresenter: participantPresentation,
 		CommentPresenter:     commentPresentation,
+		ProductPresenter:     productPresentation,
+		CartPresenter:        cartPresentation,
 	}
 }
