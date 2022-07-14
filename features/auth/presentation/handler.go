@@ -24,19 +24,15 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	reqBody := request.User{}
 	errBind := c.Bind(&reqBody)
 	if errBind != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "failed to get bind data",
-		})
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed bind data"))
 	}
 
 	authCore := request.ToCore(reqBody)
-	token, id, err := h.userBusiness.Login(authCore)
+	token, id, role, err := h.userBusiness.Login(authCore)
 
-	result := response.ToResponse(id, token)
+	result := response.ToResponse(id, role, token)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "failed to get token data" + err.Error(),
-		})
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(err.Error()))
 	}
 	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("login success", result))
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-func UploadImageToS3(fileName string, fileData multipart.File) (string, error) {
+func UploadFileToS3(fileName string, fileData multipart.File) (string, error) {
 	// The session the S3 Uploader will use
 	sess := _config.GetSession()
 

@@ -133,7 +133,7 @@ func TestUpdateData(t *testing.T) {
 		id := 1
 		data := users.Core{
 			Name:     "Zaki",
-			URL:      "https://image.site",
+			Image:    "https://image.site",
 			Email:    "mail@mail.id",
 			Password: "Mail@",
 		}
@@ -146,7 +146,7 @@ func TestUpdateData(t *testing.T) {
 		id := 3
 		data := users.Core{
 			Name:     "Zaki",
-			URL:      "https://image.site",
+			Image:    "https://image.site",
 			Email:    "mail@mail.id",
 			Password: "Mail@",
 		}

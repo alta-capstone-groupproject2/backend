@@ -1,13 +1,15 @@
 package response
 
 type user struct {
-	ID    int    `json:"id" form:"id"`
-	Token string `json:"token" form:"token"`
+	ID    int    `json:"id"`
+	Role  string `json:"role"`
+	Token string `json:"token"`
 }
 
-func ToResponse(id int, token string) user {
+func ToResponse(id int, role string, token string) user {
 	return user{
 		ID:    id,
+		Role:  role,
 		Token: token,
 	}
 }
