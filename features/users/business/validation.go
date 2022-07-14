@@ -2,6 +2,7 @@ package business
 
 import (
 	"errors"
+	"lami/app/config"
 	"lami/app/features/users"
 	"lami/app/helper"
 	"mime/multipart"
@@ -37,7 +38,7 @@ func uploadFileValidation(userReq users.Core, id int, fileInfo *multipart.FileHe
 	fileName := strconv.Itoa(id) + "_" + userReq.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
 	// Upload file
-	urlImage, errUploadImg := helper.UploadFileToS3("userimages", fileName, fileData)
+	urlImage, errUploadImg := helper.UploadFileToS3(config.UserImages, fileName, fileData)
 
 	if errUploadImg != nil {
 		return "", errors.New("failed to upload file")
