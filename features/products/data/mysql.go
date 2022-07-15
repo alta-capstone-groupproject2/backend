@@ -13,13 +13,13 @@ type mysqlProductRepository struct {
 }
 
 // SelectDataRating implements product.Data
-func (repo *mysqlProductRepository) SelectDataRating(idProduct int) (product.CoreRating, error) {
-	dataRating := Rating{}
+func (repo *mysqlProductRepository) SelectDataRating(idProduct int) ([]product.CoreRating, error) {
+	dataRating := []Rating{}
 
 	res := repo.db.Preload("Product").Where("product_id = ?", idProduct).Find(&dataRating)
 	fmt.Println("res rating from mysql.go:", res)
 	if res.Error != nil {
-		return product.CoreRating{}, res.Error
+		return []product.CoreRating{}, res.Error
 	}
 
 	return ToCoreRating(dataRating), nil
@@ -42,13 +42,7 @@ func (repo *mysqlProductRepository) SelectDataMyProduct(idUser int) ([]product.C
 func (repo *mysqlProductRepository) SelectDataProductbyIDProduct(idProduct int) (product.Core, error) {
 	dataProduct := Product{}
 
-	// var idUser int
-	// idUserJoin := repo.db.Raw("SELECT user_id FROM products WHERE id = ?", idProduct).Scan(&idUser)
-	// fmt.Println(idUserJoin)
-	// fmt.Println("idUser:", idUser)
-
 	res := repo.db.Preload("User").Where("id = ?", idProduct).Find(&dataProduct)
-	// res := repo.db.Find(&dataProduct)
 	fmt.Println("res from mysql.go:", res)
 	if res.Error != nil {
 		return product.Core{}, res.Error

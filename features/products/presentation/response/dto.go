@@ -52,6 +52,14 @@ func FromCoreRating(core product.CoreRating) ProductRating {
 	}
 }
 
+func FromCoreListRating(data []product.CoreRating) []ProductRating {
+	res := []ProductRating{}
+	for key := range data {
+		res = append(res, FromCoreRating(data[key]))
+	}
+	return res
+}
+
 // Get MyProduct
 func FromCoreMyProduct(core product.Core) MyProduct {
 	// city := product.User{
