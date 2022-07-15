@@ -147,8 +147,7 @@ func (h *UserHandler) UpdateStatusAccount(c echo.Context) error {
 
 	err := h.userBusiness.UpdateStatusUser(dataReq.StoreStatus, userId)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed(err.Error()))
+		return c.JSON(helper.ResponseInternalServerError(err.Error()))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success update data"))
 }
@@ -170,7 +169,7 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 
 	result, err := h.userBusiness.GetAllData(5, offsetint)
 	if err != nil {
-		return c.JSON(helper.ResponseFailedServer("failed to get all data"))
+		return c.JSON(helper.ResponseInternalServerError("failed to get all data"))
 	}
 
 	return c.JSON(helper.ResponseStatusOkWithData("success", _responseUser.FromCoreList(result)))

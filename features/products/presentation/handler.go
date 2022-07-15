@@ -179,16 +179,6 @@ func (h *ProductHandler) PostProductRating(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to bind data rating"))
 	}
 
-<<<<<<< HEAD
-	layout_time := "2006-01-02T15:04"
-	DateTime, errDate := time.Parse(layout_time, rating.Date)
-	if errDate != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to format date"))
-	}
-	rating.DateTime = DateTime
-
-=======
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	ratingCore := request.ToCoreRating(rating)
 	ratingCore.UserID = userID_token
 	ratingCore.ProductID = idProduct

@@ -23,16 +23,18 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.POST("/users/stores", presenter.UserPresenter.AccountUpgrade, middlewares.JWTMiddleware())
 	e.GET("/users/stores", presenter.UserPresenter.GetStoreSubmission, middlewares.JWTMiddleware())
 	e.PUT("/users/stores/:id", presenter.UserPresenter.UpdateStatusAccount, middlewares.JWTMiddleware())
+	//submission
+
+	e.PUT("/events/submission/:id", presenter.EventPresenter.UpdateData, middlewares.JWTMiddleware())
+	//event data
+	e.POST("/events", presenter.EventPresenter.InsertData, middlewares.JWTMiddleware())
+	e.GET("/events", presenter.EventPresenter.GetAll)
+	e.GET("/events/:id", presenter.EventPresenter.GetDataById)
+	e.DELETE("/events/:id", presenter.EventPresenter.DeleteData, middlewares.JWTMiddleware())
+	e.GET("/users/events", presenter.EventPresenter.GetEventByUser, middlewares.JWTMiddleware())
 
 	e.POST("/events/comments", presenter.CommentPresenter.Add, middlewares.JWTMiddleware())
 	e.GET("/events/comments/:id", presenter.CommentPresenter.Get, middlewares.JWTMiddleware())
-
-	e.GET("/events", presenter.EventPresenter.GetAll)
-	e.GET("/events/:id", presenter.EventPresenter.GetDataById)
-	e.POST("/events", presenter.EventPresenter.InsertData, middlewares.JWTMiddleware())
-	e.PUT("/events/:id", presenter.EventPresenter.UpdateData, middlewares.JWTMiddleware())
-	e.DELETE("/events/:id", presenter.EventPresenter.DeleteData, middlewares.JWTMiddleware())
-	e.GET("/myevents", presenter.EventPresenter.GetEventByUser, middlewares.JWTMiddleware())
 
 	e.POST("/events/participations", presenter.ParticipantPresenter.Joined, middlewares.JWTMiddleware())
 	e.GET("/events/participations", presenter.ParticipantPresenter.GetAllEventParticipant, middlewares.JWTMiddleware())

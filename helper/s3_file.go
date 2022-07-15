@@ -13,7 +13,7 @@ import (
 )
 
 func UploadFileToS3(directory string, fileName string, contentType string, fileData multipart.File) (string, error) {
-    
+
 	// The session the S3 Uploader will use
 	sess := _config.GetSession()
 
@@ -53,36 +53,6 @@ func CheckFileExtension(filename string, contentType string) (string, error) {
 	return extension, nil
 }
 
-<<<<<<< HEAD
-func CheckFileExtension(filename string) (string, error) {
-	extension := strings.ToLower(filename[strings.LastIndex(filename, ".")+1:])
-
-	if extension != "pdf" {
-		return "", fmt.Errorf("forbidden file type")
-	}
-	return extension, nil
-}
-
-func CheckFileSize(size int64) error {
-	if size == 0 {
-		return fmt.Errorf("illegal file size")
-	}
-
-	if size > 10485760 {
-		return fmt.Errorf("file size too big")
-	}
-
-	return nil
-}
-
-func CheckImageSize(size int64) error {
-	if size == 0 {
-		return fmt.Errorf("illegal file size")
-	}
-
-	if size > 1097152 {
-		return fmt.Errorf("file size too big")
-=======
 func CheckFileSize(size int64, contentType string) error {
 	if size == 0 {
 		return fmt.Errorf("illegal file size")
@@ -91,7 +61,6 @@ func CheckFileSize(size int64, contentType string) error {
 		if size > 1097152 {
 			return fmt.Errorf("file size too big")
 		}
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	}
 
 	if contentType == _config.ContentDocuments {

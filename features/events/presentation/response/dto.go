@@ -69,7 +69,6 @@ func FromCoreByID(data events.Core) EventByID {
 	return EventByID{
 		ID:          data.ID,
 		Image:       data.Image,
-		Document:    data.Document,
 		Name:        data.Name,
 		Detail:      data.Detail,
 		HostedBy:    data.HostedBy,
@@ -77,7 +76,6 @@ func FromCoreByID(data events.Core) EventByID {
 		City:        data.City,
 		Location:    data.Location,
 		Price:       data.Price,
-		Status:      data.Status,
 		Participant: FromParticipantCoreList(data.Participant),
 	}
 }
