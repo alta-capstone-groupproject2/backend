@@ -32,16 +32,22 @@ type Role struct {
 
 func (data *User) toCore() users.Core {
 	return users.Core{
-		ID:        int(data.ID),
-		Image:     data.Image,
-		Name:      data.Name,
-		Email:     data.Email,
-		Password:  data.Password,
-		CreatedAt: data.CreatedAt,
-		UpdatedAt: data.UpdatedAt,
-		Role: users.Role{
-			RoleName: data.Role.RoleName,
-		},
+		ID:          int(data.ID),
+		Name:        data.Name,
+		Email:       data.Email,
+		Password:    data.Password,
+		Image:       data.Image,
+		StoreName:   data.StoreName,
+		Phone:       data.Phone,
+		Owner:       data.StoreOwner,
+		City:        data.City,
+		Address:     data.Address,
+		Document:    data.Document,
+		RoleID:      data.RoleID,
+		StoreStatus: data.StoreStatus,
+		CreatedAt:   data.CreatedAt,
+		UpdatedAt:   data.UpdatedAt,
+		Role:        users.Role{RoleName: data.Role.RoleName},
 	}
 
 }
@@ -60,48 +66,14 @@ func StiretoCore(data User) users.Core {
 	return data.toCore()
 }
 
-func (data *User) StoretoCore() users.Core {
-	return users.Core{
-		ID:          int(data.ID),
-		Name:        data.Name,
-		Email:       data.Email,
-		Password:    data.Password,
-		Image:       data.Image,
-		StoreName:   data.StoreName,
-		Phone:       data.Phone,
-		Owner:       data.StoreOwner,
-		City:        data.City,
-		Address:     data.Address,
-		Document:    data.Document,
-		RoleID:      data.RoleID,
-		StoreStatus: data.StoreStatus,
-		CreatedAt:   data.CreatedAt,
-		UpdatedAt:   data.UpdatedAt,
-		Role:        users.Role{RoleName: data.Role.RoleName},
-	}
-}
-
-func StorefromCore(core users.Core) User {
-	return User{
-		StoreName:   core.StoreName,
-		Phone:       core.Phone,
-		StoreOwner:  core.Owner,
-		City:        core.City,
-		Address:     core.Address,
-		Document:    core.Document,
-		StoreStatus: core.StoreStatus,
-		Role:        Role{},
-	}
-}
-
 func toCore(data User) users.Core {
 	return data.toCore()
 }
 
-func storeToCoreList(data []User) []users.Core {
+func ToCoreList(data []User) []users.Core {
 	result := []users.Core{}
 	for key := range data {
-		result = append(result, data[key].StoretoCore())
+		result = append(result, data[key].toCore())
 	}
 	return result
 }

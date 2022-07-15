@@ -35,7 +35,12 @@ func (h *UserHandler) GetDataById(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError,
 			helper.ResponseFailed(err.Error()))
 	}
-	return c.JSON(helper.ResponseStatusOkWithData("success", _responseUser.FromCore(result)))
+	if result.Role.RoleName == config.User {
+		return c.JSON(helper.ResponseStatusOkWithData("success", _responseUser.FromCore(result)))
+	} else {
+		return c.JSON(helper.ResponseStatusOkWithData("success", _responseUser.UserStoreFromCore(result)))
+	}
+
 }
 
 func (h *UserHandler) Insert(c echo.Context) error {
@@ -98,9 +103,13 @@ func (h *UserHandler) Update(c echo.Context) error {
 }
 
 func (h *UserHandler) AccountUpgrade(c echo.Context) error {
-	userIDToken, _, errToken := middlewares.ExtractToken(c)
+	userIDToken, userRole, errToken := middlewares.ExtractToken(c)
 	if userIDToken == 0 || errToken != nil {
 		return c.JSON(helper.ResponseBadRequest("failed to get user id"))
+	}
+
+	if userRole == config.UMKM {
+		return c.JSON(helper.ResponseBadRequest("your account already upgraded"))
 	}
 
 	userReq := _requestUser.Store{}
@@ -155,10 +164,14 @@ func (h *UserHandler) UpdateStatusAccount(c echo.Context) error {
 
 func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 
-	// limit := c.QueryParam("limit")
-	offset := c.QueryParam("offset")
-	// limitint, _ := strconv.Atoi(limit)
-	offsetint, _ := strconv.Atoi(offset)
+	limit := c.QueryParam("limit")
+	page := c.QueryParam("page")
+	limitint, errLimit := strconv.Atoi(limit)
+	pageint, errPage := strconv.Atoi(page)
+
+	if errLimit != nil || errPage != nil || limitint == 0 || pageint == 0 {
+		return c.JSON(helper.ResponseBadRequest("wrong query param"))
+	}
 
 	userIDToken, userRole, errToken := middlewares.ExtractToken(c)
 	if userIDToken == 0 || errToken != nil {
@@ -168,11 +181,11 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 		return c.JSON(helper.ResponseForbidden("access denied"))
 	}
 
-	result, err := h.userBusiness.GetAllData(5, offsetint)
+	result, totalPage, err := h.userBusiness.GetAllData(limitint, pageint)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError,
 			helper.ResponseFailed("failed to get all data"))
 	}
 
-	return c.JSON(helper.ResponseStatusOkWithData("success", _responseUser.FromCoreList(result)))
+	return c.JSON(helper.ResponseStatusOkWithDataPage("success", totalPage, _responseUser.UserStoreFromCoreList(result)))
 }
