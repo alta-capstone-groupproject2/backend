@@ -2,6 +2,7 @@ package presentation
 
 import (
 	"fmt"
+	"lami/app/config"
 	"lami/app/features/products"
 	"lami/app/features/products/presentation/request"
 	"lami/app/features/products/presentation/response"
@@ -64,7 +65,7 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 	// memberikan nama file
 	fileName := strconv.Itoa(userID_token) + "_" + product.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-	url, errUploadImg := helper.UploadFileToS3(fileName, fileData)
+	url, errUploadImg := helper.UploadFileToS3(config.ProductImages, fileName, fileData)
 
 	if errUploadImg != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to upload file"))
@@ -127,7 +128,7 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 		// memberikan nama file
 		fileName := strconv.Itoa(userID_token) + "_" + product.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-		url, errUploadImg := helper.UploadFileToS3(fileName, fileData)
+		url, errUploadImg := helper.UploadFileToS3(config.ProductImages, fileName, fileData)
 
 		if errUploadImg != nil {
 			fmt.Println(errUploadImg)
@@ -237,7 +238,7 @@ func (h *ProductHandler) GetProductRating(c echo.Context) error {
 	res, err := h.productBusiness.SelectRating(idProduct)
 	fmt.Println("res rating from handler.go:", res)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed get product rating"))		
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed get product rating"))
 	}
 
 	response := response.FromCoreRating(res)
