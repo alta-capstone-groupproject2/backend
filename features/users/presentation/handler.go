@@ -27,11 +27,7 @@ func NewUserHandler(business users.Business) *UserHandler {
 func (h *UserHandler) GetDataById(c echo.Context) error {
 	userIDToken, _, errToken := middlewares.ExtractToken(c)
 	if userIDToken == 0 || errToken != nil {
-<<<<<<< HEAD
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get user id"))
-=======
 		return c.JSON(helper.ResponseBadRequest("failed to get user id"))
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	}
 
 	result, err := h.userBusiness.GetDataById(userIDToken)
@@ -46,12 +42,7 @@ func (h *UserHandler) Insert(c echo.Context) error {
 	user := _requestUser.User{}
 	err_bind := c.Bind(&user)
 	if err_bind != nil {
-<<<<<<< HEAD
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailedServer("failed to bind insert data"))
-=======
 		return c.JSON(helper.ResponseBadRequest("error bind data"))
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	}
 
 	userCore := _requestUser.ToCore(user)
@@ -66,11 +57,7 @@ func (h *UserHandler) Insert(c echo.Context) error {
 func (h *UserHandler) Delete(c echo.Context) error {
 	userIDToken, _, errToken := middlewares.ExtractToken(c)
 	if userIDToken == 0 || errToken != nil {
-<<<<<<< HEAD
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get user id"))
-=======
 		return c.JSON(helper.ResponseBadRequest("failed to get user id"))
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	}
 	err := h.userBusiness.DeleteData(userIDToken)
 	if err != nil {
@@ -83,33 +70,20 @@ func (h *UserHandler) Delete(c echo.Context) error {
 func (h *UserHandler) Update(c echo.Context) error {
 	userIDToken, _, errToken := middlewares.ExtractToken(c)
 	if userIDToken == 0 || errToken != nil {
-<<<<<<< HEAD
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get user id"))
-=======
 		return c.JSON(helper.ResponseBadRequest("failed to get user id"))
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	}
 
 	userReq := _requestUser.User{}
 	err_bind := c.Bind(&userReq)
 	if err_bind != nil {
-<<<<<<< HEAD
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailedServer("failed to bind update data"))
-=======
 		return c.JSON(helper.ResponseBadRequest("failed to bind update data"))
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	}
 
 	fileData, fileInfo, fileErr := c.Request().FormFile("image")
 	if fileErr != http.ErrMissingFile {
 		if fileErr != nil {
 			log.Print(fileErr)
-<<<<<<< HEAD
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get file"))
-=======
 			return c.JSON(helper.ResponseBadRequest("failed to get file"))
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 		}
 	}
 
@@ -196,8 +170,7 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 
 	result, err := h.userBusiness.GetAllData(5, offsetint)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed("failed to get all data"))
+		return c.JSON(helper.ResponseFailedServer("failed to get all data"))
 	}
 
 	return c.JSON(helper.ResponseStatusOkWithData("success", _responseUser.FromCoreList(result)))
