@@ -30,7 +30,7 @@ type Role struct {
 }
 
 type Business interface {
-	GetAllData(limit, offset int) (data []Core, err error)
+	GetAllData(limit, offset int) (data []Core, total int64, err error)
 	GetDataById(param int) (data Core, err error)
 	InsertData(dataReq Core) (err error)
 	DeleteData(param int) (err error)
@@ -40,7 +40,7 @@ type Business interface {
 }
 
 type Data interface {
-	SelectData(limit, offset int) (data []Core, err error)
+	SelectData(limit, offset int) (data []Core, total int64, err error)
 	SelectDataById(param int) (data Core, err error)
 	InsertData(dataReq Core) (err error)
 	DeleteData(param int) (err error)

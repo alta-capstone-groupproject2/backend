@@ -15,10 +15,10 @@ type User struct {
 }
 
 type UserStore struct {
-	ID        int       `json:"id" form:"id"`
-	Image     string    `json:"image" form:"image"`
-	Name      string    `json:"name" form:"name"`
-	Email     string    `json:"email" form:"email"`
+	ID        int       `json:"id"`
+	Image     string    `json:"image"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
 	StoreName string    `json:"storeName"`
 	Phone     string    `json:"phone"`
 	Role      string    `json:"role"`
@@ -57,6 +57,7 @@ func UserStoreFromCore(data users.Core) UserStore {
 		Phone:     data.Phone,
 		Owner:     data.Owner,
 		City:      data.City,
+		Role:      data.Role.RoleName,
 	}
 }
 

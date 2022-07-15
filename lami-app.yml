@@ -294,6 +294,19 @@ paths:
         - Submissions
       summary: All apply UMKM
       description: mengambil semua apply UMKM
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: number
+            example: 1
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: number
+            example: 12
       security:
         - JWTAuth: []
       responses:
@@ -309,12 +322,14 @@ paths:
                   value:
                     code: 200
                     message: Success to get all apply UMKM
+                    totalPage: 1
                     data:
                       - userID: 1
                         username: budi.setiawan
                         storeName: storeBudi
                         owner: ownerBudi
                         phone: "081234567899"
+                        city: malang
                         address: Jalan Apel no.911, Kota Medan
                         document: url.example.document.com
                         status: approve
@@ -387,6 +402,19 @@ paths:
         - Submissions
       summary: All apply events
       description: mengambil semua apply events
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: number
+            example: 1
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: number
+            example: 12
       security:
         - JWTAuth: []
       responses:
@@ -402,6 +430,7 @@ paths:
                   value:
                     code: 200
                     message: Success to get all apply events
+                    totalPage: 1
                     data:
                       - eventID: 1
                         nameEvent: Event Budaya Cirebon
@@ -611,6 +640,7 @@ paths:
                   value:
                     code: 200
                     message: Success to get all list culture
+                    totalPage: 1
                     data:
                       [
                         {
@@ -811,7 +841,7 @@ paths:
       tags:
         - Culture
       summary: Culture report list for admin only
-      description: Get culture_reports by idCulture (get all event)
+      description: Get culture_reports by idCulture
       security:
         - JWTAuth: []
       parameters:
@@ -833,7 +863,7 @@ paths:
                   description: response success
                   value:
                     code: 200
-                    message: Success to get culture by idCulture
+                    message: Success to get culture report by idCulture
                     data:
                       - message: reports_angklung
         "400":
@@ -1223,6 +1253,13 @@ paths:
       tags:
         - Comments
       summary: get comments
+      parameters:
+        - in: path
+          name: eventID
+          required: true
+          schema:
+            type: number
+            example: 1
       description: Get event/comments/id_event (get all event by id_event)
       responses:
         "200":
@@ -1603,11 +1640,11 @@ paths:
                     code: 200
                     message: Success to get product_ratings
                     data:
-                      ratingID: 1
-                      image: url.image.example.com
-                      name: userA
-                      rating: 4
-                      review: bla bla bla
+                      - ratingID: 1
+                        image: url.image.example.com
+                        name: userA
+                        rating: 4
+                        review: bla bla bla
         "400":
           description: failed get product_ratings
           content:
