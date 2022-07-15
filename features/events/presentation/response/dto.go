@@ -16,6 +16,7 @@ type Event struct {
 	Location string    `json:"location" form:"location"`
 	Detail   string    `json:"details" form:"details"`
 	Price    int       `json:"price" form:"price"`
+	Status   string    `json:""`
 }
 
 type EventByID struct {
@@ -30,7 +31,7 @@ type EventByID struct {
 	Location    string        `json:"location" form:"location"`
 	Detail      string        `json:"details" form:"details"`
 	Price       int           `json:"price" form:"price"`
-	Status string `json:"status" form:"status"`
+	Status      string        `json:"status" form:"status"`
 	Participant []Participant `json:"participant" form:"participant"`
 }
 
@@ -52,7 +53,7 @@ func FromCore(data events.Core) Event {
 		City:     data.City,
 		Location: data.Location,
 		Price:    data.Price,
-		Status
+		Status:   data.Status,
 	}
 }
 
@@ -76,6 +77,7 @@ func FromCoreByID(data events.Core) EventByID {
 		City:        data.City,
 		Location:    data.Location,
 		Price:       data.Price,
+		Status:      data.Status,
 		Participant: FromParticipantCoreList(data.Participant),
 	}
 }
