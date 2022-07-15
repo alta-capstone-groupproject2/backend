@@ -18,11 +18,9 @@ type Product struct {
 }
 
 type Rating struct {
+	ProductID int    `json:"productID" form:"productID"`
 	Rating    uint   `json:"rating" form:"rating"`
 	Review    string `json:"review" form:"review"`
-	ProductID int    `json:"productID" form:"productID"`
-	Date      string `json:"date" form:"date"`
-	DateTime  time.Time
 	UserID    data.User
 }
 
@@ -53,7 +51,6 @@ func ToCoreUpdate(productReq Product) product.Core {
 //	For insert rating
 func ToCoreRating(ratingReq Rating) product.CoreRating {
 	return product.CoreRating{
-		Date:      ratingReq.DateTime,
 		ProductID: ratingReq.ProductID,
 		Rating:    ratingReq.Rating,
 		Review:    ratingReq.Review,

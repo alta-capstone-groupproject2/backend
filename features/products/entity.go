@@ -15,8 +15,6 @@ type Core struct {
 	StoreName string
 	City      string
 	Date      time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
 	UserID    int
 	User      data.User
 }
@@ -29,9 +27,6 @@ type CoreRating struct {
 	UserID      int
 	Rating      uint
 	Review      string
-	Date        time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 	Product     Core
 }
 
@@ -44,7 +39,7 @@ type Business interface {
 	SelectMyProduct(idUser int) ([]Core, error)
 
 	AddProductRating(dataReq CoreRating) (int, error)
-	SelectRating(idProduct int) (CoreRating, error)
+	SelectRating(idProduct int) ([]CoreRating, error)
 }
 
 type Data interface {
@@ -56,5 +51,5 @@ type Data interface {
 	SelectDataMyProduct(idUser int) ([]Core, error)
 
 	AddProductDataRating(dataReq CoreRating) (int, error)
-	SelectDataRating(idProduct int) (CoreRating, error)
+	SelectDataRating(idProduct int) ([]CoreRating, error)
 }

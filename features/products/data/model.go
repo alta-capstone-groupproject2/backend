@@ -19,19 +19,14 @@ type Product struct {
 	UserID int       `json:"user_id" form:"user_id"`
 	Date   time.Time `json:"date" form:"date"`
 	User   data.User `gorm:"foreignKey:UserID"`
-	// Store     string    `json:"store" form:"store"`
-	// City      string    `json:"city" form:"city"`
 }
 
 type Rating struct {
 	gorm.Model
-	// URL         string    `json:"url" form:"url"`
-	// ProductName string    `json:"name" form:"name"`
 	Rating      uint      `json:"rating" form:"rating"`
 	Review      string    `json:"review" form:"review"`
 	ProductID   int       `json:"productID" form:"productID"`
 	UserID      int       `json:"user_id" form:"user_id"`
-	Date        time.Time `json:"date" form:"date"`
 	Product     Product
 	User        data.User
 }
@@ -45,8 +40,6 @@ func fromCore(core product.Core) Product {
 		Detail: core.Detail,
 		Date:   core.Date,
 		UserID: core.UserID,
-		// CreatedAt: time.Now(),
-		// UpdatedAt: time.Now(),
 	}
 }
 
@@ -56,9 +49,6 @@ func fromCoreRating(core product.CoreRating) Rating {
 		Review:    core.Review,
 		ProductID: core.ProductID,
 		UserID:    core.UserID,
-		Date:      core.Date,
-		// CreatedAt: time.Now(),
-		// UpdatedAt: time.Now(),
 	}
 }
 
@@ -78,7 +68,7 @@ func ToCore(data Product) product.Core {
 	return data.toCore()
 }
 
-func (data *Rating) toCore() product.CoreRating {
+func (data *Rating) toCoreRating() product.CoreRating {
 	return product.CoreRating{
 		ID:          int(data.ID),
 		URL:         data.Product.URL,
@@ -88,8 +78,12 @@ func (data *Rating) toCore() product.CoreRating {
 	}
 }
 
-func ToCoreRating(data Rating) product.CoreRating {
-	return data.toCore()
+func ToCoreRating(data []Rating) []product.CoreRating {
+	res := []product.CoreRating{}
+	for key := range data {
+		res = append(res, data[key].toCoreRating())
+	}
+	return res
 }
 
 // Get MyProduct

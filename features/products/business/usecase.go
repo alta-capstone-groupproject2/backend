@@ -10,7 +10,7 @@ type productUseCase struct {
 }
 
 // SelectRating implements product.Business
-func (uc *productUseCase) SelectRating(idProduct int) (product.CoreRating, error) {
+func (uc *productUseCase) SelectRating(idProduct int) ([]product.CoreRating, error) {
 	resp, err := uc.productData.SelectDataRating(idProduct)
 	return resp, err
 }
