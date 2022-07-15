@@ -28,13 +28,12 @@ func NewEventHandler(business events.Business) *EventHandler {
 }
 
 func (h *EventHandler) GetAll(c echo.Context) error {
-	page := c.QueryParam("page")
 	name := c.QueryParam("name")
 	city := c.QueryParam("city")
-	pageint, _ := strconv.Atoi(page)
-	limitint := 12
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
-	result, total, err := h.eventBusiness.GetAllEvent(limitint, pageint, name, city)
+	result, total, err := h.eventBusiness.GetAllEvent(limit, pageint, name, city)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get all data"))
 	}
@@ -112,14 +111,14 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 
 	fileName := strconv.Itoa(userID_token) + "_" + event.Name + time.Now().Format("2006-01-02 15:04:05") + "." + fileExtension
 
-	image, errUploadImg := helper.UploadFileToS3(config.EventImages, imageName, imageData)
+	image, errUploadImg := helper.UploadFileToS3(config.EventImages, imageName, config.Images, imageData)
 
 	if errUploadImg != nil {
 		fmt.Println(errUploadImg)
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to upload file"))
 	}
 
-	file, errUploadFile := helper.UploadFileToS3(config.EventImages, fileName, fileData)
+	file, errUploadFile := helper.UploadFileToS3(config.EventImages, fileName, config.Documents, fileData)
 
 	if errUploadFile != nil {
 		fmt.Println(errUploadFile)
@@ -157,55 +156,20 @@ func (h *EventHandler) DeleteData(c echo.Context) error {
 
 func (h *EventHandler) UpdateData(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("eventID"))
+  status := c.Param("status")
 	eventReq := _request_event.Event{}
 	err_bind := c.Bind(&eventReq)
 	if err_bind != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to bind data"))
 	}
-
-	layout_time := "2006-01-02T15:04"
-	DateTime, errDate := time.Parse(layout_time, eventReq.Date)
-	if errDate != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed format date"))
-	}
-	eventReq.DateTime = DateTime
-
+	
 	userID_token, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get user id"))
 	}
 
 	eventCore := _request_event.ToCore(eventReq)
-
-	fileData, fileInfo, fileErr := c.Request().FormFile("file")
-	if fileErr != http.ErrMissingFile {
-		if fileErr != nil {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get file"))
-		}
-
-		extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename)
-		if err_check_extension != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("file extension error"))
-		}
-
-		// check file size
-		err_check_size := helper.CheckFileSize(fileInfo.Size)
-		if err_check_size != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("file size error"))
-		}
-
-		// memberikan nama file
-		fileName := strconv.Itoa(userID_token) + "_" + eventReq.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
-
-		url, errUploadImg := helper.UploadFileToS3("eventimages", fileName, fileData)
-
-		if errUploadImg != nil {
-			fmt.Println(errUploadImg)
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to upload file"))
-		}
-
-		eventCore.Image = url
-	}
+  eventCore.Status = status
 
 	err := h.eventBusiness.UpdateEventByID(eventCore, id, userID_token)
 	if err != nil {
