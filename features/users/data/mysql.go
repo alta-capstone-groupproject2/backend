@@ -19,15 +19,6 @@ func NewUserRepository(conn *gorm.DB) users.Data {
 	}
 }
 
-// func (repo *mysqlUserRepository) SelectData(limit, offset int) (response []users.Core, err error) {
-// 	var dataUser []User
-// 	result := repo.db.Find(&dataUser)
-// 	if result.Error != nil {
-// 		return []users.Core{}, result.Error
-// 	}
-// 	return toCoreList(dataUser), result.Error
-// }
-
 func (repo *mysqlUserRepository) SelectDataById(id int) (response users.Core, err error) {
 	datauser := User{}
 	result := repo.db.Preload("Role").Find(&datauser, id)
@@ -85,4 +76,40 @@ func (repo *mysqlUserRepository) UpdateData(dataReq map[string]interface{}, id i
 		return errors.New("failed to update data")
 	}
 	return nil
+}
+
+func (repo *mysqlUserRepository) InsertStoreData(dataReq users.Core, id int) error {
+	model := User{}
+	model.ID = uint(id)
+	dataStore := StorefromCore(dataReq)
+	result := repo.db.Model(model).Updates(dataStore)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("failed to update store data")
+	}
+	return nil
+}
+
+func (repo *mysqlUserRepository) UpdateAccountRole(status string, id int) error {
+	model := User{}
+	model.ID = uint(id)
+	result := repo.db.Model(model).Update("store_status", status)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("failed to update data")
+	}
+	return nil
+}
+
+func (repo *mysqlUserRepository) SelectData(limit, offset int) (response []users.Core, err error) {
+	var dataUser []User
+	result := repo.db.Where("store_status is not null").Find(&dataUser)
+	if result.Error != nil {
+		return []users.Core{}, result.Error
+	}
+	return storeToCoreList(dataUser), result.Error
 }

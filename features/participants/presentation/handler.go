@@ -24,7 +24,7 @@ func NewParticipantHandler(business participants.Business) *ParticipantHandler {
 }
 
 func (h *ParticipantHandler) Joined(c echo.Context) error {
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed insert data"))
 	}
@@ -48,7 +48,7 @@ func (h *ParticipantHandler) Joined(c echo.Context) error {
 }
 
 func (h *ParticipantHandler) GetAllEventParticipant(c echo.Context) error {
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed insert data"))
 	}
@@ -66,7 +66,7 @@ func (h *ParticipantHandler) GetAllEventParticipant(c echo.Context) error {
 func (h *ParticipantHandler) DeleteEventbyParticipant(c echo.Context) error {
 	idParticipant, _ := strconv.Atoi(c.Param("id"))
 
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get user id"))
 	}

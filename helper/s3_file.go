@@ -12,7 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-func UploadFileToS3(directory, fileName, ContentType string, fileData multipart.File) (string, error) {
+func UploadFileToS3(directory string, fileName string, contentType string, fileData multipart.File) (string, error) {
+    
 	// The session the S3 Uploader will use
 	sess := _config.GetSession()
 
@@ -24,7 +25,7 @@ func UploadFileToS3(directory, fileName, ContentType string, fileData multipart.
 		Bucket:      aws.String(os.Getenv("AWS_BUCKET")),
 		Key:         aws.String("/" + directory + "/" + fileName),
 		Body:        fileData,
-		ContentType: aws.String(ContentType),
+		ContentType: aws.String(contentType),
 	})
 
 	if err != nil {
@@ -34,15 +35,25 @@ func UploadFileToS3(directory, fileName, ContentType string, fileData multipart.
 	return result.Location, nil
 }
 
-func CheckImageExtension(filename string) (string, error) {
+func CheckFileExtension(filename string, contentType string) (string, error) {
 	extension := strings.ToLower(filename[strings.LastIndex(filename, ".")+1:])
 
-	if extension != "jpg" && extension != "jpeg" && extension != "png" {
-		return "", fmt.Errorf("forbidden file type")
+	if contentType == _config.ContentImage {
+		if extension != "jpg" && extension != "jpeg" && extension != "png" {
+			return "", fmt.Errorf("forbidden file type")
+		}
 	}
+
+	if contentType == _config.ContentDocuments {
+		if extension != "pdf" {
+			return "", fmt.Errorf("forbidden file type")
+		}
+	}
+
 	return extension, nil
 }
 
+<<<<<<< HEAD
 func CheckFileExtension(filename string) (string, error) {
 	extension := strings.ToLower(filename[strings.LastIndex(filename, ".")+1:])
 
@@ -71,7 +82,22 @@ func CheckImageSize(size int64) error {
 
 	if size > 1097152 {
 		return fmt.Errorf("file size too big")
+=======
+func CheckFileSize(size int64, contentType string) error {
+	if size == 0 {
+		return fmt.Errorf("illegal file size")
+	}
+	if contentType == _config.ContentImage {
+		if size > 1097152 {
+			return fmt.Errorf("file size too big")
+		}
+>>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	}
 
+	if contentType == _config.ContentDocuments {
+		if size > 10097152 {
+			return fmt.Errorf("file size too big")
+		}
+	}
 	return nil
 }
