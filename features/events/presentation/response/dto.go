@@ -23,13 +23,14 @@ type EventByID struct {
 	Image       string        `json:"image" form:"image"`
 	Document    string        `json:"document" form:"document"`
 	Name        string        `json:"eventName" form:"eventName"`
-	HostedBy    string        `json:"hostedby" form:"hostedby"`
+	HostedBy    string        `json:"hostedBy" form:"hostedBy"`
 	Phone       string        `json:"phone" form:"phone"`
 	Date        time.Time     `json:"date" form:"date"`
 	City        string        `json:"city" form:"city"`
 	Location    string        `json:"location" form:"location"`
 	Detail      string        `json:"details" form:"details"`
 	Price       int           `json:"price" form:"price"`
+	Status string `json:"status" form:"status"`
 	Participant []Participant `json:"participant" form:"participant"`
 }
 
@@ -50,6 +51,8 @@ func FromCore(data events.Core) Event {
 		Date:     data.Date,
 		City:     data.City,
 		Location: data.Location,
+		Price:    data.Price,
+		Status
 	}
 }
 

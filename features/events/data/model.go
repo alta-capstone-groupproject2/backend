@@ -20,17 +20,18 @@ type Event struct {
 	Location string
 	Detail   string
 	Price    int
+	Status   string
 	UserID   int
 	User     data.User
 }
 
 type Participant struct {
-	ID       int
-	User_ID  int
-	Event_ID int
-	Name     string
-	Image    string
-	User     data.User
+	ID      int
+	UserID  int
+	EventID int
+	Name    string
+	Image   string
+	User    data.User
 }
 
 //DTO
@@ -48,6 +49,7 @@ func (data *Event) toCore() events.Core {
 		Location: data.Location,
 		Detail:   data.Detail,
 		Price:    data.Price,
+		Status:   data.Status,
 		IDUser:   data.UserID,
 	}
 }
@@ -72,6 +74,7 @@ func fromCore(core events.Core) Event {
 		Location: core.Location,
 		Detail:   core.Detail,
 		Price:    core.Price,
+		Status:   core.Status,
 		UserID:   core.IDUser,
 	}
 }

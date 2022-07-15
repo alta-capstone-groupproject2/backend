@@ -16,6 +16,7 @@ type Core struct {
 	Location    string
 	Detail      string
 	Price       int
+	Status      string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	IDUser      int

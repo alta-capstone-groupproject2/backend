@@ -8,6 +8,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
+const UserImages = "userimages"
+const UserDocuments = "userdocuments"
+const EventImages = "eventimages"
+const EventDocuments = "eventdocuments"
+const ProductImages = "productimages"
+const CultureImages = "cultureimages"
+
 var theSession *session.Session
 
 //GetConfig Initiatilize config in singleton way

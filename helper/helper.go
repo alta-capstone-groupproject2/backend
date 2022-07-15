@@ -2,9 +2,23 @@ package helper
 
 import "time"
 
-func ResponseFailed(msg string) map[string]interface{} {
+func ResponseFailedAccess(msg string) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    "404",
+		"message": msg,
+	}
+}
+
+func ResponseFailedBadRequest(msg string) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    "400",
+		"message": msg,
+	}
+}
+
+func ResponseFailedServer(msg string) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    "500",
 		"message": msg,
 	}
 }
@@ -12,6 +26,20 @@ func ResponseFailed(msg string) map[string]interface{} {
 func ResponseSuccessNoData(msg string) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    "200",
+		"message": msg,
+	}
+}
+
+func ResponseSuccessCreate(msg string) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    "201",
+		"message": msg,
+	}
+}
+
+func ResponseSuccessDelete(msg string) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    "204",
 		"message": msg,
 	}
 }

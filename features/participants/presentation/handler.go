@@ -26,13 +26,13 @@ func NewParticipantHandler(business participants.Business) *ParticipantHandler {
 func (h *ParticipantHandler) Joined(c echo.Context) error {
 	userID_token, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed insert data"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed insert data"))
 	}
 
 	participant := _request_participant.Participant{}
 	err_bind := c.Bind(&participant)
 	if err_bind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("success insert participant"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("success insert participant"))
 	}
 
 	participantCore := _request_participant.ToCore(participant)
@@ -41,21 +41,21 @@ func (h *ParticipantHandler) Joined(c echo.Context) error {
 	err := h.participantBusiness.AddParticipant(participantCore)
 	if err != nil {
 		fmt.Println(err)
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed join"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed join"))
 	}
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("success join"))
+	return c.JSON(http.StatusCreated, helper.ResponseSuccessCreate("success join"))
 
 }
 
 func (h *ParticipantHandler) GetAllEventParticipant(c echo.Context) error {
 	userID_token, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed insert data"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed insert data"))
 	}
 
 	result, err := h.participantBusiness.GetAllEventbyParticipant(userID_token)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get all your event"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get all your event"))
 	}
 
 	response := _response_participant.FromCoreList(result)
@@ -68,13 +68,13 @@ func (h *ParticipantHandler) DeleteEventbyParticipant(c echo.Context) error {
 
 	userID_token, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get user id"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get user id"))
 	}
 
 	result := h.participantBusiness.DeleteParticipant(idParticipant, userID_token)
 	if result != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to delete your event"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to delete your event"))
 	}
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("success delete to delete your event"))
+	return c.JSON(http.StatusOK, helper.ResponseSuccessDelete("success delete to delete your event"))
 
 }

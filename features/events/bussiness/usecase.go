@@ -36,7 +36,7 @@ func (uc *eventUseCase) GetEventByID(id int) (response events.Core, err error) {
 }
 
 func (uc *eventUseCase) InsertEvent(eventRequest events.Core) error {
-	if eventRequest.Name == "" || eventRequest.Image == "" || eventRequest.Detail == "" || eventRequest.City == "" || eventRequest.Location == "" || eventRequest.HostedBy == "" {
+	if eventRequest.Name == "" || eventRequest.Image == "" || eventRequest.Document == "" || eventRequest.Detail == "" || eventRequest.City == "" || eventRequest.Location == "" || eventRequest.HostedBy == "" {
 		return errors.New("all data must be filled")
 	}
 
@@ -55,7 +55,7 @@ func (uc *eventUseCase) UpdateEventByID(eventReq events.Core, id int, userId int
 		updateMap["name"] = &eventReq.Name
 	}
 	if eventReq.Detail != "" {
-		updateMap["detail"] = &eventReq.Detail
+		updateMap["details"] = &eventReq.Detail
 	}
 	if eventReq.City != "" {
 		updateMap["city"] = &eventReq.City
@@ -67,10 +67,10 @@ func (uc *eventUseCase) UpdateEventByID(eventReq events.Core, id int, userId int
 		updateMap["location"] = &eventReq.Location
 	}
 	if eventReq.HostedBy != "" {
-		updateMap["hosted_by"] = &eventReq.HostedBy
+		updateMap["hostedBy"] = &eventReq.HostedBy
 	}
 	if eventReq.Image != "" {
-		updateMap["url"] = &eventReq.Image
+		updateMap["image"] = &eventReq.Image
 	}
 
 	err = uc.eventData.UpdateDataByID(updateMap, id, userId)
