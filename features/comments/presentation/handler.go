@@ -26,7 +26,7 @@ func NewCommentHandler(business comments.Business) *CommentHandler {
 }
 
 func (h *CommentHandler) Add(c echo.Context) error {
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get user id"))
 	}

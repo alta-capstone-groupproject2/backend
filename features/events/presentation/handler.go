@@ -2,6 +2,7 @@ package presentation
 
 import (
 	"fmt"
+	"lami/app/config"
 	"lami/app/features/events"
 	"log"
 	"net/http"
@@ -54,7 +55,7 @@ func (h *EventHandler) GetDataById(c echo.Context) error {
 }
 
 func (h *EventHandler) InsertData(c echo.Context) error {
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed insert data"))
 	}
@@ -79,13 +80,13 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get file"))
 	}
 
-	extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename)
+	extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, config.ContentImage)
 	if err_check_extension != nil {
 		return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file extension error"))
 	}
 
 	// check file size
-	err_check_size := helper.CheckFileSize(fileInfo.Size)
+	err_check_size := helper.CheckFileSize(fileInfo.Size, config.ContentImage)
 	if err_check_size != nil {
 		return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file size error"))
 	}
@@ -93,7 +94,7 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 	// memberikan nama file
 	fileName := strconv.Itoa(userID_token) + "_" + event.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-	url, errUploadImg := helper.UploadFileToS3("eventimages", fileName, fileData)
+	url, errUploadImg := helper.UploadFileToS3(config.EventImages, config.ContentImage, fileName, fileData)
 
 	if errUploadImg != nil {
 		fmt.Println(errUploadImg)
@@ -116,7 +117,7 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 func (h *EventHandler) DeleteData(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("eventID"))
 
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get user id"))
 	}
@@ -143,7 +144,7 @@ func (h *EventHandler) UpdateData(c echo.Context) error {
 	}
 	eventReq.DateTime = DateTime
 
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get user id"))
 	}
@@ -156,13 +157,13 @@ func (h *EventHandler) UpdateData(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get file"))
 		}
 
-		extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename)
+		extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, config.ContentImage)
 		if err_check_extension != nil {
 			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file extension error"))
 		}
 
 		// check file size
-		err_check_size := helper.CheckFileSize(fileInfo.Size)
+		err_check_size := helper.CheckFileSize(fileInfo.Size, config.ContentImage)
 		if err_check_size != nil {
 			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file size error"))
 		}
@@ -170,7 +171,7 @@ func (h *EventHandler) UpdateData(c echo.Context) error {
 		// memberikan nama file
 		fileName := strconv.Itoa(userID_token) + "_" + eventReq.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-		url, errUploadImg := helper.UploadFileToS3("eventimages", fileName, fileData)
+		url, errUploadImg := helper.UploadFileToS3(config.EventImages, config.ContentImage, fileName, fileData)
 
 		if errUploadImg != nil {
 			fmt.Println(errUploadImg)
@@ -194,7 +195,7 @@ func (h *EventHandler) GetEventByUser(c echo.Context) error {
 	pageint, _ := strconv.Atoi(page)
 	limitint := 12
 
-	id_user, errToken := middlewares.ExtractToken(c)
+	id_user, _, errToken := middlewares.ExtractToken(c)
 	if errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get user id"))
 	}

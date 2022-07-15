@@ -16,22 +16,24 @@ func JWTMiddleware() echo.MiddlewareFunc {
 		SigningKey:    []byte(config.JWT()),
 	})
 }
-func CreateToken(userId int) (string, error) {
+func CreateToken(userId int, role string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
 	claims["userId"] = userId
+	claims["role"] = role
 	claims["exp"] = time.Now().Add(time.Hour * 5).Unix() //Token expires after 1 hour
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte(config.JWT()))
 }
 
-func ExtractToken(e echo.Context) (int, error) {
+func ExtractToken(e echo.Context) (int, string, error) {
 	user := e.Get("user").(*jwt.Token)
 	if user.Valid {
 		claims := user.Claims.(jwt.MapClaims)
 		userId := claims["userId"].(float64)
-		return int(userId), nil
+		role := claims["role"].(string)
+		return int(userId), role, nil
 	}
-	return 0, fmt.Errorf("token invalid")
+	return 0, "", fmt.Errorf("token invalid")
 }

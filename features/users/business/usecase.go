@@ -2,6 +2,7 @@ package business
 
 import (
 	"errors"
+	"lami/app/config"
 	"lami/app/features/users"
 	"mime/multipart"
 
@@ -17,11 +18,6 @@ func NewUserBusiness(usrData users.Data) users.Business {
 		userData: usrData,
 	}
 }
-
-// func (uc *userUseCase) GetAllData(limit, offset int) (response []users.Core, err error) {
-// 	resp, errData := uc.userData.SelectData(limit, offset)
-// 	return resp, errData
-// }
 
 func (uc *userUseCase) GetDataById(id int) (response users.Core, err error) {
 	resp, errData := uc.userData.SelectDataById(id)
@@ -78,16 +74,16 @@ func (uc *userUseCase) UpdateData(userReq users.Core, id int, fileInfo *multipar
 		updateMap["email"] = &userReq.Email
 	}
 	if userReq.Password != "" {
-		hash, err := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
-		if err != nil {
+		hash, errHash := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
+		if errHash != nil {
 			return errors.New("hasing password failed")
 		}
 		updateMap["password"] = &hash
 	}
 
 	if fileInfo != nil {
-		urlImage, errFile := uploadFileValidation(userReq, id, fileInfo, fileData)
-		if err != nil {
+		urlImage, errFile := uploadFileValidation(userReq.Name, id, config.UserImages, config.ContentImage, fileInfo, fileData)
+		if errFile != nil {
 			return errors.New(errFile.Error())
 		}
 
@@ -99,4 +95,36 @@ func (uc *userUseCase) UpdateData(userReq users.Core, id int, fileInfo *multipar
 		return err
 	}
 	return nil
+}
+
+func (uc *userUseCase) UpgradeAccount(dataReq users.Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) error {
+	if dataReq.StoreName == "" || dataReq.Phone == "" || dataReq.Owner == "" || dataReq.City == "" || dataReq.Address == "" || fileInfo == nil {
+		return errors.New("all data must be filled")
+	}
+
+	urlDoc, errFile := uploadFileValidation(dataReq.StoreName, id, config.UserDocuments, config.ContentDocuments, fileInfo, fileData)
+	if errFile != nil {
+		return errors.New(errFile.Error())
+	}
+	dataReq.Document = urlDoc
+	dataReq.StoreStatus = "waiting"
+
+	err := uc.userData.InsertStoreData(dataReq, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *userUseCase) UpdateStatusUser(status string, id int) error {
+	err := uc.userData.UpdateAccountRole(status, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *userUseCase) GetAllData(limit, offset int) (response []users.Core, err error) {
+	resp, errData := uc.userData.SelectData(limit, offset)
+	return resp, errData
 }

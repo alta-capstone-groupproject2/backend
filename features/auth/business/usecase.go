@@ -27,7 +27,7 @@ func (uc *authUseCase) Login(data auth.Core) (string, int, string, error) {
 	if errCompare != nil {
 		return "", 0, "", errors.New("wrong password")
 	}
-	token, err := middlewares.CreateToken(int(response.ID))
+	token, err := middlewares.CreateToken(int(response.ID), response.Role)
 
 	return token, response.ID, response.Role, err
 }
