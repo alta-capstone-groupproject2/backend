@@ -1,7 +1,7 @@
 package presentation
 
 import (
-	"lami/app/features/carts"
+	cart "lami/app/features/carts"
 	"lami/app/features/carts/presentation/request"
 	"lami/app/features/carts/presentation/response"
 
@@ -24,12 +24,12 @@ func NewCartHandler(business cart.Business) *CartHandler {
 }
 
 func (h *CartHandler) PostCart(c echo.Context) error {
-	
-	userID_token, errToken := middlewares.ExtractToken(c)
+
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
 	}
-	
+
 	cart := request.Cart{}
 	err_bind := c.Bind(&cart)
 	if err_bind != nil {
@@ -50,7 +50,7 @@ func (h *CartHandler) PostCart(c echo.Context) error {
 }
 
 func (h *CartHandler) GetCart(c echo.Context) error {
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed extract data token"))
 	}
@@ -73,7 +73,7 @@ func (h *CartHandler) PutCart(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to bind data update cart"))
 	}
 
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get id user"))
 	}
@@ -89,7 +89,7 @@ func (h *CartHandler) PutCart(c echo.Context) error {
 
 func (h *CartHandler) DeletedCart(c echo.Context) error {
 	idCart, _ := strconv.Atoi(c.Param("cartID"))
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get id user"))
 	}
@@ -100,5 +100,5 @@ func (h *CartHandler) DeletedCart(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to delete data cart"))
-	
+
 }

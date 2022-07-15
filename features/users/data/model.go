@@ -14,8 +14,8 @@ type User struct {
 	Password    string `json:"password"`
 	RoleID      int    `json:"role_id"`
 	StoreName   string `json:"store_name"`
-	phone       string `json:"phone"`
-	storeOwner  string `json:"store_owner"`
+	Phone       string `json:"phone"`
+	StoreOwner  string `json:"store_owner"`
 	City        string `json:"city"`
 	Address     string `json:"address"`
 	Document    string `json:"document"`
@@ -46,14 +46,6 @@ func (data *User) toCore() users.Core {
 
 }
 
-// func toCoreList(data []User) []users.Core {
-// 	result := []users.Core{}
-// 	for key := range data {
-// 		result = append(result, data[key].toCore())
-// 	}
-// 	return result
-// }
-
 func fromCore(core users.Core) User {
 	return User{
 		Image:    core.Image,
@@ -64,6 +56,52 @@ func fromCore(core users.Core) User {
 	}
 }
 
+func StiretoCore(data User) users.Core {
+	return data.toCore()
+}
+
+func (data *User) StoretoCore() users.Core {
+	return users.Core{
+		ID:          int(data.ID),
+		Name:        data.Name,
+		Email:       data.Email,
+		Password:    data.Password,
+		Image:       data.Image,
+		StoreName:   data.StoreName,
+		Phone:       data.Phone,
+		Owner:       data.StoreOwner,
+		City:        data.City,
+		Address:     data.Address,
+		Document:    data.Document,
+		RoleID:      data.RoleID,
+		StoreStatus: data.StoreStatus,
+		CreatedAt:   data.CreatedAt,
+		UpdatedAt:   data.UpdatedAt,
+		Role:        users.Role{RoleName: data.Role.RoleName},
+	}
+}
+
+func StorefromCore(core users.Core) User {
+	return User{
+		StoreName:   core.StoreName,
+		Phone:       core.Phone,
+		StoreOwner:  core.Owner,
+		City:        core.City,
+		Address:     core.Address,
+		Document:    core.Document,
+		StoreStatus: core.StoreStatus,
+		Role:        Role{},
+	}
+}
+
 func toCore(data User) users.Core {
 	return data.toCore()
+}
+
+func storeToCoreList(data []User) []users.Core {
+	result := []users.Core{}
+	for key := range data {
+		result = append(result, data[key].StoretoCore())
+	}
+	return result
 }

@@ -18,3 +18,24 @@ func ToCore(userReq User) users.Core {
 	}
 	return userCore
 }
+
+type Store struct {
+	StoreName   string `json:"storeName" form:"storeName"`
+	Phone       string `json:"phone" form:"phone"`
+	Owner       string `json:"owner" form:"owner"`
+	City        string `json:"city" form:"city"`
+	Address     string `json:"address" form:"address"`
+	Document    string
+	StoreStatus string `json:"status" form:"status"`
+}
+
+func StoreToCore(userReq Store) users.Core {
+	userCore := users.Core{
+		StoreName: userReq.StoreName,
+		Phone:     userReq.Phone,
+		Owner:     userReq.Owner,
+		City:      userReq.City,
+		Address:   userReq.Address,
+	}
+	return userCore
+}

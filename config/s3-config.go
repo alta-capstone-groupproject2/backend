@@ -14,6 +14,8 @@ const EventImages = "eventimages"
 const EventDocuments = "eventdocuments"
 const ProductImages = "productimages"
 const CultureImages = "cultureimages"
+const ContentImage = "images"
+const ContentDocuments = "application"
 
 var theSession *session.Session
 

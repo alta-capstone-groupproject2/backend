@@ -3,7 +3,7 @@ package presentation
 import (
 	"fmt"
 	"lami/app/config"
-	"lami/app/features/products"
+	product "lami/app/features/products"
 	"lami/app/features/products/presentation/request"
 	"lami/app/features/products/presentation/response"
 	"lami/app/helper"
@@ -27,7 +27,7 @@ func NewProductHandler(business product.Business) *ProductHandler {
 
 func (h *ProductHandler) PostProduct(c echo.Context) error {
 
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
 	}
@@ -51,13 +51,13 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get file"))
 	}
 
-	extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename)
+	extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, config.ContentImage)
 	if err_check_extension != nil {
 		return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file extension error"))
 	}
 
 	// check file size
-	err_check_size := helper.CheckFileSize(fileInfo.Size)
+	err_check_size := helper.CheckFileSize(fileInfo.Size, config.ContentImage)
 	if err_check_size != nil {
 		return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file size error"))
 	}
@@ -65,7 +65,7 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 	// memberikan nama file
 	fileName := strconv.Itoa(userID_token) + "_" + product.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-	url, errUploadImg := helper.UploadFileToS3(config.ProductImages, fileName, fileData)
+	url, errUploadImg := helper.UploadFileToS3(config.ProductImages, config.ContentImage, fileName, fileData)
 
 	if errUploadImg != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to upload file"))
@@ -101,7 +101,7 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 	}
 	product.DateTime = DateTime
 
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get id user"))
 	}
@@ -114,13 +114,13 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get file"))
 		}
 
-		extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename)
+		extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, config.ContentImage)
 		if err_check_extension != nil {
 			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file extension error"))
 		}
 
 		// check file size
-		err_check_size := helper.CheckFileSize(fileInfo.Size)
+		err_check_size := helper.CheckFileSize(fileInfo.Size, config.ContentImage)
 		if err_check_size != nil {
 			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file size error"))
 		}
@@ -128,7 +128,7 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 		// memberikan nama file
 		fileName := strconv.Itoa(userID_token) + "_" + product.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-		url, errUploadImg := helper.UploadFileToS3(config.ProductImages, fileName, fileData)
+		url, errUploadImg := helper.UploadFileToS3(config.ProductImages, config.ContentImage, fileName, fileData)
 
 		if errUploadImg != nil {
 			fmt.Println(errUploadImg)
@@ -150,7 +150,7 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 	idProduct, _ := strconv.Atoi(c.Param("productID"))
 
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get id user"))
 	}
@@ -167,7 +167,7 @@ func (h *ProductHandler) PostProductRating(c echo.Context) error {
 
 	idProduct, _ := strconv.Atoi(c.Param("productID"))
 
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
 	}
@@ -209,7 +209,7 @@ func (h *ProductHandler) GetProductbyIDProduct(c echo.Context) error {
 }
 
 func (h *ProductHandler) GetMyProduct(c echo.Context) error {
-	userID_token, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
 	}
