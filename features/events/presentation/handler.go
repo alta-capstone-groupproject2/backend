@@ -33,30 +33,30 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
-	result, total, err := h.eventBusiness.GetAllEvent(limit, pageint, name, city)
+	result, total, err := h.eventBusiness.GetAllEvent(limit, page, name, city)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get all data"))
+		return c.JSON(helper.ResponseInternalServerError("failed get all data"))
 	}
 	respons := _response_event.FromCoreList(result)
-	return c.JSON(http.StatusOK, helper.ResponseSuccessWithDataPage("Success get all events", total, respons))
+	return c.JSON(helper.ResponseStatusOkWithDataPage("Success get all events", total, respons))
 }
 
 func (h *EventHandler) GetDataById(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("eventID"))
 	result, err := h.eventBusiness.GetEventByID(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get event"))
+		return c.JSON(helper.ResponseInternalServerError("failed get event"))
 	}
 
 	response := _response_event.FromCoreByID(result)
 
-	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("success get event", response))
+	return c.JSON(helper.ResponseStatusOkWithData("success get event", response))
 }
 
 func (h *EventHandler) InsertData(c echo.Context) error {
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed insert data"))
+		return c.JSON(helper.ResponseInternalServerError("failed insert data"))
 	}
 
 	event := _request_event.Event{}
@@ -64,13 +64,13 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 
 	if err_bind != nil {
 		log.Print(err_bind)
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed bind data"))
+		return c.JSON(helper.ResponseBadRequest("failed bind data"))
 	}
 
 	layout_time := "2006-01-02T15:04"
 	DateTime, errDate := time.Parse(layout_time, event.Date)
 	if errDate != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed format date"))
+		return c.JSON(helper.ResponseInternalServerError("failed format date"))
 	}
 	event.DateTime = DateTime
 
@@ -79,33 +79,6 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get image"))
 	}
 
-<<<<<<< HEAD
-	imageExtension, err_image_extension := helper.CheckImageExtension(imageInfo.Filename)
-	if err_image_extension != nil {
-		return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("image extension error"))
-	}
-
-	fileData, fileInfo, fileErr := c.Request().FormFile("document")
-	if fileErr == http.ErrMissingFile || fileErr != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get file"))
-	}
-
-	fileExtension, err_file_extension := helper.CheckFileExtension(fileInfo.Filename)
-	if err_file_extension != nil {
-		return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("file extension error"))
-	}
-
-	// check image size
-	err_image_size := helper.CheckImageSize(imageInfo.Size)
-	if err_image_size != nil {
-		return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("file size error"))
-	}
-
-	// check file size
-	err_file_size := helper.CheckFileSize(fileInfo.Size)
-	if err_file_size != nil {
-		return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("file size error"))
-=======
 	extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, config.ContentImage)
 	if err_check_extension != nil {
 		return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file extension error"))
@@ -115,19 +88,12 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 	err_check_size := helper.CheckFileSize(fileInfo.Size, config.ContentImage)
 	if err_check_size != nil {
 		return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file size error"))
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	}
 
 	// memberikan nama file
 	imageName := strconv.Itoa(userID_token) + "_" + event.Name + time.Now().Format("2006-01-02 15:04:05") + "." + imageExtension
 
-<<<<<<< HEAD
-	fileName := strconv.Itoa(userID_token) + "_" + event.Name + time.Now().Format("2006-01-02 15:04:05") + "." + fileExtension
-
-	image, errUploadImg := helper.UploadFileToS3(config.EventImages, imageName, config.Images, imageData)
-=======
 	url, errUploadImg := helper.UploadFileToS3(config.EventImages, config.ContentImage, fileName, fileData)
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 
 	if errUploadImg != nil {
 		fmt.Println(errUploadImg)
@@ -172,16 +138,12 @@ func (h *EventHandler) DeleteData(c echo.Context) error {
 
 func (h *EventHandler) UpdateData(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("eventID"))
-  status := c.Param("status")
+	status := c.Param("status")
 	eventReq := _request_event.Event{}
 	err_bind := c.Bind(&eventReq)
 	if err_bind != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to bind data"))
 	}
-<<<<<<< HEAD
-	
-	userID_token, errToken := middlewares.ExtractToken(c)
-=======
 
 	layout_time := "2006-01-02T15:04"
 	DateTime, errDate := time.Parse(layout_time, eventReq.Date)
@@ -191,15 +153,11 @@ func (h *EventHandler) UpdateData(c echo.Context) error {
 	eventReq.DateTime = DateTime
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get user id"))
 	}
 
 	eventCore := _request_event.ToCore(eventReq)
-<<<<<<< HEAD
-  eventCore.Status = status
-=======
 
 	fileData, fileInfo, fileErr := c.Request().FormFile("file")
 	if fileErr != http.ErrMissingFile {
@@ -230,7 +188,6 @@ func (h *EventHandler) UpdateData(c echo.Context) error {
 
 		eventCore.Image = url
 	}
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 
 	err := h.eventBusiness.UpdateEventByID(eventCore, id, userID_token)
 	if err != nil {

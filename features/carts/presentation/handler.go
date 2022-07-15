@@ -25,11 +25,7 @@ func NewCartHandler(business cart.Business) *CartHandler {
 
 func (h *CartHandler) PostCart(c echo.Context) error {
 
-<<<<<<< HEAD
-	userID_token, errToken := middlewares.ExtractToken(c)
-=======
 	userID_token, _, errToken := middlewares.ExtractToken(c)
->>>>>>> 06b7e42b3fed4d28e3c965bd5dddd2f0f7cae88c
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to extract token"))
 	}

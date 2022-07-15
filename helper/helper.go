@@ -66,7 +66,7 @@ func ResponseSuccessWithDataPage(msg string, page int64, data interface{}) map[s
 	}
 }
 
-func ResponseStatusOkNoData(msg string)(int, map[string]interface{} ){
+func ResponseStatusOkNoData(msg string) (int, map[string]interface{}) {
 	return http.StatusOK, map[string]interface{}{
 		"code":    "200",
 		"message": msg,
@@ -74,7 +74,7 @@ func ResponseStatusOkNoData(msg string)(int, map[string]interface{} ){
 }
 
 func ResponseStatusOkWithData(msg string, data interface{}) (int, map[string]interface{}) {
-	return http.StatusOK,map[string]interface{}{
+	return http.StatusOK, map[string]interface{}{
 		"code":        "200",
 		"message":     msg,
 		"currenttime": time.Now().Format("2006-01-02 15:04:05"),
@@ -82,7 +82,7 @@ func ResponseStatusOkWithData(msg string, data interface{}) (int, map[string]int
 	}
 }
 
-func ResponseStatusOkWithDataPage(msg string, page int64, data interface{}) (int,map[string]interface{}) {
+func ResponseStatusOkWithDataPage(msg string, page int64, data interface{}) (int, map[string]interface{}) {
 	return http.StatusOK, map[string]interface{}{
 		"code":        "200",
 		"message":     msg,
@@ -93,42 +93,42 @@ func ResponseStatusOkWithDataPage(msg string, page int64, data interface{}) (int
 }
 
 func ResponseBadRequest(msg string) (int, map[string]interface{}) {
-	return http.StatusBadRequest,map[string]interface{}{
+	return http.StatusBadRequest, map[string]interface{}{
 		"code":    "400",
 		"message": msg,
 	}
 }
 
 func ResponseNotFound(msg string) (int, map[string]interface{}) {
-	return http.StatusNotFound,map[string]interface{}{
+	return http.StatusNotFound, map[string]interface{}{
 		"code":    "404",
 		"message": msg,
 	}
 }
 
 func ResponseInternalServerError(msg string) (int, map[string]interface{}) {
-	return http.StatusInternalServerError,map[string]interface{}{
+	return http.StatusInternalServerError, map[string]interface{}{
 		"code":    "500",
 		"message": msg,
 	}
 }
 
 func ResponseNoContent(msg string) (int, map[string]interface{}) {
-	return http.StatusNoContent,map[string]interface{}{
+	return http.StatusNoContent, map[string]interface{}{
 		"code":    "204",
 		"message": msg,
 	}
 }
 
 func ResponseCreateSuccess(msg string) (int, map[string]interface{}) {
-	return http.StatusCreated,map[string]interface{}{
+	return http.StatusCreated, map[string]interface{}{
 		"code":    "201",
 		"message": msg,
 	}
 }
 
 func ResponseForbidden(msg string) (int, map[string]interface{}) {
-	return http.StatusForbidden,map[string]interface{}{
+	return http.StatusForbidden, map[string]interface{}{
 		"code":    "403",
 		"message": msg,
 	}
