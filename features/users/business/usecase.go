@@ -35,6 +35,11 @@ func (uc *userUseCase) InsertData(userRequest users.Core) (err error) {
 		return errors.New(errEmailFormat.Error())
 	}
 
+	errNameFormat := nameFormatValidation(userRequest.Name)
+	if errNameFormat != nil {
+		return errors.New(errNameFormat.Error())
+	}
+
 	passWillBcrypt := []byte(userRequest.Password)
 	hash, err_hash := bcrypt.GenerateFromPassword(passWillBcrypt, bcrypt.DefaultCost)
 	if err_hash != nil {
@@ -124,7 +129,9 @@ func (uc *userUseCase) UpdateStatusUser(status string, id int) error {
 	return nil
 }
 
-func (uc *userUseCase) GetAllData(limit, offset int) (response []users.Core, err error) {
-	resp, errData := uc.userData.SelectData(limit, offset)
-	return resp, errData
+func (uc *userUseCase) GetAllData(limit, page int) (response []users.Core, total int64, err error) {
+	offset := limit * (page - 1)
+	resp, total, errData := uc.userData.SelectData(limit, offset)
+	total = total/int64(limit) + 1
+	return resp, total, errData
 }

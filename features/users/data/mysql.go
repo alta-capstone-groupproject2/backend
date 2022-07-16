@@ -81,7 +81,7 @@ func (repo *mysqlUserRepository) UpdateData(dataReq map[string]interface{}, id i
 func (repo *mysqlUserRepository) InsertStoreData(dataReq users.Core, id int) error {
 	model := User{}
 	model.ID = uint(id)
-	dataStore := StorefromCore(dataReq)
+	dataStore := fromCore(dataReq)
 	result := repo.db.Model(model).Updates(dataStore)
 	if result.Error != nil {
 		return result.Error
@@ -95,7 +95,7 @@ func (repo *mysqlUserRepository) InsertStoreData(dataReq users.Core, id int) err
 func (repo *mysqlUserRepository) UpdateAccountRole(status string, id int) error {
 	model := User{}
 	model.ID = uint(id)
-	result := repo.db.Model(model).Update("store_status", status)
+	result := repo.db.Model(model).Updates(map[string]interface{}{"store_status": status, "role_id": 3})
 	if result.Error != nil {
 		return result.Error
 	}
@@ -105,11 +105,12 @@ func (repo *mysqlUserRepository) UpdateAccountRole(status string, id int) error 
 	return nil
 }
 
-func (repo *mysqlUserRepository) SelectData(limit, offset int) (response []users.Core, err error) {
+func (repo *mysqlUserRepository) SelectData(limit, offset int) (response []users.Core, total int64, err error) {
 	var dataUser []User
-	result := repo.db.Where("store_status is not null").Find(&dataUser)
+	var count int64
+	result := repo.db.Preload("Role").Where("store_status is not null").Find(&dataUser).Count(&count)
 	if result.Error != nil {
-		return []users.Core{}, result.Error
+		return []users.Core{}, 0, result.Error
 	}
-	return storeToCoreList(dataUser), result.Error
+	return ToCoreList(dataUser), count, result.Error
 }
