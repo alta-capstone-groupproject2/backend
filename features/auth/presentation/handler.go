@@ -24,7 +24,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	reqBody := request.User{}
 	errBind := c.Bind(&reqBody)
 	if errBind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed bind data"))
+		return c.JSON(helper.ResponseBadRequest("failed bind data"))
 	}
 
 	authCore := request.ToCore(reqBody)
@@ -32,7 +32,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	result := response.ToResponse(id, role, token)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(err.Error()))
+		return c.JSON(helper.ResponseNotFound(err.Error()))
 	}
 	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("login success", result))
 }

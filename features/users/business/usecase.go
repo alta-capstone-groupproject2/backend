@@ -26,7 +26,7 @@ func (uc *userUseCase) GetDataById(id int) (response users.Core, err error) {
 
 func (uc *userUseCase) InsertData(userRequest users.Core) (err error) {
 
-	if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" {
+	if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" || userRequest.Name == " " || userRequest.Password == " " {
 		return errors.New("all data must be filled")
 	}
 
@@ -68,7 +68,11 @@ func (uc *userUseCase) DeleteData(id int) (err error) {
 func (uc *userUseCase) UpdateData(userReq users.Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) (err error) {
 	updateMap := make(map[string]interface{})
 
-	if userReq.Name != "" {
+	if userReq.Name != "" || userReq.Name == " " {
+		errNameFormat := nameFormatValidation(userReq.Name)
+		if errNameFormat != nil {
+			return errors.New(errNameFormat.Error())
+		}
 		updateMap["name"] = &userReq.Name
 	}
 	if userReq.Email != "" {

@@ -4,30 +4,9 @@ import (
 	"errors"
 	"lami/app/helper"
 	"mime/multipart"
-	"regexp"
 	"strconv"
 	"time"
 )
-
-func emailFormatValidation(email string) error {
-	//	Check syntax email address
-	pattern := `^\w+@\w+\.\w+$`
-	matched, _ := regexp.Match(pattern, []byte(email))
-	if !matched {
-		return errors.New("failed syntax email address")
-	}
-	return nil
-}
-
-func nameFormatValidation(name string) error {
-	//	Check syntax email address
-	pattern := `^[a-zA-Z ]+$`
-	matched, _ := regexp.Match(pattern, []byte(name))
-	if !matched {
-		return errors.New("failed syntax name")
-	}
-	return nil
-}
 
 func uploadFileValidation(name string, id int, directory string, contentType string, fileInfo *multipart.FileHeader, fileData multipart.File) (string, error) {
 	//	Check file extension
