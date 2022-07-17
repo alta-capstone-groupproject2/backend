@@ -29,6 +29,10 @@ type Store struct {
 	StoreStatus string `json:"status" form:"status"`
 }
 
+type Gmail struct {
+	Gmail string `json:"email" form:"email"`
+}
+
 func StoreToCore(userReq Store) users.Core {
 	userCore := users.Core{
 		StoreName: userReq.StoreName,

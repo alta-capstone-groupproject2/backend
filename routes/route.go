@@ -24,6 +24,8 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.GET("/users/stores", presenter.UserPresenter.GetStoreSubmission, middlewares.JWTMiddleware())
 	e.PUT("/users/stores/:id", presenter.UserPresenter.UpdateStatusAccount, middlewares.JWTMiddleware())
 
+	e.POST("/verifs", presenter.UserPresenter.GmailVerification)
+
 	e.POST("/cultures", presenter.CulturePresenter.PostCulture, middlewares.JWTMiddleware())
 	e.GET("/cultures", presenter.CulturePresenter.GetCulture)
 	e.GET("/cultures/:cultureID", presenter.CulturePresenter.GetCulturebyIDCulture)

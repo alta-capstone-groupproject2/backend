@@ -94,8 +94,7 @@ func (h *UserHandler) Update(c echo.Context) error {
 
 	err := h.userBusiness.UpdateData(userCore, userIDToken, fileInfo, fileData)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed(err.Error()))
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success update data"))
 }
@@ -186,4 +185,21 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 	}
 
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success", totalPage, _responseUser.UserStoreFromCoreList(result)))
+}
+
+func (h *UserHandler)GmailVerification(c echo.Context)error{
+	gmail := _requestUser.Gmail{}
+	errBind := c.Bind(&gmail)
+	if errBind != nil {
+		return c.JSON(http.StatusInternalServerError,
+			helper.ResponseFailed("failed bind gmail"))
+	}
+	
+	errResult := helper.Send(gmail.Gmail, "abc")
+	if errResult != nil {
+		return c.JSON(http.StatusInternalServerError,
+			helper.ResponseFailed(errResult.Error()))
+	}
+	return c.JSON(http.StatusOK,
+		helper.ResponseSuccessNoData("success email verification sent"))
 }

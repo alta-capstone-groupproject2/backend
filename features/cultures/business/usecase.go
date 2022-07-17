@@ -75,7 +75,7 @@ func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fi
 		updateMap["details"] = &dataReq.Details
 	}
 	if fileInfo != nil {
-		urlImage, errFile := uploadFileValidation(dataReq.Name, 0, config.CultureImages, config.ContentImage, fileInfo, fileData)
+		urlImage, errFile := uploadFileValidation("", 0, config.CultureImages, config.ContentImage, fileInfo, fileData)
 		if errFile != nil {
 			return errors.New(errFile.Error())
 		}
