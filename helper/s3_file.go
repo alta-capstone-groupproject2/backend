@@ -13,6 +13,7 @@ import (
 )
 
 func UploadFileToS3(directory string, fileName string, contentType string, fileData multipart.File) (string, error) {
+
 	// The session the S3 Uploader will use
 	sess := _config.GetSession()
 

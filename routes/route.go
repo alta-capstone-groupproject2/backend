@@ -26,24 +26,27 @@ func New(presenter factory.Presenter) *echo.Echo {
 
 	e.POST("/verifs", presenter.UserPresenter.GmailVerification)
 
+	//submission by user
+	e.GET("/events/submissions", presenter.EventPresenter.GetSubmissionAll, middlewares.JWTMiddleware())
+	e.PUT("/events/submissions/:id", presenter.EventPresenter.UpdateData, middlewares.JWTMiddleware())
+	//event data
+	e.POST("/events", presenter.EventPresenter.InsertData, middlewares.JWTMiddleware())
 	e.POST("/cultures", presenter.CulturePresenter.PostCulture, middlewares.JWTMiddleware())
 	e.GET("/cultures", presenter.CulturePresenter.GetCulture)
 	e.GET("/cultures/:cultureID", presenter.CulturePresenter.GetCulturebyIDCulture)
 	e.PUT("/cultures/:cultureID", presenter.CulturePresenter.PutCulture, middlewares.JWTMiddleware())
 	e.DELETE("/cultures/:cultureID", presenter.CulturePresenter.DeleteCulture, middlewares.JWTMiddleware())
-	
+
 	e.POST("/cultures/reports/:cultureID", presenter.CulturePresenter.PostCultureReport, middlewares.JWTMiddleware())
 	e.GET("/cultures/reports/:cultureID", presenter.CulturePresenter.GetCultureReport, middlewares.JWTMiddleware())
 
-	e.POST("/events/comments", presenter.CommentPresenter.Add, middlewares.JWTMiddleware())
-	e.GET("/events/comments/:id", presenter.CommentPresenter.Get, middlewares.JWTMiddleware())
-
 	e.GET("/events", presenter.EventPresenter.GetAll)
 	e.GET("/events/:id", presenter.EventPresenter.GetDataById)
-	e.POST("/events", presenter.EventPresenter.InsertData, middlewares.JWTMiddleware())
-	e.PUT("/events/:id", presenter.EventPresenter.UpdateData, middlewares.JWTMiddleware())
 	e.DELETE("/events/:id", presenter.EventPresenter.DeleteData, middlewares.JWTMiddleware())
-	e.GET("/myevents", presenter.EventPresenter.GetEventByUser, middlewares.JWTMiddleware())
+	e.GET("/users/events", presenter.EventPresenter.GetEventByUser, middlewares.JWTMiddleware())
+
+	e.POST("/events/comments", presenter.CommentPresenter.Add, middlewares.JWTMiddleware())
+	e.GET("/events/comments/:id", presenter.CommentPresenter.Get, middlewares.JWTMiddleware())
 
 	e.POST("/events/participations", presenter.ParticipantPresenter.Joined, middlewares.JWTMiddleware())
 	e.GET("/events/participations", presenter.ParticipantPresenter.GetAllEventParticipant, middlewares.JWTMiddleware())

@@ -5,7 +5,6 @@ import (
 	"lami/app/features/auth/presentation/request"
 	"lami/app/features/auth/presentation/response"
 	"lami/app/helper"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -34,5 +33,5 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	if err != nil {
 		return c.JSON(helper.ResponseNotFound(err.Error()))
 	}
-	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("login success", result))
+	return c.JSON(helper.ResponseStatusOkWithData("login success", result))
 }

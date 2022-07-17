@@ -20,17 +20,18 @@ type Event struct {
 	Location string
 	Detail   string
 	Price    int
+	Status   string
 	UserID   int
 	User     data.User
 }
 
 type Participant struct {
-	ID       int    `json:"participant_id" form:"participant_id"`
-	User_ID  int    `json:"user_id" form:"user_id"`
-	Event_ID int    `json:"event_id" form:"event_id"`
-	Name     string `json:"name" form:"name"`
-	Url      string `json:"url" form:"url"`
-	User     data.User
+	ID      int
+	UserID  int
+	EventID int
+	Name    string
+	Image   string
+	User    data.User
 }
 
 //DTO
@@ -48,7 +49,8 @@ func (data *Event) toCore() events.Core {
 		Location: data.Location,
 		Detail:   data.Detail,
 		Price:    data.Price,
-		IDUser:   data.UserID,
+		Status:   data.Status,
+		UserID:   data.UserID,
 	}
 }
 
@@ -72,7 +74,8 @@ func fromCore(core events.Core) Event {
 		Location: core.Location,
 		Detail:   core.Detail,
 		Price:    core.Price,
-		UserID:   core.IDUser,
+		Status:   core.Status,
+		UserID:   core.UserID,
 	}
 }
 
@@ -95,3 +98,26 @@ func ToParticipantCoreList(data []Participant) []events.Participant {
 	}
 	return result
 }
+
+func (data *Event) toSubmissionCore() events.Submission {
+	return events.Submission{
+		ID:       int(data.ID),
+		Name:     data.Name,
+		UserName: data.User.Name,
+		City:     data.City,
+		Date:     data.Date,
+		Status:   data.Status,
+	}
+}
+
+func ToCoreSubmissionList(data []Event) []events.Submission {
+	result := []events.Submission{}
+	for key := range data {
+		result = append(result, data[key].toSubmissionCore())
+	}
+	return result
+}
+
+// func toSubmissionCore(data Event) events.Submission {
+// 	return data.toSubmissionCore()
+// }

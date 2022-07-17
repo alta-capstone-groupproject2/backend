@@ -33,7 +33,7 @@ func (h *UserHandler) GetDataById(c echo.Context) error {
 	result, err := h.userBusiness.GetDataById(userIDToken)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed(err.Error()))
+			helper.ResponseFailedServer(err.Error()))
 	}
 	if result.Role.RoleName == config.User {
 		return c.JSON(helper.ResponseStatusOkWithData("success", _responseUser.FromCore(result)))
@@ -66,7 +66,7 @@ func (h *UserHandler) Delete(c echo.Context) error {
 	err := h.userBusiness.DeleteData(userIDToken)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed("failed to delete data"))
+			helper.ResponseFailedServer("failed to delete data"))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success delete data"))
 }
@@ -153,8 +153,7 @@ func (h *UserHandler) UpdateStatusAccount(c echo.Context) error {
 
 	err := h.userBusiness.UpdateStatusUser(dataReq.StoreStatus, userId)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed(err.Error()))
+		return c.JSON(helper.ResponseInternalServerError(err.Error()))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success update data"))
 }
@@ -180,8 +179,7 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 
 	result, totalPage, err := h.userBusiness.GetDataSubmissionStore(limitint, pageint)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed("failed to get all data"))
+		return c.JSON(helper.ResponseInternalServerError("failed to get all data"))
 	}
 
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success", totalPage, _responseUser.UserStoreFromCoreList(result)))
@@ -191,14 +189,12 @@ func (h *UserHandler)GmailVerification(c echo.Context)error{
 	gmail := _requestUser.Gmail{}
 	errBind := c.Bind(&gmail)
 	if errBind != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed("failed bind gmail"))
+		return c.JSON(helper.ResponseBadRequest("failed bind gmail"))
 	}
 	
 	errResult := helper.Send(gmail.Gmail, "abc")
 	if errResult != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed(errResult.Error()))
+		return c.JSON(helper.ResponseBadRequest(errResult.Error()))
 	}
 	return c.JSON(http.StatusOK,
 		helper.ResponseSuccessNoData("success email verification sent"))

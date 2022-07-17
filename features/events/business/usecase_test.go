@@ -1,4 +1,4 @@
-package bussiness
+package business
 
 import (
 	"fmt"
@@ -13,13 +13,13 @@ type mockEventDataSucces struct{}
 
 func (mock mockEventDataSucces) SelectData(limit int, offset int, name string, sity string) (data []events.Core, total int64, err error) {
 	return []events.Core{
-		{ID: 1, Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", IDUser: 1},
-		{ID: 2, Name: "festival 2", Detail: "detail festival 2", Location: "1,1", HostedBy: "me", City: "malang", IDUser: 1},
+		{ID: 1, Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", UserID: 1},
+		{ID: 2, Name: "festival 2", Detail: "detail festival 2", Location: "1,1", HostedBy: "me", City: "malang", UserID: 1},
 	}, 1, nil
 }
 
 func (mock mockEventDataSucces) SelectDataByID(id int) (data events.Core, err error) {
-	return events.Core{ID: 1, Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", IDUser: 1}, nil
+	return events.Core{ID: 1, Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", UserID: 1}, nil
 }
 
 func (mock mockEventDataSucces) InsertData(data events.Core) (err error) {
@@ -30,14 +30,14 @@ func (mock mockEventDataSucces) DeleteDataByID(id int, userid int) (err error) {
 	return nil
 }
 
-func (mock mockEventDataSucces) UpdateDataByID(dataReq map[string]interface{}, id int, userId int) (err error) {
+func (mock mockEventDataSucces) UpdateDataByID(status string, id int, userId int) (err error) {
 	return nil
 }
 
 func (mock mockEventDataSucces) SelectDataByUserID(userId int, limit int, offset int) (data []events.Core, total int64, err error) {
 	return []events.Core{
-		{ID: 1, Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", IDUser: 1},
-		{ID: 2, Name: "festival 2", Detail: "detail festival 2", Location: "1,1", HostedBy: "me", City: "malang", IDUser: 1},
+		{ID: 1, Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", UserID: 1},
+		{ID: 2, Name: "festival 2", Detail: "detail festival 2", Location: "1,1", HostedBy: "me", City: "malang", UserID: 1},
 	}, 1, nil
 }
 
@@ -46,6 +46,15 @@ func (mock mockEventDataSucces) SelectParticipantData(limit int) (data []events.
 		{ID: 1, Name: "user 1", Image: "example.com"},
 		{ID: 2, Name: "user 2", Image: "example.com"},
 	}, nil
+}
+
+func (mock mockEventDataSucces) SelectDataSubmission(limit, page int) (data []events.Submission, total int64, err error) {
+	return data, total, nil
+}
+
+func (mock mockEventDataSucces) CheckUserID(id int) (userID int, err error) {
+	var data events.Core
+	return data.UserID, nil
 }
 
 //mock data failed case
@@ -67,7 +76,7 @@ func (mock mockEventDataFailed) DeleteDataByID(id int, userid int) (err error) {
 	return fmt.Errorf("failed to insert data ")
 }
 
-func (mock mockEventDataFailed) UpdateDataByID(dataReq map[string]interface{}, id int, userId int) (err error) {
+func (mock mockEventDataFailed) UpdateDataByID(status string, id int, userId int) (err error) {
 	return fmt.Errorf("failed to insert data ")
 }
 
@@ -77,6 +86,14 @@ func (mock mockEventDataFailed) SelectDataByUserID(userId int, limit int, offset
 
 func (mock mockEventDataFailed) SelectParticipantData(event_id int) (data []events.Participant, err error) {
 	return nil, fmt.Errorf("failed get participant")
+}
+
+func (mock mockEventDataFailed) SelectDataSubmission(limit, page int) (data []events.Submission, total int64, err error) {
+	return nil, 0, err
+}
+
+func (mock mockEventDataFailed) CheckUserID(id int) (userID int, err error) {
+	return 0, err
 }
 
 func TestGetAllEvent(t *testing.T) {
@@ -127,7 +144,7 @@ func TestInsertEvent(t *testing.T) {
 	t.Run("Test Insert Data Success", func(t *testing.T) {
 		eventBusiness := NewEventBusiness(mockEventDataSucces{})
 		newEvent := events.Core{
-			Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", IDUser: 1, Image: "example.com",
+			Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", UserID: 1, Image: "example.com",
 		}
 		err := eventBusiness.InsertEvent(newEvent)
 		assert.Nil(t, err)
@@ -190,22 +207,16 @@ func TestUpdateEvent(t *testing.T) {
 	t.Run("Test Update Data Success", func(t *testing.T) {
 		eventBusiness := NewEventBusiness(mockEventDataSucces{})
 		id := 1
-		userid := 1
-		newEvent := events.Core{
-			Name: "festival 1", Detail: "detail festival 1", Location: "1,1", HostedBy: "me", City: "malang", IDUser: 1,
-		}
-		err := eventBusiness.UpdateEventByID(newEvent, id, userid)
+		status := "approved"
+		err := eventBusiness.UpdateEventByID(status, id)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Test Update Data Failed", func(t *testing.T) {
-		id := 1
-		userid := 0
 		eventBusiness := NewEventBusiness(mockEventDataFailed{})
-		newEvent := events.Core{
-			Name: "festival abs",
-		}
-		err := eventBusiness.UpdateEventByID(newEvent, id, userid)
+		id := 1
+		status := "approved"
+		err := eventBusiness.UpdateEventByID(status, id)
 		assert.NotNil(t, err)
 	})
 }
