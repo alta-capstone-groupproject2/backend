@@ -105,7 +105,7 @@ func (repo *mysqlUserRepository) UpdateAccountRole(status string, id int) error 
 	return nil
 }
 
-func (repo *mysqlUserRepository) SelectData(limit, offset int) (response []users.Core, total int64, err error) {
+func (repo *mysqlUserRepository) SelectDataSubmissionStore(limit, offset int) (response []users.Core, total int64, err error) {
 	var dataUser []User
 	var count int64
 	result := repo.db.Preload("Role").Where("store_status is not null").Find(&dataUser).Count(&count)

@@ -53,8 +53,7 @@ func (h *UserHandler) Insert(c echo.Context) error {
 	userCore := _requestUser.ToCore(user)
 	err := h.userBusiness.InsertData(userCore)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailedServer(err.Error()))
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 	return c.JSON(helper.ResponseCreateSuccess("success insert data"))
 }
@@ -87,7 +86,6 @@ func (h *UserHandler) Update(c echo.Context) error {
 	fileData, fileInfo, fileErr := c.Request().FormFile("image")
 	if fileErr != http.ErrMissingFile {
 		if fileErr != nil {
-			log.Print(fileErr)
 			return c.JSON(helper.ResponseBadRequest("failed to get file"))
 		}
 	}
@@ -180,7 +178,7 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 		return c.JSON(helper.ResponseForbidden("access denied"))
 	}
 
-	result, totalPage, err := h.userBusiness.GetAllData(limitint, pageint)
+	result, totalPage, err := h.userBusiness.GetDataSubmissionStore(limitint, pageint)
 	if err != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed to get all data"))
 	}
