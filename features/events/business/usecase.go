@@ -49,8 +49,13 @@ func (uc *eventUseCase) DeleteEventByID(id int, userId int) (err error) {
 	return err
 }
 
-func (uc *eventUseCase) UpdateEventByID(status string, id int, userId int) (err error) {
-	err = uc.eventData.UpdateDataByID(status, id, userId)
+func (uc *eventUseCase) UpdateEventByID(status string, id int) (err error) {
+	checkUserID, errCheck := uc.eventData.CheckUserID(id)
+	if errCheck != nil {
+		return err
+	}
+	userID := checkUserID
+	err = uc.eventData.UpdateDataByID(status, id, userID)
 	return err
 }
 

@@ -43,7 +43,7 @@ type Business interface {
 	GetEventByID(param int) (data Core, err error)
 	InsertEvent(dataReq Core) (err error)
 	DeleteEventByID(id int, userId int) (err error)
-	UpdateEventByID(status string, id int, userId int) (err error)
+	UpdateEventByID(status string, id int) (err error)
 	GetEventByUserID(id_user, limit, offset int) (data []Core, total int64, err error)
 	GetEventSubmission(limit, offset int) (data []Submission, total int64, err error)
 	// GetEventSubmissionByID(id int) (data Core, err error)
@@ -57,6 +57,7 @@ type Data interface {
 	UpdateDataByID(status string, id int, userId int) (err error)
 	SelectDataByUserID(id_user, limit, offset int) (data []Core, total int64, err error)
 	SelectParticipantData(id_event int) (data []Participant, err error)
+	CheckUserID(id int) (userID int, err error)
 	SelectDataSubmission(limit, offset int) (data []Submission, total int64, err error)
 	// SelectDataSubmissionByID(id int) (data Core, err error)
 }

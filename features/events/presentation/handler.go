@@ -175,7 +175,7 @@ func (h *EventHandler) UpdateData(c echo.Context) error {
 	}
 
 	if role == config.Admin {
-		err := h.eventBusiness.UpdateEventByID(status, id, userID_token)
+		err := h.eventBusiness.UpdateEventByID(status, id)
 		if err != nil {
 			fmt.Println(err.Error())
 			return c.JSON(helper.ResponseInternalServerError("failed update data"))

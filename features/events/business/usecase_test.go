@@ -52,6 +52,11 @@ func (mock mockEventDataSucces) SelectDataSubmission(limit, page int) (data []ev
 	return data, total, nil
 }
 
+func (mock mockEventDataSucces) CheckUserID(id int) (userID int, err error) {
+	var data events.Core
+	return data.UserID, nil
+}
+
 //mock data failed case
 type mockEventDataFailed struct{}
 
@@ -85,6 +90,10 @@ func (mock mockEventDataFailed) SelectParticipantData(event_id int) (data []even
 
 func (mock mockEventDataFailed) SelectDataSubmission(limit, page int) (data []events.Submission, total int64, err error) {
 	return nil, 0, err
+}
+
+func (mock mockEventDataFailed) CheckUserID(id int) (userID int, err error) {
+	return 0, err
 }
 
 func TestGetAllEvent(t *testing.T) {
@@ -198,18 +207,16 @@ func TestUpdateEvent(t *testing.T) {
 	t.Run("Test Update Data Success", func(t *testing.T) {
 		eventBusiness := NewEventBusiness(mockEventDataSucces{})
 		id := 1
-		userid := 1
 		status := "approved"
-		err := eventBusiness.UpdateEventByID(status, id, userid)
+		err := eventBusiness.UpdateEventByID(status, id)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Test Update Data Failed", func(t *testing.T) {
 		eventBusiness := NewEventBusiness(mockEventDataFailed{})
 		id := 1
-		userid := 0
 		status := "approved"
-		err := eventBusiness.UpdateEventByID(status, id, userid)
+		err := eventBusiness.UpdateEventByID(status, id)
 		assert.NotNil(t, err)
 	})
 }

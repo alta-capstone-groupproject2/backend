@@ -2,7 +2,6 @@ package data
 
 import (
 	"errors"
-	"fmt"
 	"lami/app/config"
 	"lami/app/features/events"
 
@@ -61,11 +60,20 @@ func (repo *mysqlEventRepository) DeleteDataByID(id int, userId int) error {
 	return result.Error
 }
 
-func (repo *mysqlEventRepository) UpdateDataByID(status string, id, userId int) error {
+func (repo *mysqlEventRepository) CheckUserID(id int) (respon int, err error) {
+	var data Event
+	result := repo.db.First(&data, id)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return data.UserID, nil
+}
+
+func (repo *mysqlEventRepository) UpdateDataByID(status string, id, userID int) error {
 	model := Event{}
 	model.ID = uint(id)
-	fmt.Println(model.UserID)
-	result := repo.db.Model(&model).Where("user_id = ?", model.UserID).Update("status", status)
+
+	result := repo.db.Model(&model).Where("user_id = ?", userID).Update("status", status)
 	if result.RowsAffected == 0 {
 		return errors.New("no row affected")
 	}
