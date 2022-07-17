@@ -7,6 +7,7 @@ import (
 
 type Core struct {
 	ID        int
+	UserID    int
 	Name      string
 	URL       string
 	Price     float32
@@ -14,8 +15,8 @@ type Core struct {
 	Detail    string
 	StoreName string
 	City      string
-	Date      time.Time
-	UserID    int
+	CreateAt  time.Time
+	UpdatedAt time.Time
 	User      data.User
 }
 
@@ -27,6 +28,8 @@ type CoreRating struct {
 	UserID      int
 	Rating      uint
 	Review      string
+	CreateAt    time.Time
+	UpdatedAt   time.Time
 	Product     Core
 }
 

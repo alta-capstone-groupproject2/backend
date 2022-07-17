@@ -40,11 +40,13 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 	}
 
 	layout_time := "2006-01-02T15:04"
-	DateTime, errDate := time.Parse(layout_time, product.Date)
+	Time, errDate := time.Parse(layout_time, time.Now().Format(layout_time))
+	fmt.Println("Time:", Time)
 	if errDate != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to format date"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed format date"))
 	}
-	product.DateTime = DateTime
+	product.CreateAt = Time
+	product.UpdatedAt = Time
 
 	fileData, fileInfo, fileErr := c.Request().FormFile("file")
 	if fileErr == http.ErrMissingFile || fileErr != nil {
@@ -95,11 +97,11 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 	}
 
 	layout_time := "2006-01-02T15:04"
-	DateTime, errDate := time.Parse(layout_time, product.Date)
+	UpdatedTime, errDate := time.Parse(layout_time, product.Date)
 	if errDate != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed format date"))
 	}
-	product.DateTime = DateTime
+	product.UpdatedAt = UpdatedTime
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
@@ -174,10 +176,17 @@ func (h *ProductHandler) PostProductRating(c echo.Context) error {
 
 	rating := request.Rating{}
 	err_bind := c.Bind(&rating)
-
 	if err_bind != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to bind data rating"))
 	}
+
+	layout_time := "2006-01-02T15:04"
+	Time, errDate := time.Parse(layout_time, rating.Date)
+	if errDate != nil {
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed format date"))
+	}
+	rating.CreateAt = Time
+	rating.UpdatedAt = Time
 
 	ratingCore := request.ToCoreRating(rating)
 	ratingCore.UserID = userID_token

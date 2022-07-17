@@ -1,54 +1,59 @@
 package data
 
 import (
-	"time"
-
 	"lami/app/features/products"
 	"lami/app/features/users/data"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type Product struct {
 	gorm.Model
-	Name   string    `json:"name" form:"name"`
-	URL    string    `json:"url" form:"url"`
-	Price  float32   `json:"price" form:"price"`
-	Stock  uint      `json:"stock" form:"stock"`
-	Detail string    `json:"detail" form:"detail"`
-	UserID int       `json:"user_id" form:"user_id"`
-	Date   time.Time `json:"date" form:"date"`
-	User   data.User `gorm:"foreignKey:UserID"`
+	UserID    int     `json:"user_id" form:"user_id"`
+	Name      string  `json:"name" form:"name"`
+	URL       string  `json:"url" form:"url"`
+	Price     float32 `json:"price" form:"price"`
+	Stock     uint    `json:"stock" form:"stock"`
+	Detail    string  `json:"detail" form:"detail"`
+	CreateAt  time.Time
+	UpdatedAt time.Time
+	User      data.User `gorm:"foreignKey:UserID"`
 }
 
 type Rating struct {
 	gorm.Model
-	Rating      uint      `json:"rating" form:"rating"`
-	Review      string    `json:"review" form:"review"`
-	ProductID   int       `json:"productID" form:"productID"`
-	UserID      int       `json:"user_id" form:"user_id"`
-	Product     Product
-	User        data.User
+	UserID    int    `json:"user_id" form:"user_id"`
+	ProductID int    `json:"productID" form:"productID"`
+	Rating    uint   `json:"rating" form:"rating"`
+	Review    string `json:"review" form:"review"`
+	CreateAt  time.Time
+	UpdatedAt time.Time
+	Product   Product
+	User      data.User
 }
 
 func fromCore(core product.Core) Product {
 	return Product{
-		URL:    core.URL,
-		Name:   core.Name,
-		Price:  core.Price,
-		Stock:  core.Stock,
-		Detail: core.Detail,
-		Date:   core.Date,
-		UserID: core.UserID,
+		UserID:    core.UserID,
+		URL:       core.URL,
+		Name:      core.Name,
+		Price:     core.Price,
+		Stock:     core.Stock,
+		Detail:    core.Detail,
+		CreateAt:  core.CreateAt,
+		UpdatedAt: core.UpdatedAt,
 	}
 }
 
 func fromCoreRating(core product.CoreRating) Rating {
 	return Rating{
+		UserID:    core.UserID,
+		ProductID: core.ProductID,
 		Rating:    core.Rating,
 		Review:    core.Review,
-		ProductID: core.ProductID,
-		UserID:    core.UserID,
+		CreateAt:  core.CreateAt,
+		UpdatedAt: core.UpdatedAt,
 	}
 }
 
