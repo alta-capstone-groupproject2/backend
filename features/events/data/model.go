@@ -50,7 +50,7 @@ func (data *Event) toCore() events.Core {
 		Detail:   data.Detail,
 		Price:    data.Price,
 		Status:   data.Status,
-		IDUser:   data.UserID,
+		UserID:   data.UserID,
 	}
 }
 
@@ -75,7 +75,7 @@ func fromCore(core events.Core) Event {
 		Detail:   core.Detail,
 		Price:    core.Price,
 		Status:   core.Status,
-		UserID:   core.IDUser,
+		UserID:   core.UserID,
 	}
 }
 
@@ -98,3 +98,26 @@ func ToParticipantCoreList(data []Participant) []events.Participant {
 	}
 	return result
 }
+
+func (data *Event) toSubmissionCore() events.Submission {
+	return events.Submission{
+		ID:       int(data.ID),
+		Name:     data.Name,
+		UserName: data.User.Name,
+		City:     data.City,
+		Date:     data.Date,
+		Status:   data.Status,
+	}
+}
+
+func ToCoreSubmissionList(data []Event) []events.Submission {
+	result := []events.Submission{}
+	for key := range data {
+		result = append(result, data[key].toSubmissionCore())
+	}
+	return result
+}
+
+// func toSubmissionCore(data Event) events.Submission {
+// 	return data.toSubmissionCore()
+// }

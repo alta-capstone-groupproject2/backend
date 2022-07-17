@@ -1,4 +1,4 @@
-package bussiness
+package business
 
 import (
 	"errors"
@@ -49,37 +49,21 @@ func (uc *eventUseCase) DeleteEventByID(id int, userId int) (err error) {
 	return err
 }
 
-func (uc *eventUseCase) UpdateEventByID(eventReq events.Core, id int, userId int) (err error) {
-	updateMap := make(map[string]interface{})
-	if eventReq.Name != "" {
-		updateMap["name"] = &eventReq.Name
-	}
-	if eventReq.Detail != "" {
-		updateMap["details"] = &eventReq.Detail
-	}
-	if eventReq.City != "" {
-		updateMap["city"] = &eventReq.City
-	}
-	if !eventReq.Date.IsZero() {
-		updateMap["date"] = &eventReq.Date
-	}
-	if eventReq.Location != "" {
-		updateMap["location"] = &eventReq.Location
-	}
-	if eventReq.HostedBy != "" {
-		updateMap["hostedBy"] = &eventReq.HostedBy
-	}
-	if eventReq.Image != "" {
-		updateMap["image"] = &eventReq.Image
-	}
-
-	err = uc.eventData.UpdateDataByID(updateMap, id, userId)
+func (uc *eventUseCase) UpdateEventByID(status string, id int, userId int) (err error) {
+	err = uc.eventData.UpdateDataByID(status, id, userId)
 	return err
 }
 
-func (uc *eventUseCase) GetEventByUserID(id_user, limit, page int) (response []events.Core, total int64, err error) {
+func (uc *eventUseCase) GetEventByUserID(userID, limit, page int) (response []events.Core, total int64, err error) {
 	offset := limit * (page - 1)
-	resp, total, errData := uc.eventData.SelectDataByUserID(id_user, limit, offset)
+	resp, total, errData := uc.eventData.SelectDataByUserID(userID, limit, offset)
+	total = total/int64(limit) + 1
+	return resp, total, errData
+}
+
+func (uc *eventUseCase) GetEventSubmission(limit, page int) (data []events.Submission, total int64, err error) {
+	offset := limit * (page - 1)
+	resp, total, errData := uc.eventData.SelectDataSubmission(limit, offset)
 	total = total/int64(limit) + 1
 	return resp, total, errData
 }

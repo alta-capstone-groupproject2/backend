@@ -2,6 +2,8 @@ package data
 
 import (
 	"errors"
+	"fmt"
+	"lami/app/config"
 	"lami/app/features/events"
 
 	"gorm.io/gorm"
@@ -52,18 +54,18 @@ func (repo *mysqlEventRepository) InsertData(EventData events.Core) error {
 
 func (repo *mysqlEventRepository) DeleteDataByID(id int, userId int) error {
 	dataEvent := Event{}
-	result := repo.db.Where("user_id = ?", userId).Delete(&dataEvent, id)
+	result := repo.db.Where("user_id = ?", dataEvent.UserID).Delete(&dataEvent, id)
 	if result.RowsAffected == 0 {
 		return errors.New("no rows affected")
 	}
 	return result.Error
 }
 
-func (repo *mysqlEventRepository) UpdateDataByID(dataReq map[string]interface{}, id int, userId int) error {
-
+func (repo *mysqlEventRepository) UpdateDataByID(status string, id, userId int) error {
 	model := Event{}
 	model.ID = uint(id)
-	result := repo.db.Model(model).Where("user_id = ?", userId).Updates(dataReq)
+	fmt.Println(model.UserID)
+	result := repo.db.Model(&model).Where("user_id = ?", model.UserID).Update("status", status)
 	if result.RowsAffected == 0 {
 		return errors.New("no row affected")
 	}
@@ -72,7 +74,6 @@ func (repo *mysqlEventRepository) UpdateDataByID(dataReq map[string]interface{},
 	}
 
 	return nil
-
 }
 
 func (repo *mysqlEventRepository) SelectDataByUserID(id_user, limit, offset int) (response []events.Core, total int64, err error) {
@@ -95,3 +96,17 @@ func (repo *mysqlEventRepository) SelectParticipantData(id_event int) (response 
 
 	return ToParticipantCoreList(dataParticipant), result.Error
 }
+
+func (repo *mysqlEventRepository) SelectDataSubmission(limit, offset int) (data []events.Submission, total int64, err error) {
+	var dataSubmit []Event
+	var count int64
+	result := repo.db.Where("status = ?", config.Status).Limit(limit).Offset(offset).Preload("User").Find(&dataSubmit).Count(&count)
+	if result.Error != nil {
+		return []events.Submission{}, 0, result.Error
+	}
+	return ToCoreSubmissionList(dataSubmit), count, result.Error
+}
+
+// func (repo *mysqlEventRepository) SelectDataSubmissionByID(dataReq events.Core) (err error) {
+
+// }

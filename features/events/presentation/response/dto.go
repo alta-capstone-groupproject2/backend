@@ -41,6 +41,15 @@ type Participant struct {
 	Image string `json:"image" form:"image"`
 }
 
+type Submission struct {
+	ID       int       `json:"eventID" form:"eventID"`
+	Name     string    `json:"nameEvent" form:"nameEvent"`
+	UserName string    `json:"username" form:"username"`
+	City     string    `json:"city" form:"city"`
+	Date     time.Time `json:"date" form:"date"`
+	Status   string    `json:"status" form:"status"`
+}
+
 func FromCore(data events.Core) Event {
 	return Event{
 		ID:       data.ID,
@@ -88,10 +97,29 @@ func FromParticipantCore(data events.Participant) Participant {
 	}
 }
 
+func FromSubmissionCore(data events.Submission) Submission {
+	return Submission{
+		ID:       data.ID,
+		Name:     data.Name,
+		UserName: data.UserName,
+		City:     data.City,
+		Date:     data.Date,
+		Status:   data.Status,
+	}
+}
+
 func FromParticipantCoreList(data []events.Participant) []Participant {
 	result := []Participant{}
 	for key := range data {
 		result = append(result, FromParticipantCore(data[key]))
+	}
+	return result
+}
+
+func FromSubmissionCoreList(data []events.Submission) []Submission {
+	result := []Submission{}
+	for key := range data {
+		result = append(result, FromSubmissionCore(data[key]))
 	}
 	return result
 }

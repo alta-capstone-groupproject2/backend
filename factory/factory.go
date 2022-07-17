@@ -9,7 +9,7 @@ import (
 	_authData "lami/app/features/auth/data"
 	_authPresentation "lami/app/features/auth/presentation"
 
-	_eventBusiness "lami/app/features/events/bussiness"
+	_eventBusiness "lami/app/features/events/business"
 	_eventData "lami/app/features/events/data"
 	_eventPresentation "lami/app/features/events/presentation"
 

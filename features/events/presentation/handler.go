@@ -38,7 +38,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 		return c.JSON(helper.ResponseInternalServerError("failed get all data"))
 	}
 	respons := _response_event.FromCoreList(result)
-	return c.JSON(helper.ResponseStatusOkWithDataPage("Success get all events", total, respons))
+	return c.JSON(helper.ResponseStatusOkWithDataPage("success get all events", total, respons))
 }
 
 func (h *EventHandler) GetDataById(c echo.Context) error {
@@ -82,13 +82,13 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 
 	imageExtension, err_image_extension := helper.CheckFileExtension(imageInfo.Filename, config.ContentImage)
 	if err_image_extension != nil {
-		return c.JSON(helper.ResponseBadRequest("file extension error"))
+		return c.JSON(helper.ResponseBadRequest("image extension error"))
 	}
 
 	// check image size
 	err_image_size := helper.CheckFileSize(imageInfo.Size, config.ContentImage)
 	if err_image_size != nil {
-		return c.JSON(helper.ResponseBadRequest("file size error"))
+		return c.JSON(helper.ResponseBadRequest("image size error"))
 	}
 
 	// memberikan nama file
@@ -102,9 +102,9 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 	}
 
 	//upload file PDF
-	fileData, fileInfo, fileErr := c.Request().FormFile("image")
+	fileData, fileInfo, fileErr := c.Request().FormFile("document")
 	if fileErr == http.ErrMissingFile || fileErr != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed to get image"))
+		return c.JSON(helper.ResponseInternalServerError("failed to get file"))
 	}
 
 	fileExtension, err_file_extension := helper.CheckFileExtension(fileInfo.Filename, config.ContentDocuments)
@@ -129,7 +129,7 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 	}
 
 	eventCore := _request_event.ToCore(event)
-	eventCore.IDUser = userID_token
+	eventCore.UserID = userID_token
 	eventCore.Image = image
 	eventCore.Document = file
 	eventCore.Status = config.Status
@@ -146,60 +146,79 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 func (h *EventHandler) DeleteData(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("eventID"))
 
-	userID_token, _, errToken := middlewares.ExtractToken(c)
+	userID_token, role, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
 	}
-
-	err := h.eventBusiness.DeleteEventByID(id, userID_token)
-	if err != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed delete event"))
+	if role == config.Admin {
+		err := h.eventBusiness.DeleteEventByID(id, userID_token)
+		if err != nil {
+			return c.JSON(helper.ResponseInternalServerError("failed delete event"))
+		}
 	}
 	return c.JSON(helper.ResponseNoContent("success delete data"))
 }
 
 func (h *EventHandler) UpdateData(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("eventID"))
-	eventReq := _request_event.Event{}
-	status := c.Param("status")
+	id, _ := strconv.Atoi(c.Param("id"))
+	statusReq := _request_event.UpdateEvent{}
+	err_bind := c.Bind(&statusReq)
 
-	layout_time := "2006-01-02T15:04"
-	DateTime, errDate := time.Parse(layout_time, eventReq.Date)
-	if errDate != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed format date"))
+	if err_bind != nil {
+		log.Print(err_bind)
+		return c.JSON(helper.ResponseBadRequest("failed bind data"))
 	}
-	eventReq.DateTime = DateTime
-
-	userID_token, _, errToken := middlewares.ExtractToken(c)
+	status := statusReq.Status
+	userID_token, role, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed to get user id"))
 	}
 
-	eventCore := _request_event.ToCore(eventReq)
-	eventCore.Status = status
-
-	err := h.eventBusiness.UpdateEventByID(eventCore, id, userID_token)
-	if err != nil {
-		fmt.Println(err.Error())
-		return c.JSON(helper.ResponseInternalServerError("failed update data"))
+	if role == config.Admin {
+		err := h.eventBusiness.UpdateEventByID(status, id, userID_token)
+		if err != nil {
+			fmt.Println(err.Error())
+			return c.JSON(helper.ResponseInternalServerError("failed update data"))
+		}
+		return c.JSON(helper.ResponseStatusOkNoData("sucsess update event"))
 	}
-	return c.JSON(helper.ResponseStatusOkNoData("sucsess update event"))
+	return c.JSON(helper.ResponseBadRequest("only is admin"))
 }
 
 func (h *EventHandler) GetEventByUser(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
-	id_user, _, errToken := middlewares.ExtractToken(c)
+	idUser, _, errToken := middlewares.ExtractToken(c)
 	if errToken != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
 	}
 
-	result, total, err := h.eventBusiness.GetEventByUserID(id_user, limit, page)
+	result, total, err := h.eventBusiness.GetEventByUserID(idUser, limit, page)
 
 	respons := _response_event.FromCoreList(result)
 	if err != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed to get all my events"))
 	}
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success get all my events", total, respons))
+}
+
+func (h *EventHandler) GetSubmissionAll(c echo.Context) (err error) {
+	page, _ := strconv.Atoi(c.Param("page"))
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+
+	_, role, errToken := middlewares.ExtractToken(c)
+	if errToken != nil {
+		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
+	}
+
+	if role == config.Admin {
+		result, total, err := h.eventBusiness.GetEventSubmission(limit, page)
+		if err != nil {
+			return c.JSON(helper.ResponseInternalServerError("failed to get all apply events"))
+		}
+		response := _response_event.FromSubmissionCoreList(result)
+		return c.JSON(helper.ResponseStatusOkWithDataPage("success to get all apply events", total, response))
+	}
+	return c.JSON(helper.ResponseBadRequest("only is admin"))
 }

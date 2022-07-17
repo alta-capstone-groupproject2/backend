@@ -19,6 +19,10 @@ type Event struct {
 	DateTime time.Time
 }
 
+type UpdateEvent struct {
+	Status string `json:"status" form:"status"`
+}
+
 func ToCore(eventReq Event) events.Core {
 	eventCore := events.Core{
 		Image:    eventReq.Image,
