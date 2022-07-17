@@ -133,9 +133,9 @@ func (uc *userUseCase) UpdateStatusUser(status string, id int) error {
 	return nil
 }
 
-func (uc *userUseCase) GetAllData(limit, page int) (response []users.Core, total int64, err error) {
+func (uc *userUseCase) GetDataSubmissionStore(limit, page int) (response []users.Core, total int64, err error) {
 	offset := limit * (page - 1)
-	resp, total, errData := uc.userData.SelectData(limit, offset)
+	resp, total, errData := uc.userData.SelectDataSubmissionStore(limit, offset)
 	total = total/int64(limit) + 1
 	return resp, total, errData
 }

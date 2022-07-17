@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"fmt"
+	"errors"
 	"lami/app/config"
 	"time"
 
@@ -28,12 +28,16 @@ func CreateToken(userId int, role string) (string, error) {
 }
 
 func ExtractToken(e echo.Context) (int, string, error) {
-	user := e.Get("user").(*jwt.Token)
+	token := e.Get("user")
+	if token == nil {
+		return 0,"", errors.New("not authorized")
+	}
+	user := token.(*jwt.Token)
 	if user.Valid {
 		claims := user.Claims.(jwt.MapClaims)
 		userId := claims["userId"].(float64)
 		role := claims["role"].(string)
 		return int(userId), role, nil
 	}
-	return 0, "", fmt.Errorf("token invalid")
+	return 0, "", errors.New("invalid token")
 }

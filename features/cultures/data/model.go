@@ -34,6 +34,7 @@ func fromCoreReport(core cultures.CoreReport) Report {
 	return Report{
 		CultureID: core.CultureID,
 		Message:   core.Message,
+		
 	}
 }
 
@@ -51,14 +52,23 @@ func ToCore(data Culture) cultures.Core {
 	return data.toCore()
 }
 
+func ToCoreList(data []Culture) []cultures.Core {
+	res := []cultures.Core{}
+	for key := range data {
+		res = append(res, data[key].toCore())
+	}
+	return res
+}
+
 func (data *Report) toCoreReport() cultures.CoreReport {
 	return cultures.CoreReport{
 		ID:      int(data.ID),
 		Message: data.Message,
+		CreatedAt: data.CreatedAt,
 	}
 }
 
-func ToCoreReport(data []Report) []cultures.CoreReport {
+func ToCoreReportList(data []Report) []cultures.CoreReport {
 	res := []cultures.CoreReport{}
 	for key := range data {
 		res = append(res, data[key].toCoreReport())
@@ -66,21 +76,5 @@ func ToCoreReport(data []Report) []cultures.CoreReport {
 	return res
 }
 
-// Get MyCulture
-func (data *Culture) toCoreMyCulture() cultures.Core {
-	return cultures.Core{
-		ID:      int(data.ID),
-		Image:   data.Image,
-		Name:    data.Name,
-		Details: data.Details,
-		City:    data.City,
-	}
-}
 
-func ToCoreMyCulture(data []Culture) []cultures.Core {
-	res := []cultures.Core{}
-	for key := range data {
-		res = append(res, data[key].toCoreMyCulture())
-	}
-	return res
-}
+

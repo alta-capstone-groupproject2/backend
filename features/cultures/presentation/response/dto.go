@@ -2,7 +2,6 @@ package response
 
 import (
 	"lami/app/features/cultures"
-	"time"
 )
 
 type Culture struct {
@@ -16,7 +15,7 @@ type Culture struct {
 type CultureReport struct {
 	ID        int       `json:"report_id"`
 	Message   string    `json:"message"`
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt string `json:"createdAt"`
 }
 
 func FromCore(core cultures.Core) Culture {
@@ -33,7 +32,7 @@ func FromCoreReport(core cultures.CoreReport) CultureReport {
 	return CultureReport{
 		ID:        core.ID,
 		Message:   core.Message,
-		CreatedAt: core.CreatedAt,
+		CreatedAt: core.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
 }
 

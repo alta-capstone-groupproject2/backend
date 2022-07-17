@@ -46,7 +46,7 @@ func uploadFileValidation(name string, id int, directory string, contentType str
 	fileName := strconv.Itoa(id) + "_" + name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
 	// Upload file
-	urlImage, errUploadImg := helper.UploadFileToS3(directory, contentType, fileName, fileData)
+	urlImage, errUploadImg := helper.UploadFileToS3(directory, fileName, contentType, fileData)
 
 	if errUploadImg != nil {
 		return "", errors.New("failed to upload file")

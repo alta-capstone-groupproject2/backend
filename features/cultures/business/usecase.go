@@ -2,6 +2,7 @@ package business
 
 import (
 	"errors"
+	"fmt"
 	"lami/app/config"
 	"lami/app/features/cultures"
 	"mime/multipart"
@@ -40,16 +41,12 @@ func (uc *cultureUseCase) AddCulture(dataReq cultures.Core, fileInfo *multipart.
 	return nil
 }
 
-// SelectReport implements culture.Business
-func (uc *cultureUseCase) SelectReport(cultureID int) ([]cultures.CoreReport, error) {
-	resp, err := uc.cultureData.SelectDataReport(cultureID)
-	return resp, err
-}
-
 // SelectMyculture implements culture.Business
-func (uc *cultureUseCase) SelectMyCulture(idUser int) ([]cultures.Core, error) {
-	resp, err := uc.cultureData.SelectDataMyCulture(idUser)
-	return resp, err
+func (uc *cultureUseCase) SelectCulture(limit, page int) ([]cultures.Core, int64, error) {
+	offset := limit*(page-1)
+	resp, total, err := uc.cultureData.SelectDataCulture(limit, offset)
+	total = total/int64(limit) + 1
+	return resp, total, err
 }
 
 // SelectculturebyCultureID implements culture.Business
@@ -59,8 +56,8 @@ func (uc *cultureUseCase) SelectCulturebyCultureID(cultureID int) (cultures.Core
 }
 
 // DeleteCulture implements culture.Business
-func (uc *cultureUseCase) DeleteCulture(cultureID int, idUser int) error {
-	err := uc.cultureData.DeleteDataCulture(cultureID, idUser)
+func (uc *cultureUseCase) DeleteCulture(cultureID int) error {
+	err := uc.cultureData.DeleteDataCulture(cultureID)
 	return err
 }
 
@@ -85,8 +82,8 @@ func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fi
 
 		updateMap["image"] = urlImage
 	}
-
-	err := uc.cultureData.UpdateDataCulture(dataReq, cultureID)
+	fmt.Println(updateMap["image"])
+	err := uc.cultureData.UpdateDataCulture(updateMap, cultureID)
 	if err != nil {
 		return errors.New("failed to update data culture")
 	}
@@ -102,4 +99,10 @@ func (uc *cultureUseCase) AddCultureReport(dataReq cultures.CoreReport) error {
 	}
 
 	return nil
+}
+
+// SelectReport implements culture.Business
+func (uc *cultureUseCase) SelectReport(cultureID int) ([]cultures.CoreReport, error) {
+	resp, err := uc.cultureData.SelectDataReport(cultureID)
+	return resp, err
 }

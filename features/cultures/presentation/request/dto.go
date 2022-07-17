@@ -30,10 +30,10 @@ func ToCore(cultureReq Culture) cultures.Core {
 func ToCoreUpdate(cultureReq Culture) cultures.Core {
 	return cultures.Core{
 		ID:      0,
-		Name:    "",
-		Image:   "",
-		City:    "",
-		Details: "",
+		Name:    cultureReq.Name,
+		Image:   cultureReq.Image,
+		City:    cultureReq.City,
+		Details: cultureReq.Details,
 	}
 }
 

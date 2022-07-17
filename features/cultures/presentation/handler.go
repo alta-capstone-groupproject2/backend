@@ -52,22 +52,63 @@ func (h *CultureHandler) PostCulture(c echo.Context) error {
 		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to insert culture"))
-
+	return c.JSON(helper.ResponseStatusOkNoData("Success to insert culture"))
 }
 
-func (h *CultureHandler) PutCulture(c echo.Context) error {
+func (h *CultureHandler) GetCulture(c echo.Context) error {
+	limit := c.QueryParam("limit")
+	page := c.QueryParam("page")
+	limitint, errLimit := strconv.Atoi(limit)
+	pageint, errPage := strconv.Atoi(page)
 
-	idCulture, _ := strconv.Atoi(c.Param("cultureID"))
+	if errLimit != nil || errPage != nil || limitint == 0 || pageint == 0 {
+		return c.JSON(helper.ResponseBadRequest("wrong query param"))
+	}
+
+	res, total, err := h.cultureBusiness.SelectCulture(limitint, pageint)
+	if err != nil {
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
+	}
+
+	resp := response.FromCoreList(res)
+	return c.JSON(helper.ResponseStatusOkWithDataPage("Success get all your cultures", total,resp))
+}
+
+func (h *CultureHandler) GetCulturebyIDCulture(c echo.Context) error {
+
+	cultureID, errConv := strconv.Atoi(c.Param("cultureID"))
+	if errConv != nil {
+		return c.JSON(helper.ResponseBadRequest("wrong param"))
+	}
+
+	res, err := h.cultureBusiness.SelectCulturebyCultureID(cultureID)
+	if err != nil {
+		return c.JSON(helper.ResponseBadRequest("Failed get culture by cultureID"))
+	}
+
+	response := response.FromCore(res)
+	return c.JSON(helper.ResponseStatusOkWithData("Success get culture by cultureID", response))
+}
+
+
+func (h *CultureHandler) PutCulture(c echo.Context) error {
+	userIDToken, userRole, errToken := middlewares.ExtractToken(c)
+	if userIDToken == 0 || errToken != nil {
+		return c.JSON(helper.ResponseForbidden("role not authorized"))
+	}
+	if userRole != config.Admin {
+		return c.JSON(helper.ResponseForbidden("role not authorized"))
+	}
+
+	cultureID, errConv := strconv.Atoi(c.Param("cultureID"))
+	if errConv != nil {
+		return c.JSON(helper.ResponseBadRequest("wrong param"))
+	}
+
 	culture := request.Culture{}
 	err_bind := c.Bind(&culture)
 	if err_bind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to bind data update culture"))
-	}
-
-	userID_token, _, errToken := middlewares.ExtractToken(c)
-	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get id user"))
+		return c.JSON(helper.ResponseBadRequest("failed to bind data update culture"))
 	}
 
 	cultureCore := request.ToCoreUpdate(culture)
@@ -79,94 +120,86 @@ func (h *CultureHandler) PutCulture(c echo.Context) error {
 		}
 	}
 
-	err := h.cultureBusiness.UpdateCulture(cultureCore, idCulture, fileInfo, fileData)
+	err := h.cultureBusiness.UpdateCulture(cultureCore, cultureID, fileInfo, fileData)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed to update data culture"))
+		return c.JSON(helper.ResponseBadRequest("Failed to update data culture"))
 	}
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to update data culture"))
+	return c.JSON(helper.ResponseStatusOkNoData("Success to update data culture"))
 
 }
 
 func (h *CultureHandler) DeleteCulture(c echo.Context) error {
-	idCulture, _ := strconv.Atoi(c.Param("cultureID"))
-
-	userID_token, _, errToken := middlewares.ExtractToken(c)
-	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get id user"))
+	userIDToken, userRole, errToken := middlewares.ExtractToken(c)
+	if userIDToken == 0 || errToken != nil {
+		return c.JSON(helper.ResponseBadRequest("failed get id user"))
+	}
+	if userRole != config.Admin {
+		return c.JSON(helper.ResponseForbidden("role not authorized"))
+	}
+	
+	cultureID, errConv := strconv.Atoi(c.Param("cultureID"))
+	if errConv != nil {
+		return c.JSON(helper.ResponseBadRequest("wrong param"))
 	}
 
-	err := h.cultureBusiness.DeleteCulture(idCulture, userID_token)
+	err := h.cultureBusiness.DeleteCulture(cultureID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed to delete data culture"))
+		return c.JSON(helper.ResponseBadRequest("Failed to delete data culture"))
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to delete data culture"))
+	return c.JSON(helper.ResponseStatusOkNoData("Success to delete data culture"))
 }
 
 func (h *CultureHandler) PostCultureReport(c echo.Context) error {
+	userIDToken, _, errToken := middlewares.ExtractToken(c)
+	if userIDToken == 0 || errToken != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to extract token"))
+	}
 
-	idCulture, _ := strconv.Atoi(c.Param("cultureID"))
-
-	userID_token, _, errToken := middlewares.ExtractToken(c)
-	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
+	cultureID, errConv := strconv.Atoi(c.Param("cultureID"))
+	if errConv != nil {
+		return c.JSON(helper.ResponseBadRequest("wrong param"))
 	}
 
 	report := request.Report{}
 	err_bind := c.Bind(&report)
 
 	if err_bind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to bind data report"))
+		return c.JSON(helper.ResponseBadRequest("failed to bind data report"))
 	}
 
 	reportCore := request.ToCoreReport(report)
-	reportCore.CultureID = idCulture
+	reportCore.CultureID = cultureID
 
 	err := h.cultureBusiness.AddCultureReport(reportCore)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed to insert culture report"))
+		return c.JSON(helper.ResponseBadRequest("Failed to insert culture report"))
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to insert culture report"))
+	return c.JSON(helper.ResponseStatusOkNoData("Success to insert culture report"))
 
 }
 
-func (h *CultureHandler) GetCulturebyIDCulture(c echo.Context) error {
-
-	idCulture, _ := strconv.Atoi(c.Param("cultureID"))
-
-	res, err := h.cultureBusiness.SelectCulturebyCultureID(idCulture)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed get culture by idCulture"))
-	}
-
-	response := response.FromCore(res)
-	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get culture by idCulture", response))
-}
-
-func (h *CultureHandler) GetCulture(c echo.Context) error {
-	userID_token, _, errToken := middlewares.ExtractToken(c)
-	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
-	}
-
-	res, err := h.cultureBusiness.SelectMyCulture(userID_token)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get all your cultures"))
-	}
-
-	resp := response.FromCoreList(res)
-	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get all your cultures", resp))
-}
 
 func (h *CultureHandler) GetCultureReport(c echo.Context) error {
-	idCulture, _ := strconv.Atoi(c.Param("cultureID"))
+	userIDToken, userRole, errToken := middlewares.ExtractToken(c)
+	if userIDToken == 0 || errToken != nil {
+		return c.JSON(helper.ResponseBadRequest("failed get id user"))
+	}
+	if userRole != config.Admin {
+		return c.JSON(helper.ResponseForbidden("role not authorized"))
+	}
+	
+	cultureID, errConv := strconv.Atoi(c.Param("cultureID"))
+	if errConv != nil {
+		return c.JSON(helper.ResponseBadRequest("wrong param"))
+	}
 
-	res, err := h.cultureBusiness.SelectReport(idCulture)
+	res, err := h.cultureBusiness.SelectReport(cultureID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed get culture report"))
+		return c.JSON(helper.ResponseNotFound("Failed get culture report"))
 	}
 
 	response := response.FromCoreListReport(res)
-	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get culture report", response))
+	return c.JSON(helper.ResponseStatusOkWithData("Success get culture report", response))
 }

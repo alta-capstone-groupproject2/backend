@@ -179,7 +179,7 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 		return c.JSON(helper.ResponseForbidden("access denied"))
 	}
 
-	result, totalPage, err := h.userBusiness.GetAllData(limitint, pageint)
+	result, totalPage, err := h.userBusiness.GetDataSubmissionStore(limitint, pageint)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError,
 			helper.ResponseFailed("failed to get all data"))
