@@ -31,11 +31,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	result := response.ToResponse(id, role, token)
 	if err != nil {
-<<<<<<< HEAD
-		return c.JSON(helper.ResponseInternalServerError(err.Error()))
-=======
 		return c.JSON(helper.ResponseNotFound(err.Error()))
->>>>>>> 540443ec067aa5673dd37c4b5d04d3c42ef7374d
 	}
 	return c.JSON(helper.ResponseStatusOkWithData("login success", result))
 }
