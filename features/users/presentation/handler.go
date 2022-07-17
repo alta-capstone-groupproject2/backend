@@ -33,7 +33,7 @@ func (h *UserHandler) GetDataById(c echo.Context) error {
 	result, err := h.userBusiness.GetDataById(userIDToken)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed(err.Error()))
+			helper.ResponseFailedServer(err.Error()))
 	}
 	if result.Role.RoleName == config.User {
 		return c.JSON(helper.ResponseStatusOkWithData("success", _responseUser.FromCore(result)))
@@ -66,7 +66,7 @@ func (h *UserHandler) Delete(c echo.Context) error {
 	err := h.userBusiness.DeleteData(userIDToken)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed("failed to delete data"))
+			helper.ResponseFailedServer("failed to delete data"))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success delete data"))
 }
@@ -95,7 +95,7 @@ func (h *UserHandler) Update(c echo.Context) error {
 	err := h.userBusiness.UpdateData(userCore, userIDToken, fileInfo, fileData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed(err.Error()))
+			helper.ResponseFailedServer(err.Error()))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success update data"))
 }
@@ -154,8 +154,7 @@ func (h *UserHandler) UpdateStatusAccount(c echo.Context) error {
 
 	err := h.userBusiness.UpdateStatusUser(dataReq.StoreStatus, userId)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed(err.Error()))
+		return c.JSON(helper.ResponseInternalServerError(err.Error()))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success update data"))
 }
@@ -181,8 +180,7 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 
 	result, totalPage, err := h.userBusiness.GetDataSubmissionStore(limitint, pageint)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailed("failed to get all data"))
+		return c.JSON(helper.ResponseInternalServerError("failed to get all data"))
 	}
 
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success", totalPage, _responseUser.UserStoreFromCoreList(result)))
