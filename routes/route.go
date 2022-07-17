@@ -24,6 +24,15 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.GET("/users/stores", presenter.UserPresenter.GetStoreSubmission, middlewares.JWTMiddleware())
 	e.PUT("/users/stores/:id", presenter.UserPresenter.UpdateStatusAccount, middlewares.JWTMiddleware())
 
+	e.POST("/cultures", presenter.CulturePresenter.PostCulture, middlewares.JWTMiddleware())
+	e.GET("/cultures", presenter.CulturePresenter.GetCulture)
+	e.GET("/cultures/:cultureID", presenter.CulturePresenter.GetCulturebyIDCulture)
+	e.PUT("/cultures/:cultureID", presenter.CulturePresenter.PutCulture, middlewares.JWTMiddleware())
+	e.DELETE("/cultures/:cultureID", presenter.CulturePresenter.DeleteCulture, middlewares.JWTMiddleware())
+	
+	e.POST("/cultures/reports/:cultureID", presenter.CulturePresenter.PostCultureReport, middlewares.JWTMiddleware())
+	e.GET("/cultures/reports/:cultureID", presenter.CulturePresenter.GetCultureReport, middlewares.JWTMiddleware())
+
 	e.POST("/events/comments", presenter.CommentPresenter.Add, middlewares.JWTMiddleware())
 	e.GET("/events/comments/:id", presenter.CommentPresenter.Get, middlewares.JWTMiddleware())
 
