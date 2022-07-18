@@ -26,7 +26,7 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.PUT("/stores/submissions/:id", presenter.UserPresenter.UpdateStatusAccount, middlewares.JWTMiddleware())
 
 	e.POST("/users/verify", presenter.UserPresenter.GmailVerification)
-	e.POST("/users/confirm", presenter.UserPresenter.InsertFromVerificaton, middlewares.JWTMiddleware())
+	e.GET("/users/confirm/:encrypt", presenter.UserPresenter.InsertFromVerificaton)
 
 	//submission by user
 	e.GET("/events/submissions", presenter.EventPresenter.GetSubmissionAll, middlewares.JWTMiddleware())

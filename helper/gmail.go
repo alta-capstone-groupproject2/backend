@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"lami/app/middlewares"
 	"os"
+	"path/filepath"
 	"runtime"
 
-	_requestUser "lami/app/features/users/presentation/request"
+	"lami/app/features/users"
 
 	"gopkg.in/gomail.v2"
 )
@@ -20,7 +20,9 @@ type BodylinkEmail struct {
 }
 
 func SendGmailNotify(email, subject string) {
-	template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailNotif.html"
+	template, errPath := filepath.Abs("./helper/templates/emailNotif.html")
+	fmt.Print(errPath)
+	//template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailNotif.html"
 
 	templateData := BodylinkEmail{
 		SUBJECT: subject,
@@ -32,13 +34,13 @@ func SendGmailNotify(email, subject string) {
 	go SendEmail(email, subject, result)
 }
 
-func SendEmailVerification(userData _requestUser.User) {
-	template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailVerify.html"
+func SendEmailVerification(userData users.Core, encrypt string) {
+	template, errPath := filepath.Abs("./helper/templates/emailVerify.html")
+	fmt.Print(errPath)
+	//template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailVerify.html"
 	subject := "Email Verification"
 
-	token, _ := middlewares.CreateTokenVerification(userData.Name, userData.Email, userData.Password)
-
-	url := "localhost:8000/users/confirm/" + token
+	url := "https://lamiapp.site/users/confirm/" + encrypt
 
 	templateData := BodylinkEmail{
 		Name:    userData.Name,
