@@ -7,7 +7,7 @@ import (
 )
 
 type Participant struct {
-	ID       int       `json:"id_participant" form:"id_participant"`
+	ID       int       `json:"participantID" form:"participantID"`
 	Name     string    `json:"name" form:"name"`
 	Detail   string    `json:"detail" form:"detail"`
 	Image    string    `json:"url" form:"url"`

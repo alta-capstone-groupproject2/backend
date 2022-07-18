@@ -21,7 +21,7 @@ func NewEventRepository(conn *gorm.DB) events.Data {
 func (repo *mysqlEventRepository) SelectData(limit int, offset int, name string, city string) (response []events.Core, totaldata int64, err error) {
 	var dataEvent []Event
 	var count int64
-	result := repo.db.Order("id desc").Where("city LIKE ? and name LIKE ?", "%"+city+"%", "%"+name+"%").Limit(limit).Offset(offset).Find(&dataEvent).Count(&count)
+	result := repo.db.Order("id desc").Where("city LIKE ? and name LIKE ? and status = ?", "%"+city+"%", "%"+name+"%", config.Approved).Limit(limit).Offset(offset).Find(&dataEvent).Count(&count)
 	if result.Error != nil {
 		return []events.Core{}, 0, result.Error
 	}
@@ -30,9 +30,8 @@ func (repo *mysqlEventRepository) SelectData(limit int, offset int, name string,
 
 func (repo *mysqlEventRepository) SelectDataByID(id int) (response events.Core, err error) {
 	dataEvent := Event{}
-	result := repo.db.Find(&dataEvent, id)
+	result := repo.db.Where("status = ?", config.Approved).Find(&dataEvent, id)
 	if result.Error != nil {
-
 		return events.Core{}, result.Error
 	}
 
@@ -108,13 +107,18 @@ func (repo *mysqlEventRepository) SelectParticipantData(id_event int) (response 
 func (repo *mysqlEventRepository) SelectDataSubmission(limit, offset int) (data []events.Submission, total int64, err error) {
 	var dataSubmit []Event
 	var count int64
-	result := repo.db.Where("status = ?", config.Status).Limit(limit).Offset(offset).Preload("User").Find(&dataSubmit).Count(&count)
+	result := repo.db.Limit(limit).Offset(offset).Preload("User").Find(&dataSubmit).Count(&count)
 	if result.Error != nil {
 		return []events.Submission{}, 0, result.Error
 	}
 	return ToCoreSubmissionList(dataSubmit), count, result.Error
 }
 
-// func (repo *mysqlEventRepository) SelectDataSubmissionByID(dataReq events.Core) (err error) {
-
-// }
+func (repo *mysqlEventRepository) SelectDataSubmissionByID(id int) (data events.Core, err error) {
+	var dataSubmit Event
+	result := repo.db.Where("id = ?", id).Find(&dataSubmit)
+	if result.Error != nil {
+		return events.Core{}, result.Error
+	}
+	return dataSubmit.toCore(), result.Error
+}

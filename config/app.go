@@ -12,4 +12,5 @@ func JWT() string {
 const Admin = "admin"
 const User = "user"
 const UMKM = "umkm"
-const Status = "waiting"
+const Waiting = "waiting"
+const Approved = "approved"

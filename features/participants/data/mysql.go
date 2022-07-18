@@ -2,6 +2,8 @@ package data
 
 import (
 	"errors"
+	"lami/app/config"
+	_eventData "lami/app/features/events/data"
 	"lami/app/features/participants"
 
 	"gorm.io/gorm"
@@ -9,6 +11,22 @@ import (
 
 type mysqlParticipantRepository struct {
 	db *gorm.DB
+}
+
+func NewParticipantRepository(conn *gorm.DB) participants.Data {
+	return &mysqlParticipantRepository{
+		db: conn,
+	}
+}
+
+func (repo *mysqlParticipantRepository) SelectDataByID(id int) (response _eventData.Event, err error) {
+	dataEvent := _eventData.Event{}
+	result := repo.db.Where("status = ?", config.Approved).Find(&dataEvent, id)
+	if result.Error != nil {
+		return _eventData.Event{}, result.Error
+	}
+
+	return dataEvent, err
 }
 
 // DeleteData implements participants.Data
@@ -36,15 +54,6 @@ func (repo *mysqlParticipantRepository) SelectDataEvent(idUser int) (data []part
 // Add implements participants.Data
 func (repo *mysqlParticipantRepository) AddData(ParticipantData participants.Core) error {
 	Model := fromCore(ParticipantData)
-
-	//	Check jika user telah join di event yang sama
-	// var check int
-	// checkJoin := repo.db.Select("event_id").Find(&Participant{}).Scan(&check)
-	// fmt.Println(check)
-	// if check == ParticipantData.EventID {
-	// 	return che
-	// }
-
 	result := repo.db.Create(&Model)
 	if result.Error != nil {
 		return result.Error
@@ -53,10 +62,4 @@ func (repo *mysqlParticipantRepository) AddData(ParticipantData participants.Cor
 		return errors.New("failed insert join")
 	}
 	return nil
-}
-
-func NewParticipantRepository(conn *gorm.DB) participants.Data {
-	return &mysqlParticipantRepository{
-		db: conn,
-	}
 }

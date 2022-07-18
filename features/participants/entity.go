@@ -1,6 +1,7 @@
 package participants
 
 import (
+	"lami/app/features/events/data"
 	"time"
 )
 
@@ -31,12 +32,13 @@ type Event struct {
 
 type Business interface {
 	AddParticipant(data Core) error
-	GetAllEventbyParticipant(idUser int) (data []Core, err error)
+	GetAllEventbyParticipant(userID int) (data []Core, err error)
 	DeleteParticipant(param, userID int) error
 }
 
 type Data interface {
+	SelectDataByID(id int) (response data.Event, err error)
 	AddData(data Core) error
-	SelectDataEvent(idUser int) (data []Core, err error)
+	SelectDataEvent(userID int) (data []Core, err error)
 	DeleteData(param, userID int) error
 }

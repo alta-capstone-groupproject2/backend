@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"lami/app/features/events"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -52,9 +53,17 @@ func (mock mockEventDataSucces) SelectDataSubmission(limit, page int) (data []ev
 	return data, total, nil
 }
 
+func (mock mockEventDataSucces) SelectDataSubmissionByID(id int) (data events.Core, err error) {
+	return data, nil
+}
+
 func (mock mockEventDataSucces) CheckUserID(id int) (userID int, err error) {
 	var data events.Core
 	return data.UserID, nil
+}
+
+func (mock mockEventDataSucces) SelectDateEventJoin(date time.Time, userID int) (row int, err error) {
+	return 1, nil
 }
 
 //mock data failed case
@@ -92,7 +101,15 @@ func (mock mockEventDataFailed) SelectDataSubmission(limit, page int) (data []ev
 	return nil, 0, err
 }
 
+func (mock mockEventDataFailed) SelectDataSubmissionByID(id int) (data events.Core, err error) {
+	return events.Core{}, err
+}
+
 func (mock mockEventDataFailed) CheckUserID(id int) (userID int, err error) {
+	return 0, err
+}
+
+func (mock mockEventDataFailed) SelectDateEventJoin(date time.Time, userID int) (row int, err error) {
 	return 0, err
 }
 

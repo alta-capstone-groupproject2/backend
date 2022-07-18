@@ -9,8 +9,8 @@ import (
 
 type Participant struct {
 	gorm.Model
-	UserID  int `json:"user_id" form:"user_id"`
-	EventID int `json:"event_id" form:"event_id"`
+	UserID  int
+	EventID int
 	Event   _event.Event
 }
 
@@ -23,7 +23,7 @@ func fromCore(core participants.Core) Participant {
 
 func (data *Participant) toCore() participants.Core {
 	return participants.Core{
-		ID: int(data.EventID),
+		ID: int(data.ID),
 		Event: participants.Event{
 			Image:    data.Event.Image,
 			Name:     data.Event.Name,
