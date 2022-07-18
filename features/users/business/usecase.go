@@ -4,7 +4,9 @@ import (
 	"errors"
 	"lami/app/config"
 	"lami/app/features/users"
+	"lami/app/helper"
 	"mime/multipart"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,26 +28,26 @@ func (uc *userUseCase) GetDataById(id int) (response users.Core, err error) {
 
 func (uc *userUseCase) InsertData(userRequest users.Core) (err error) {
 
-	if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" || userRequest.Name == " " || userRequest.Password == " " {
-		return errors.New("all data must be filled")
-	}
+	// if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" || userRequest.Name == " " || userRequest.Password == " " {
+	// 	return errors.New("all data must be filled")
+	// }
 
-	errEmailFormat := emailFormatValidation(userRequest.Email)
-	if errEmailFormat != nil {
-		return errors.New(errEmailFormat.Error())
-	}
+	// errEmailFormat := emailFormatValidation(userRequest.Email)
+	// if errEmailFormat != nil {
+	// 	return errors.New(errEmailFormat.Error())
+	// }
 
-	errNameFormat := nameFormatValidation(userRequest.Name)
-	if errNameFormat != nil {
-		return errors.New(errNameFormat.Error())
-	}
+	// errNameFormat := nameFormatValidation(userRequest.Name)
+	// if errNameFormat != nil {
+	// 	return errors.New(errNameFormat.Error())
+	// }
 
-	passWillBcrypt := []byte(userRequest.Password)
-	hash, err_hash := bcrypt.GenerateFromPassword(passWillBcrypt, bcrypt.DefaultCost)
-	if err_hash != nil {
-		return errors.New("hashing password failed")
-	}
-	userRequest.Password = string(hash)
+	// passWillBcrypt := []byte(userRequest.Password)
+	// hash, err_hash := bcrypt.GenerateFromPassword(passWillBcrypt, bcrypt.DefaultCost)
+	// if err_hash != nil {
+	// 	return errors.New("hashing password failed")
+	// }
+	// userRequest.Password = string(hash)
 
 	//default role user
 	userRequest.RoleID = 2
@@ -149,4 +151,49 @@ func (uc *userUseCase) GetDataSubmissionStore(limit, page int) (response []users
 	resp, total, errData := uc.userData.SelectDataSubmissionStore(limit, offset)
 	total = total/int64(limit) + 1
 	return resp, total, errData
+}
+
+func (uc *userUseCase) VerifyEmail(userData users.Core)(error){
+	//random string for sparator
+	key := helper.RandomString(3)
+	//combine data and sparator
+	if userData.Name == "" || userData.Email == "" || userData.Password == "" || userData.Name == " " || userData.Password == " " {
+		return errors.New("all data must be filled")
+	}
+	
+	errEmailFormat := emailFormatValidation(userData.Email)
+	if errEmailFormat != nil {
+		return errors.New(errEmailFormat.Error())
+	}
+
+	errNameFormat := nameFormatValidation(userData.Name)
+	if errNameFormat != nil {
+		return errors.New(errNameFormat.Error())
+	}
+
+	plain := key+key+userData.Name+key+userData.Email+key+userData.Password
+
+	encrypted := helper.Encrypt(plain, config.EncryptKey())
+
+	helper.SendEmailVerification(userData, encrypted)
+	return nil
+}
+	
+func (uc *userUseCase) ConfirmEmail(encryptData string)(error){
+	var userData users.Core
+	Decrypted := helper.Decrypt(encryptData, config.EncryptKey())
+
+	// get sparator 
+	sparator := Decrypted[:6]
+	dataRaw := strings.Split(Decrypted, sparator)
+	userData.Name = dataRaw[2]
+	userData.Email = dataRaw[3]
+	userData.Password = dataRaw[4]
+
+	errInsert := uc.InsertData(userData)
+	if errInsert != nil {
+		return errInsert
+	}
+
+	return nil
 }

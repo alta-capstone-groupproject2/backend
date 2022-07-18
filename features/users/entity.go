@@ -37,6 +37,8 @@ type Business interface {
 	UpdateData(dataReq Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) (err error)
 	UpgradeAccount(dataReq Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) error
 	UpdateStatusUser(status string, id int) error
+	VerifyEmail(Core)(error)
+	ConfirmEmail(encryptData string)(error)
 }
 
 type Data interface {
