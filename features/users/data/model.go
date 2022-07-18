@@ -54,11 +54,18 @@ func (data *User) toCore() users.Core {
 
 func fromCore(core users.Core) User {
 	return User{
-		Image:    core.Image,
-		Name:     core.Name,
-		Email:    core.Email,
-		Password: core.Password,
-		RoleID:   core.RoleID,
+		Image:       core.Image,
+		Name:        core.Name,
+		Email:       core.Email,
+		Password:    core.Password,
+		RoleID:      core.RoleID,
+		StoreName:   core.StoreName,
+		StoreStatus: core.StoreStatus,
+		StoreOwner:  core.Owner,
+		Phone:       core.Phone,
+		City:        core.City,
+		Address:     core.Address,
+		Document:    core.Document,
 	}
 }
 

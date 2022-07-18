@@ -94,8 +94,7 @@ func (h *UserHandler) Update(c echo.Context) error {
 
 	err := h.userBusiness.UpdateData(userCore, userIDToken, fileInfo, fileData)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailedServer(err.Error()))
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success update data"))
 }
@@ -184,4 +183,39 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 	}
 
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success", totalPage, _responseUser.UserStoreFromCoreList(result)))
+}
+
+func (h *UserHandler) GmailVerification(c echo.Context) error {
+	userData := _requestUser.User{}
+	errBind := c.Bind(&userData)
+	if errBind != nil {
+		return c.JSON(helper.ResponseBadRequest("failed bind gmail"))
+	}
+
+	helper.SendEmailVerification(userData)
+	return c.JSON(http.StatusOK,
+		helper.ResponseSuccessNoData("success email verification sent"))
+}
+
+func (h *UserHandler) InsertFromVerificaton(c echo.Context) error {
+	name, email, password, errToken := middlewares.ExtractTokenVerification(c)
+	if name == "" || email == "" || password == "" || errToken != nil {
+		return c.JSON(helper.ResponseBadRequest("failed extract token"))
+	}
+	user := _requestUser.User{
+		Name:     name,
+		Email:    email,
+		Password: password,
+	}
+	// err_bind := c.Bind(&user)
+	// if err_bind != nil {
+	// 	return c.JSON(helper.ResponseBadRequest("error bind data"))
+	// }
+
+	userCore := _requestUser.ToCore(user)
+	err := h.userBusiness.InsertData(userCore)
+	if err != nil {
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
+	}
+	return c.JSON(helper.ResponseCreateSuccess("success insert data"))
 }
