@@ -140,28 +140,6 @@
         <tr>
             <td align="center" bgcolor="#e9ecef">
                 <!--[if (gte mso 9)|(IE)]>
-        <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-        <tr>
-        <td align="center" valign="top" width="600">
-        <![endif]-->
-                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                    <tr>
-
-                        <td align="left" bgcolor="#ffffff"
-                            style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
-                            <a href={{.URL}}
-                                style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600;font-size: 32px; ">Lami
-                                App </a>
-                            <h1
-                                style="margin: 0; font-size: 23px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">
-                                Confirm Your Email Address</h1>
-                        </td>
-                    </tr>
-                </table>
-                <!--[if (gte mso 9)|(IE)]>
-        </td>
-        </tr>
-        </table>
         <![endif]-->
             </td>
         </tr>
@@ -182,7 +160,7 @@
                         <td align="left" bgcolor="#ffffff"
                             style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
                             <p style="margin: 0;">Tap the button below to confirm your email address. If you didn't
-                                create an account with <a href={{.URL}}>Lami App</a>, you can safely
+                                create an account with Lami App {{ .SUBJECT }}, you can safely
                                 delete
                                 this email.</p>
                         </td>
@@ -216,7 +194,7 @@
                             style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
                             <p style="margin: 0;">If that doesn't work, copy and paste the following link in your
                                 browser:</p>
-                            <p style="margin: 0;"><a href={{.URL}} target="_blank">{{.URL}}</a></p>
+                            <p style="margin: 0;"><a href="{{.URL}}" target="_blank">{{.URL}}</a></p>
                         </td>
                     </tr>
                     <!-- end copy -->

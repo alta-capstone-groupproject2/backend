@@ -111,6 +111,16 @@ func (uc *userUseCase) UpgradeAccount(dataReq users.Core, id int, fileInfo *mult
 		return errors.New("all data must be filled")
 	}
 
+	errOwner := nameFormatValidation(dataReq.Owner)
+	if errOwner != nil {
+		return errors.New(errOwner.Error())
+	}
+
+	errPhone := phoneFormatValidation(dataReq.Phone)
+	if errPhone != nil {
+		return errors.New(errPhone.Error())
+	}
+
 	urlDoc, errFile := uploadFileValidation(dataReq.StoreName, id, config.UserDocuments, config.ContentDocuments, fileInfo, fileData)
 	if errFile != nil {
 		return errors.New(errFile.Error())
@@ -122,9 +132,10 @@ func (uc *userUseCase) UpgradeAccount(dataReq users.Core, id int, fileInfo *mult
 	if err != nil {
 		return err
 	}
+
+	//helper.SendGmailNotify(dataReq.Email, "upgrade account to umkm")
 	return nil
 }
-
 func (uc *userUseCase) UpdateStatusUser(status string, id int) error {
 	err := uc.userData.UpdateAccountRole(status, id)
 	if err != nil {

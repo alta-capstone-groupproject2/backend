@@ -4,50 +4,60 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"lami/app/middlewares"
 	"os"
 	"runtime"
+
+	_requestUser "lami/app/features/users/presentation/request"
 
 	"gopkg.in/gomail.v2"
 )
 
-const CONFIG_SMTP_HOST = "smtp.gmail.com"
-const CONFIG_SMTP_PORT = 587
-const CONFIG_SENDER_NAME = "Lami App <alfin.7007@gmail.com>"
-
 type BodylinkEmail struct {
-	Name string
-	URL string
+	SUBJECT string
+	Name    string
+	URL     string
 }
 
-func Send(gmail string, code string) error{
-	
+func SendGmailNotify(email, subject string) {
+	template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailNotif.html"
+
 	templateData := BodylinkEmail{
-		URL: "https://detik.id/",
+		SUBJECT: subject,
 	}
+	result, errParse := ParseTemplate(template, templateData)
+	fmt.Println(errParse)
 
-	to := gmail
 	runtime.GOMAXPROCS(1)
-	go SendEmailVerification(to, templateData)
-
-	return nil
+	go SendEmail(email, subject, result)
 }
 
-func SendEmailVerification(to string, data interface{}) {
+func SendEmailVerification(userData _requestUser.User) {
 	template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailVerify.html"
 	subject := "Email Verification"
 
-	result, _ := ParseTemplate(template, data)
+	token, _ := middlewares.CreateTokenVerification(userData.Name, userData.Email, userData.Password)
 
-	err := SendEmail(to, subject, data, result)
-	if err == nil {
-		fmt.Println("send email '" + subject + "' success")
-	} else {
-		fmt.Println(err)
+	url := "localhost:8000/users/confirm/" + token
+
+	templateData := BodylinkEmail{
+		Name:    userData.Name,
+		SUBJECT: subject,
+		URL:     url,
 	}
+	result, errParse := ParseTemplate(template, templateData)
+	fmt.Println(errParse)
+
+	runtime.GOMAXPROCS(1)
+	go SendEmail(userData.Email, subject, result)
 }
 
-func SendEmail(to string, subject string, data interface{}, result string) error {
-	
+func SendEmail(to string, subject string, result string) error {
+	const CONFIG_SMTP_HOST = "smtp.gmail.com"
+	const CONFIG_SMTP_PORT = 587
+	const CONFIG_SENDER_NAME = "Lami App <alfin.7007@gmail.com>"
+	CONFIG_AUTH_EMAIL := os.Getenv("EMAIL")
+	CONFIG_AUTH_PASSWORD := os.Getenv("EMAIL_PASSWORD")
 	m := gomail.NewMessage()
 	m.SetHeader("From", CONFIG_SENDER_NAME)
 	m.SetHeader("To", to)
@@ -56,9 +66,6 @@ func SendEmail(to string, subject string, data interface{}, result string) error
 	m.SetBody("text/html", result)
 	// m.Attach(templateFile) // attach whatever you want
 
-
-	CONFIG_AUTH_EMAIL := os.Getenv("EMAIL")
-	CONFIG_AUTH_PASSWORD := os.Getenv("EMAIL_PASSWORD")
 	d := gomail.NewDialer(
 		CONFIG_SMTP_HOST, CONFIG_SMTP_PORT, CONFIG_AUTH_EMAIL, CONFIG_AUTH_PASSWORD)
 	err := d.DialAndSend(m)
@@ -79,5 +86,3 @@ func ParseTemplate(templateFileName string, data interface{}) (string, error) {
 	}
 	return buf.String(), nil
 }
-
-

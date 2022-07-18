@@ -19,6 +19,16 @@ func emailFormatValidation(email string) error {
 	return nil
 }
 
+func phoneFormatValidation(email string) error {
+	//	Check syntax email address
+	pattern := `^[0-9]+$`
+	matched, _ := regexp.Match(pattern, []byte(email))
+	if !matched {
+		return errors.New("failed syntax phone ")
+	}
+	return nil
+}
+
 func nameFormatValidation(name string) error {
 	//	Check syntax email address
 	pattern := `^[a-zA-Z ]+$`

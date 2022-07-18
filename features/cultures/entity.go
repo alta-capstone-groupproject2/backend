@@ -1,6 +1,7 @@
 package cultures
 
 import (
+	"lami/app/features/users/data"
 	"mime/multipart"
 	"time"
 )
@@ -18,17 +19,17 @@ type Core struct {
 type CoreReport struct {
 	ID        int
 	CultureID int
+	UserID    int
 	Message   string
 	CreatedAt time.Time
 }
 
 type Business interface {
 	AddCulture(dataReq Core, fileInfo *multipart.FileHeader, fileData multipart.File) error
-	SelectCulture(limit, page int) ([]Core, int64,error)
+	SelectCulture(limit, page int) ([]Core, int64, error)
 	SelectCulturebyCultureID(cultureID int) (Core, error)
 	UpdateCulture(dataReq Core, cultureID int, fileInfo *multipart.FileHeader, fileData multipart.File) error
 	DeleteCulture(cultureID int) error
-	
 
 	AddCultureReport(dataReq CoreReport) error
 	SelectReport(cultureID int) ([]CoreReport, error)
@@ -43,4 +44,6 @@ type Data interface {
 
 	AddCultureDataReport(dataReq CoreReport) error
 	SelectDataReport(cultureID int) ([]CoreReport, error)
+
+	SelectUser(id int) (response data.User, err error)
 }

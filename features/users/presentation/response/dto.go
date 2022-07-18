@@ -24,6 +24,7 @@ type UserStore struct {
 	Role      string    `json:"role"`
 	Owner     string    `json:"owner"`
 	City      string    `json:"city"`
+	Address   string    `json:"address"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
@@ -57,7 +58,9 @@ func UserStoreFromCore(data users.Core) UserStore {
 		Phone:     data.Phone,
 		Owner:     data.Owner,
 		City:      data.City,
-		Role:      data.Role.RoleName,
+		Address:   data.Address,
+
+		Role: data.Role.RoleName,
 	}
 }
 
