@@ -142,7 +142,7 @@ func (h *UserHandler) UpdateStatusAccount(c echo.Context) error {
 	}
 
 	userId, errParam := strconv.Atoi(c.Param("id"))
-	if errParam != nil {
+	if errParam != nil || userIDToken == userId {
 		return c.JSON(helper.ResponseBadRequest("wrong param"))
 	}
 	dataReq := _requestUser.Store{}
