@@ -62,7 +62,7 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/registerRequestBody"
       responses:
-        "200":
+        "201":
           $ref: "#/components/responses/registerResponseSuccess"
         "400":
           $ref: "#/components/responses/registerResponseFailed"
@@ -235,7 +235,7 @@ paths:
             schema:
               $ref: "#/components/schemas/requestCulture"
       responses:
-        "200":
+        "201":
           $ref: "#/components/responses/createDataResponseSuccess"
         "400":
           $ref: "#/components/responses/createCultureResponseFailed"
@@ -358,7 +358,7 @@ paths:
             schema:
               $ref: "#/components/schemas/requestReportCulture"
       responses:
-        "200":
+        "201":
           description: create culture reports success
           content:
             application/json:
@@ -426,7 +426,7 @@ paths:
             schema:
               $ref: "#/components/schemas/requestEvent"
       responses:
-        "200":
+        "201":
           $ref: "#/components/responses/createDataResponseSuccess"
         "400":
           $ref: "#/components/responses/createEventResponseFailed"
@@ -570,7 +570,7 @@ paths:
             schema:
               $ref: "#/components/schemas/requestJoin"
       responses:
-        "200":
+        "201":
           description: create events/participation success
           content:
             application/json:
@@ -580,7 +580,7 @@ paths:
                 responseData:
                   description: response success
                   value:
-                    code: 200
+                    code: 201
                     message: Success insert events participants
         "400":
           $ref: "#/components/responses/createParticipationResponseFailed"
@@ -642,7 +642,7 @@ paths:
             schema:
               $ref: "#/components/schemas/requesCreateComment"
       responses:
-        "200":
+        "201":
           description: create events/comments success
           content:
             application/json:
@@ -652,7 +652,7 @@ paths:
                 responseData:
                   description: response success
                   value:
-                    code: 200
+                    code: 201
                     message: Success insert your comments
         "400":
           $ref: "#/components/responses/createCommentResponseFailed"
@@ -702,7 +702,7 @@ paths:
             schema:
               $ref: "#/components/schemas/requestProduct"
       responses:
-        "200":
+        "201":
           $ref: "#/components/responses/createDataResponseSuccess"
         "400":
           $ref: "#/components/responses/createProductResponseFailed"
@@ -857,7 +857,7 @@ paths:
             schema:
               $ref: "#/components/schemas/requestPostReview"
       responses:
-        "200":
+        "201":
           description: product ratings success
           content:
             application/json:
@@ -867,7 +867,7 @@ paths:
                 responseData:
                   description: response success
                   value:
-                    code: 200
+                    code: 201
                     message: Success to insert product ratings
         "400":
           description: failed product ratings
@@ -1306,11 +1306,12 @@ components:
         - name
         - hostedBy
         - phone
-        - date
+        - startDate
         - city
         - location
         - details
         - price
+        - endDate
       properties:
         image:
           type: string
@@ -1329,7 +1330,10 @@ components:
         phone:
           type: string
           minLength: 1
-        date:
+        startDate:
+          type: string
+          minLength: 1
+        endDate:
           type: string
           minLength: 1
         city:
@@ -1816,7 +1820,7 @@ components:
             responseData:
               description: response success
               value:
-                code: 200
+                code: 201
                 message: create success
     createCultureResponseFailed:
       description: create failed
