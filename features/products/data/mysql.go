@@ -12,6 +12,18 @@ type mysqlProductRepository struct {
 	db *gorm.DB
 }
 
+// SelectProductList implements product.Data
+func (repo *mysqlProductRepository) SelectProductList(limit int, page int, city string, name string) ([]product.Core, int64, error) {
+	var dataProduct []Product
+	var count int64
+	res := repo.db.Order("id asc").Where("city LIKE ? and name LIKE ?", "%"+city+"%", "%"+name+"%").Limit(limit).Offset(page).Find(&dataProduct).Count(&count)
+	if res.Error != nil {
+		return []product.Core{}, 0, res.Error
+	}
+
+	return ToCoreListProductList(dataProduct), count, res.Error
+}
+
 // SelectDataRating implements product.Data
 func (repo *mysqlProductRepository) SelectDataRating(idProduct int) ([]product.CoreRating, error) {
 	dataRating := []Rating{}

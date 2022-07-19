@@ -1,16 +1,20 @@
 package cart
 
-import "lami/app/features/products/data"
+import (
+	_dataProduct "lami/app/features/products/data"
+	_dataUser "lami/app/features/users/data"
+)
 
 type Core struct {
-	ID        int
+	ID          int
 	UserID      int
 	ProductID   int
 	Qty         int
 	URL         string
 	ProductName string
 	Price       float32
-	Product     data.Product
+	User        _dataUser.User
+	Product     _dataProduct.Product
 }
 
 type Business interface {

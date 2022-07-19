@@ -57,6 +57,7 @@ func New(presenter factory.Presenter) *echo.Echo {
 
 	// Product
 	e.POST("/products", presenter.ProductPresenter.PostProduct, middlewares.JWTMiddleware())
+	e.GET("/products", presenter.ProductPresenter.GetProductList)
 	e.PUT("/products/:productID", presenter.ProductPresenter.PutProduct, middlewares.JWTMiddleware())
 	e.DELETE("/products/:productID", presenter.ProductPresenter.DeleteProduct, middlewares.JWTMiddleware())
 	e.GET("/products/:productID", presenter.ProductPresenter.GetProductbyIDProduct)
@@ -65,6 +66,9 @@ func New(presenter factory.Presenter) *echo.Echo {
 	// Rating
 	e.POST("/products/ratings/:productID", presenter.ProductPresenter.PostProductRating, middlewares.JWTMiddleware())
 	e.GET("/products/ratings/:productID", presenter.ProductPresenter.GetProductRating)
+
+	// Order
+	e.POST("/orders", presenter.OrderPresenter.PostOrder, middlewares.JWTMiddleware())
 
 	// Cart
 	e.POST("/carts", presenter.CartPresenter.PostCart, middlewares.JWTMiddleware())
