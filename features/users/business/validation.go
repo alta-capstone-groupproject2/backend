@@ -39,6 +39,16 @@ func nameFormatValidation(name string) error {
 	return nil
 }
 
+func cityFormatValidation(name string) error {
+	//	Check syntax email address
+	pattern := `^[a-zA-Z ]+$`
+	matched, _ := regexp.Match(pattern, []byte(name))
+	if !matched {
+		return errors.New("failed syntax name")
+	}
+	return nil
+}
+
 func uploadFileValidation(name string, id int, directory string, contentType string, fileInfo *multipart.FileHeader, fileData multipart.File) (string, error) {
 	//	Check file extension
 	extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, contentType)

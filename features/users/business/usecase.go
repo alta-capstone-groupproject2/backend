@@ -118,6 +118,11 @@ func (uc *userUseCase) UpgradeAccount(dataReq users.Core, id int, fileInfo *mult
 		return errors.New(errOwner.Error())
 	}
 
+	errCity := cityFormatValidation(dataReq.City)
+	if errCity != nil {
+		return errors.New(errCity.Error())
+	}
+
 	errPhone := phoneFormatValidation(dataReq.Phone)
 	if errPhone != nil {
 		return errors.New(errPhone.Error())
