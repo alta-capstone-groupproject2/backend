@@ -44,7 +44,7 @@ func cityFormatValidation(name string) error {
 	pattern := `^[a-zA-Z ]+$`
 	matched, _ := regexp.Match(pattern, []byte(name))
 	if !matched {
-		return errors.New("failed syntax name")
+		return errors.New("failed syntax city")
 	}
 	return nil
 }
