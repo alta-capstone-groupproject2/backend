@@ -17,5 +17,5 @@ func NewOrderHandler(business orders.Business) *OrderHandler {
 }
 
 func (h *OrderHandler) PostOrder(c echo.Context) error {
-	
+	panic("unimplemented")
 }

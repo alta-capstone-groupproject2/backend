@@ -16,6 +16,7 @@ type Event struct {
 	Location string    `json:"location" form:"location"`
 	Detail   string    `json:"details" form:"details"`
 	Price    int       `json:"price" form:"price"`
+	Status   string    `json:""`
 }
 
 type EventByID struct {
@@ -23,13 +24,14 @@ type EventByID struct {
 	Image       string        `json:"image" form:"image"`
 	Document    string        `json:"document" form:"document"`
 	Name        string        `json:"eventName" form:"eventName"`
-	HostedBy    string        `json:"hostedby" form:"hostedby"`
+	HostedBy    string        `json:"hostedBy" form:"hostedBy"`
 	Phone       string        `json:"phone" form:"phone"`
 	Date        time.Time     `json:"date" form:"date"`
 	City        string        `json:"city" form:"city"`
 	Location    string        `json:"location" form:"location"`
 	Detail      string        `json:"details" form:"details"`
 	Price       int           `json:"price" form:"price"`
+	Status      string        `json:"status" form:"status"`
 	Participant []Participant `json:"participant" form:"participant"`
 }
 
@@ -37,6 +39,15 @@ type Participant struct {
 	ID    int    `json:"participantID" form:"participantID"`
 	Name  string `json:"name" form:"name"`
 	Image string `json:"image" form:"image"`
+}
+
+type Submission struct {
+	ID       int       `json:"eventID" form:"eventID"`
+	Name     string    `json:"nameEvent" form:"nameEvent"`
+	UserName string    `json:"username" form:"username"`
+	City     string    `json:"city" form:"city"`
+	Date     time.Time `json:"date" form:"date"`
+	Status   string    `json:"status" form:"status"`
 }
 
 func FromCore(data events.Core) Event {
@@ -50,6 +61,8 @@ func FromCore(data events.Core) Event {
 		Date:     data.Date,
 		City:     data.City,
 		Location: data.Location,
+		Price:    data.Price,
+		Status:   data.Status,
 	}
 }
 
@@ -65,7 +78,6 @@ func FromCoreByID(data events.Core) EventByID {
 	return EventByID{
 		ID:          data.ID,
 		Image:       data.Image,
-		Document:    data.Document,
 		Name:        data.Name,
 		Detail:      data.Detail,
 		HostedBy:    data.HostedBy,
@@ -85,10 +97,29 @@ func FromParticipantCore(data events.Participant) Participant {
 	}
 }
 
+func FromSubmissionCore(data events.Submission) Submission {
+	return Submission{
+		ID:       data.ID,
+		Name:     data.Name,
+		UserName: data.UserName,
+		City:     data.City,
+		Date:     data.Date,
+		Status:   data.Status,
+	}
+}
+
 func FromParticipantCoreList(data []events.Participant) []Participant {
 	result := []Participant{}
 	for key := range data {
 		result = append(result, FromParticipantCore(data[key]))
+	}
+	return result
+}
+
+func FromSubmissionCoreList(data []events.Submission) []Submission {
+	result := []Submission{}
+	for key := range data {
+		result = append(result, FromSubmissionCore(data[key]))
 	}
 	return result
 }

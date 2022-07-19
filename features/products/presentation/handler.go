@@ -1,7 +1,6 @@
 package presentation
 
 import (
-	"fmt"
 	"lami/app/config"
 	product "lami/app/features/products"
 	"lami/app/features/products/presentation/request"
@@ -29,39 +28,37 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
+		return c.JSON(helper.ResponseBadRequest("failed to get user id"))
 	}
 
 	product := request.Product{}
 	err_bind := c.Bind(&product)
 
 	if err_bind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to bind data product"))
+		return c.JSON(helper.ResponseBadRequest("error bind data"))
 	}
 
-	layout_time := "2006-01-02T15:04"
-	Time, errDate := time.Parse(layout_time, time.Now().Format(layout_time))
-	fmt.Println("Time:", Time)
-	if errDate != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed format date"))
-	}
-	product.CreateAt = Time
-	product.UpdatedAt = Time
+	// layout_time := "2006-01-02T15:04"
+	// Time, errDate := time.Parse(layout_time, time.Now().Format(layout_time))
+	// fmt.Println("Time:", Time)
+	// if errDate != nil {
+	// 	return c.JSON(helper.ResponseBadRequest("failed format date"))
+	// }
 
 	fileData, fileInfo, fileErr := c.Request().FormFile("file")
 	if fileErr == http.ErrMissingFile || fileErr != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get file"))
+		return c.JSON(helper.ResponseBadRequest("failed to get file"))
 	}
 
 	extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, config.ContentImage)
 	if err_check_extension != nil {
-		return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file extension error"))
+		return c.JSON(helper.ResponseBadRequest("file extension error"))
 	}
 
 	// check file size
 	err_check_size := helper.CheckFileSize(fileInfo.Size, config.ContentImage)
 	if err_check_size != nil {
-		return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file size error"))
+		return c.JSON(helper.ResponseBadRequest("file size error"))
 	}
 
 	// memberikan nama file
@@ -70,7 +67,7 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 	url, errUploadImg := helper.UploadFileToS3(config.ProductImages, config.ContentImage, fileName, fileData)
 
 	if errUploadImg != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to upload file"))
+		return c.JSON(helper.ResponseInternalServerError("failed to upload file"))
 	}
 
 	productCore := request.ToCore(product)
@@ -78,12 +75,11 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 	productCore.URL = url
 
 	row, err := h.productBusiness.AddProduct(productCore)
-	fmt.Println(row)
 	if err != nil || row != 1 {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed to insert product"))
+		return c.JSON(helper.ResponseInternalServerError("failed to insert product"))
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to insert product"))
+	return c.JSON(helper.ResponseCreateSuccess("success to insert product"))
 
 }
 
@@ -93,19 +89,18 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 	product := request.Product{}
 	err_bind := c.Bind(&product)
 	if err_bind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to bind data update product"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to bind data update product"))
 	}
 
-	layout_time := "2006-01-02T15:04"
-	UpdatedTime, errDate := time.Parse(layout_time, product.Date)
-	if errDate != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed format date"))
-	}
-	product.UpdatedAt = UpdatedTime
+	// layout_time := "2006-01-02T15:04"
+	// UpdatedTime, errDate := time.Parse(layout_time, product.Date)
+	// if errDate != nil {
+	// 	return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed format date"))
+	// }
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get id user"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get id user"))
 	}
 
 	productCore := request.ToCoreUpdate(product)
@@ -113,18 +108,18 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 	fileData, fileInfo, fileErr := c.Request().FormFile("file")
 	if fileErr != http.ErrMissingFile {
 		if fileErr != nil {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get file"))
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get file"))
 		}
 
 		extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, config.ContentImage)
 		if err_check_extension != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file extension error"))
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("file extension error"))
 		}
 
 		// check file size
 		err_check_size := helper.CheckFileSize(fileInfo.Size, config.ContentImage)
 		if err_check_size != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("file size error"))
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("file size error"))
 		}
 
 		// memberikan nama file
@@ -133,8 +128,7 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 		url, errUploadImg := helper.UploadFileToS3(config.ProductImages, config.ContentImage, fileName, fileData)
 
 		if errUploadImg != nil {
-			fmt.Println(errUploadImg)
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to upload file"))
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to upload file"))
 		}
 
 		productCore.URL = url
@@ -142,8 +136,7 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 
 	err := h.productBusiness.UpdateProduct(productCore, idProduct, userID_token)
 	if err != nil {
-		fmt.Println(err.Error())
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed to update data product"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed to update data product"))
 	}
 	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to update data product"))
 
@@ -154,15 +147,30 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get id user"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get id user"))
 	}
 
 	err := h.productBusiness.DeleteProduct(idProduct, userID_token)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed to delete data product"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed to delete data product"))
 	}
 
 	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to delete data product"))
+}
+
+func (h *ProductHandler) GetProductList(c echo.Context) error {
+	page := c.QueryParam("page")
+	name := c.QueryParam("name")
+	city := c.QueryParam("city")
+	offset, _ := strconv.Atoi(page)
+	limit := 12
+
+	res, total, err := h.productBusiness.SelectProductList(limit, offset, name, city)
+	if err != nil {
+		return c.JSON(helper.ResponseBadRequest("failed get all data"))
+	}
+	resp := response.FromCoreListProductList(res)
+	return c.JSON(http.StatusOK, helper.ResponseSuccessWithDataPage("Success get all events", total, resp))
 }
 
 func (h *ProductHandler) PostProductRating(c echo.Context) error {
@@ -171,31 +179,28 @@ func (h *ProductHandler) PostProductRating(c echo.Context) error {
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to extract token"))
 	}
 
 	rating := request.Rating{}
 	err_bind := c.Bind(&rating)
 	if err_bind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to bind data rating"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to bind data rating"))
 	}
 
-	layout_time := "2006-01-02T15:04"
-	Time, errDate := time.Parse(layout_time, rating.Date)
-	if errDate != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed format date"))
-	}
-	rating.CreateAt = Time
-	rating.UpdatedAt = Time
+	// layout_time := "2006-01-02T15:04"
+	// Time, errDate := time.Parse(layout_time, rating.Date)
+	// if errDate != nil {
+	// 	return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed format date"))
+	// }
 
 	ratingCore := request.ToCoreRating(rating)
 	ratingCore.UserID = userID_token
 	ratingCore.ProductID = idProduct
 
 	row, err := h.productBusiness.AddProductRating(ratingCore)
-	fmt.Println(row)
 	if err != nil || row != 1 {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed to insert product rating"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed to insert product rating"))
 	}
 
 	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to insert product rating"))
@@ -207,30 +212,26 @@ func (h *ProductHandler) GetProductbyIDProduct(c echo.Context) error {
 	idProduct, _ := strconv.Atoi(c.Param("productID"))
 
 	res, err := h.productBusiness.SelectProductbyIDProduct(idProduct)
-	fmt.Println("res from handler.go:", res)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed get product by idProduct"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed get product by idProduct"))
 	}
 
 	response := response.FromCore(res)
-	fmt.Println("response from handler.go:", response)
 	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get product by idProduct", response))
 }
 
 func (h *ProductHandler) GetMyProduct(c echo.Context) error {
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to extract token"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to extract token"))
 	}
 
 	res, err := h.productBusiness.SelectMyProduct(userID_token)
-	fmt.Println("res from handler:", res)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed get all your products"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get all your products"))
 	}
 
 	resp := response.FromCoreList(res)
-	fmt.Println("response:", resp)
 	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get all your products", resp))
 }
 
@@ -238,12 +239,10 @@ func (h *ProductHandler) GetProductRating(c echo.Context) error {
 	idProduct, _ := strconv.Atoi(c.Param("productID"))
 
 	res, err := h.productBusiness.SelectRating(idProduct)
-	fmt.Println("res rating from handler.go:", res)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("Failed get product rating"))
+		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed get product rating"))
 	}
 
 	response := response.FromCoreListRating(res)
-	fmt.Println("response rating from handler.go:", response)
 	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get product rating", response))
 }

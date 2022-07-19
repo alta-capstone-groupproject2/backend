@@ -3,46 +3,41 @@ package data
 import (
 	"lami/app/features/products"
 	"lami/app/features/users/data"
-	"time"
 
 	"gorm.io/gorm"
 )
 
 type Product struct {
 	gorm.Model
-	UserID    int     `json:"user_id" form:"user_id"`
-	Name      string  `json:"name" form:"name"`
-	URL       string  `json:"url" form:"url"`
-	Price     float32 `json:"price" form:"price"`
-	Stock     uint    `json:"stock" form:"stock"`
-	Detail    string  `json:"detail" form:"detail"`
-	CreateAt  time.Time
-	UpdatedAt time.Time
-	User      data.User `gorm:"foreignKey:UserID"`
+	UserID     int       `json:"user_id" form:"user_id"`
+	Name       string    `json:"name" form:"name"`
+	URL        string    `json:"url" form:"url"`
+	Price      float32   `json:"price" form:"price"`
+	Stock      uint      `json:"stock" form:"stock"`
+	City       string    `json:"city" form:"city"`
+	Detail     string    `json:"detail" form:"detail"`
+	MeanRating float32   `json:"mean_rating" form:"mean_rating"`
+	User       data.User `gorm:"foreignKey:UserID"`
 }
 
 type Rating struct {
 	gorm.Model
-	UserID    int    `json:"user_id" form:"user_id"`
-	ProductID int    `json:"productID" form:"productID"`
-	Rating    uint   `json:"rating" form:"rating"`
-	Review    string `json:"review" form:"review"`
-	CreateAt  time.Time
-	UpdatedAt time.Time
-	Product   Product
-	User      data.User
+	UserID    int       `json:"user_id" form:"user_id"`
+	ProductID int       `json:"productID" form:"productID"`
+	Rating    uint      `json:"rating" form:"rating"`
+	Review    string    `json:"review" form:"review"`
+	Product   Product   `gorm:"foreignKey:ProductID"`
+	User      data.User `gorm:"foreignKey:UserID"`
 }
 
 func fromCore(core product.Core) Product {
 	return Product{
-		UserID:    core.UserID,
-		URL:       core.URL,
-		Name:      core.Name,
-		Price:     core.Price,
-		Stock:     core.Stock,
-		Detail:    core.Detail,
-		CreateAt:  core.CreateAt,
-		UpdatedAt: core.UpdatedAt,
+		UserID: core.UserID,
+		URL:    core.URL,
+		Name:   core.Name,
+		Price:  core.Price,
+		Stock:  core.Stock,
+		Detail: core.Detail,
 	}
 }
 
@@ -52,8 +47,6 @@ func fromCoreRating(core product.CoreRating) Rating {
 		ProductID: core.ProductID,
 		Rating:    core.Rating,
 		Review:    core.Review,
-		CreateAt:  core.CreateAt,
-		UpdatedAt: core.UpdatedAt,
 	}
 }
 
@@ -71,6 +64,24 @@ func (data *Product) toCore() product.Core {
 
 func ToCore(data Product) product.Core {
 	return data.toCore()
+}
+
+func (data *Product) toCoreProductList() product.Core {
+	return product.Core{
+		ID:    int(data.ID),
+		Name:  data.Name,
+		URL:   data.URL,
+		Price: data.Price,
+		City:  data.City,
+	}
+}
+
+func ToCoreListProductList(data []Product) []product.Core {
+	res := []product.Core{}
+	for key := range data {
+		res = append(res, data[key].toCoreProductList())
+	}
+	return res
 }
 
 func (data *Rating) toCoreRating() product.CoreRating {
