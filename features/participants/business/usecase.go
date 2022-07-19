@@ -43,8 +43,9 @@ func (uc *participantUseCase) AddParticipant(partRequest participants.Core) (err
 		return errors.New("no data event")
 	}
 	/** Check Date By Array Participation
-	** @Param UserID
-	** @return []Index data, error
+	** @Param 	UserID
+	** @return 	[]Index data
+	** @return 	error
 	**/
 	checkDate, errCheckDate := uc.participantData.SelectDataEvent(partRequest.UserID)
 	if errCheckDate != nil {

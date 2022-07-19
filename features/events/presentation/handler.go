@@ -146,15 +146,13 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 func (h *EventHandler) DeleteData(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("eventID"))
 
-	userID_token, role, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
 	}
-	if role == config.Admin {
-		err := h.eventBusiness.DeleteEventByID(id, userID_token)
-		if err != nil {
-			return c.JSON(helper.ResponseInternalServerError("failed delete event"))
-		}
+	err := h.eventBusiness.DeleteEventByID(id, userID_token)
+	if err != nil {
+		return c.JSON(helper.ResponseInternalServerError("failed delete event"))
 	}
 	return c.JSON(helper.ResponseNoContent("success delete data"))
 }

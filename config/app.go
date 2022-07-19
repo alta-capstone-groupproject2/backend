@@ -14,3 +14,6 @@ const User = "user"
 const UMKM = "umkm"
 const Waiting = "waiting"
 const Approved = "approved"
+
+const MethodPost = "POST"
+const PaymentBankTransferBCA = "BANK_TRANSFER_BCA"
