@@ -4,7 +4,9 @@ import (
 	"errors"
 	"lami/app/config"
 	"lami/app/features/users"
+	"lami/app/helper"
 	"mime/multipart"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -111,6 +113,21 @@ func (uc *userUseCase) UpgradeAccount(dataReq users.Core, id int, fileInfo *mult
 		return errors.New("all data must be filled")
 	}
 
+	errOwner := nameFormatValidation(dataReq.Owner)
+	if errOwner != nil {
+		return errors.New(errOwner.Error())
+	}
+
+	errCity := cityFormatValidation(dataReq.City)
+	if errCity != nil {
+		return errors.New(errCity.Error())
+	}
+
+	errPhone := phoneFormatValidation(dataReq.Phone)
+	if errPhone != nil {
+		return errors.New(errPhone.Error())
+	}
+
 	urlDoc, errFile := uploadFileValidation(dataReq.StoreName, id, config.UserDocuments, config.ContentDocuments, fileInfo, fileData)
 	if errFile != nil {
 		return errors.New(errFile.Error())
@@ -122,9 +139,10 @@ func (uc *userUseCase) UpgradeAccount(dataReq users.Core, id int, fileInfo *mult
 	if err != nil {
 		return err
 	}
+
+	//helper.SendGmailNotify(dataReq.Email, "upgrade account to umkm")
 	return nil
 }
-
 func (uc *userUseCase) UpdateStatusUser(status string, id int) error {
 	err := uc.userData.UpdateAccountRole(status, id)
 	if err != nil {
@@ -138,4 +156,51 @@ func (uc *userUseCase) GetDataSubmissionStore(limit, page int) (response []users
 	resp, total, errData := uc.userData.SelectDataSubmissionStore(limit, offset)
 	total = total/int64(limit) + 1
 	return resp, total, errData
+}
+
+func (uc *userUseCase) VerifyEmail(userData users.Core) error {
+	//random string for sparator
+	key := helper.RandomString(3)
+	//combine data and sparator
+	if userData.Name == "" || userData.Email == "" || userData.Password == "" || userData.Name == " " || userData.Password == " " {
+		return errors.New("all data must be filled")
+	}
+
+	errEmailFormat := emailFormatValidation(userData.Email)
+	if errEmailFormat != nil {
+		return errors.New(errEmailFormat.Error())
+	}
+
+	errNameFormat := nameFormatValidation(userData.Name)
+	if errNameFormat != nil {
+		return errors.New(errNameFormat.Error())
+	}
+
+	plain := key + key + userData.Name + key + userData.Email + key + userData.Password
+
+	encrypted := helper.Encrypt(plain, config.EncryptKey())
+
+	helper.SendEmailVerification(userData, encrypted)
+	return nil
+}
+
+func (uc *userUseCase) ConfirmEmail(encryptData string) error {
+	var userData users.Core
+	Decrypted := helper.Decrypt(encryptData, config.EncryptKey())
+
+	// get sparator
+	sparator := Decrypted[:6]
+	dataRaw := strings.Split(Decrypted, sparator)
+	userData.Name = dataRaw[2]
+	userData.Email = dataRaw[3]
+	userData.Password = dataRaw[4]
+
+	userData.RoleID = 2
+	userData.Image = "https://lamiapp.s3.amazonaws.com/userimages/default_user.png"
+	err := uc.userData.InsertData(userData)
+	if err != nil {
+		return errors.New(err.Error())
+	}
+
+	return nil
 }

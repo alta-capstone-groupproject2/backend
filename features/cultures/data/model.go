@@ -34,7 +34,6 @@ func fromCoreReport(core cultures.CoreReport) Report {
 	return Report{
 		CultureID: core.CultureID,
 		Message:   core.Message,
-		
 	}
 }
 
@@ -62,8 +61,8 @@ func ToCoreList(data []Culture) []cultures.Core {
 
 func (data *Report) toCoreReport() cultures.CoreReport {
 	return cultures.CoreReport{
-		ID:      int(data.ID),
-		Message: data.Message,
+		ID:        int(data.ID),
+		Message:   data.Message,
 		CreatedAt: data.CreatedAt,
 	}
 }
@@ -75,6 +74,3 @@ func ToCoreReportList(data []Report) []cultures.CoreReport {
 	}
 	return res
 }
-
-
-

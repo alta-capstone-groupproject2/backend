@@ -3,6 +3,7 @@ package data
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"lami/app/features/users"
 
@@ -82,6 +83,7 @@ func (repo *mysqlUserRepository) InsertStoreData(dataReq users.Core, id int) err
 	model := User{}
 	model.ID = uint(id)
 	dataStore := fromCore(dataReq)
+	fmt.Println(dataStore)
 	result := repo.db.Model(model).Updates(dataStore)
 	if result.Error != nil {
 		return result.Error
@@ -89,6 +91,7 @@ func (repo *mysqlUserRepository) InsertStoreData(dataReq users.Core, id int) err
 	if result.RowsAffected == 0 {
 		return errors.New("failed to update store data")
 	}
+	fmt.Println(dataReq)
 	return nil
 }
 
@@ -108,7 +111,7 @@ func (repo *mysqlUserRepository) UpdateAccountRole(status string, id int) error 
 func (repo *mysqlUserRepository) SelectDataSubmissionStore(limit, offset int) (response []users.Core, total int64, err error) {
 	var dataUser []User
 	var count int64
-	result := repo.db.Preload("Role").Where("store_status is not null").Find(&dataUser).Count(&count)
+	result := repo.db.Limit(limit).Offset(offset).Preload("Role").Where("store_status is not null").Find(&dataUser).Count(&count)
 	if result.Error != nil {
 		return []users.Core{}, 0, result.Error
 	}

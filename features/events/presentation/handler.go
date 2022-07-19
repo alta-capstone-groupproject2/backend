@@ -42,7 +42,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 }
 
 func (h *EventHandler) GetDataById(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("eventID"))
+	id, _ := strconv.Atoi(c.Param("id"))
 	result, err := h.eventBusiness.GetEventByID(id)
 	if err != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get event"))
@@ -132,7 +132,7 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 	eventCore.UserID = userID_token
 	eventCore.Image = image
 	eventCore.Document = file
-	eventCore.Status = config.Status
+	eventCore.Status = config.Waiting
 
 	err := h.eventBusiness.InsertEvent(eventCore)
 	if err != nil {
@@ -146,15 +146,13 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 func (h *EventHandler) DeleteData(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("eventID"))
 
-	userID_token, role, errToken := middlewares.ExtractToken(c)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
 	}
-	if role == config.Admin {
-		err := h.eventBusiness.DeleteEventByID(id, userID_token)
-		if err != nil {
-			return c.JSON(helper.ResponseInternalServerError("failed delete event"))
-		}
+	err := h.eventBusiness.DeleteEventByID(id, userID_token)
+	if err != nil {
+		return c.JSON(helper.ResponseInternalServerError("failed delete event"))
 	}
 	return c.JSON(helper.ResponseNoContent("success delete data"))
 }
@@ -189,12 +187,12 @@ func (h *EventHandler) GetEventByUser(c echo.Context) error {
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
-	idUser, _, errToken := middlewares.ExtractToken(c)
+	userID, _, errToken := middlewares.ExtractToken(c)
 	if errToken != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
 	}
 
-	result, total, err := h.eventBusiness.GetEventByUserID(idUser, limit, page)
+	result, total, err := h.eventBusiness.GetEventByUserID(userID, limit, page)
 
 	respons := _response_event.FromCoreList(result)
 	if err != nil {
@@ -217,8 +215,26 @@ func (h *EventHandler) GetSubmissionAll(c echo.Context) (err error) {
 		if err != nil {
 			return c.JSON(helper.ResponseInternalServerError("failed to get all apply events"))
 		}
-		response := _response_event.FromSubmissionCoreList(result)
-		return c.JSON(helper.ResponseStatusOkWithDataPage("success to get all apply events", total, response))
+		data := _response_event.FromSubmissionCoreList(result)
+		return c.JSON(helper.ResponseStatusOkWithDataPage("success to get all apply events", total, data))
+	}
+	return c.JSON(helper.ResponseBadRequest("only is admin"))
+}
+
+func (h *EventHandler) GetSubmissionByID(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	_, role, errToken := middlewares.ExtractToken(c)
+	if errToken != nil {
+		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
+	}
+	if role == config.Admin {
+		result, err := h.eventBusiness.GetEventSubmissionByID(id)
+		if err != nil {
+			return c.JSON(helper.ResponseInternalServerError("failed to get apply event"))
+		}
+		data := _response_event.FromCore(result)
+		return c.JSON(helper.ResponseStatusOkWithData("success to get apply event", data))
 	}
 	return c.JSON(helper.ResponseBadRequest("only is admin"))
 }

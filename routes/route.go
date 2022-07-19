@@ -21,11 +21,16 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.PUT("/users", presenter.UserPresenter.Update, middlewares.JWTMiddleware())
 	e.DELETE("/users", presenter.UserPresenter.Delete, middlewares.JWTMiddleware())
 	e.POST("/users/stores", presenter.UserPresenter.AccountUpgrade, middlewares.JWTMiddleware())
-	e.GET("/users/stores", presenter.UserPresenter.GetStoreSubmission, middlewares.JWTMiddleware())
-	e.PUT("/users/stores/:id", presenter.UserPresenter.UpdateStatusAccount, middlewares.JWTMiddleware())
+
+	e.GET("/stores/submissions", presenter.UserPresenter.GetStoreSubmission, middlewares.JWTMiddleware())
+	e.PUT("/stores/submissions/:id", presenter.UserPresenter.UpdateStatusAccount, middlewares.JWTMiddleware())
+
+	e.POST("/users/verify", presenter.UserPresenter.GmailVerification)
+	e.GET("/users/confirm/:encrypt", presenter.UserPresenter.InsertFromVerificaton)
 
 	//submission by user
 	e.GET("/events/submissions", presenter.EventPresenter.GetSubmissionAll, middlewares.JWTMiddleware())
+	e.GET("/events/submissions/:id", presenter.EventPresenter.GetSubmissionByID, middlewares.JWTMiddleware())
 	e.PUT("/events/submissions/:id", presenter.EventPresenter.UpdateData, middlewares.JWTMiddleware())
 	//event data
 	e.POST("/events", presenter.EventPresenter.InsertData, middlewares.JWTMiddleware())

@@ -3,6 +3,7 @@ package data
 import (
 	"errors"
 	"lami/app/features/cultures"
+	"lami/app/features/users/data"
 
 	"gorm.io/gorm"
 )
@@ -43,7 +44,7 @@ func (repo *mysqlCultureRepository) SelectDataCulture(limit, offset int) ([]cult
 		return []cultures.Core{}, 0, errors.New("failed get data culture")
 	}
 
-	return ToCoreList(dataCulture), count,nil
+	return ToCoreList(dataCulture), count, nil
 }
 
 // SelectDataCulturebyIDCulture implements culture.Data
@@ -91,7 +92,6 @@ func (repo *mysqlCultureRepository) UpdateDataCulture(dataReq map[string]interfa
 	return nil
 }
 
-
 // AddCultureDataReport implements culture.Data
 func (repo *mysqlCultureRepository) AddCultureDataReport(dataReq cultures.CoreReport) error {
 
@@ -118,4 +118,16 @@ func (repo *mysqlCultureRepository) SelectDataReport(idCulture int) ([]cultures.
 	}
 
 	return ToCoreReportList(dataReport), nil
+}
+
+func (repo *mysqlCultureRepository) SelectUser(id int) (response data.User, err error) {
+	datauser := data.User{}
+	result := repo.db.Preload("Role").Find(&datauser, id)
+	if result.Error != nil {
+		return data.User{}, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return data.User{}, errors.New("user not found")
+	}
+	return datauser, nil
 }

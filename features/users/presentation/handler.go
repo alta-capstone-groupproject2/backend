@@ -94,8 +94,7 @@ func (h *UserHandler) Update(c echo.Context) error {
 
 	err := h.userBusiness.UpdateData(userCore, userIDToken, fileInfo, fileData)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError,
-			helper.ResponseFailedServer(err.Error()))
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("success update data"))
 }
@@ -180,8 +179,33 @@ func (h *UserHandler) GetStoreSubmission(c echo.Context) error {
 
 	result, totalPage, err := h.userBusiness.GetDataSubmissionStore(limitint, pageint)
 	if err != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed to get all data"))
+		return c.JSON(helper.ResponseBadRequest("failed to get all data"))
 	}
 
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success", totalPage, _responseUser.UserStoreFromCoreList(result)))
+}
+
+func (h *UserHandler) GmailVerification(c echo.Context) error {
+	userData := _requestUser.User{}
+	errBind := c.Bind(&userData)
+	if errBind != nil {
+		return c.JSON(helper.ResponseBadRequest("failed bind data"))
+	}
+	userCore := _requestUser.ToCore(userData)
+	errVerify := h.userBusiness.VerifyEmail(userCore)
+	if errVerify != nil {
+		return c.JSON(helper.ResponseBadRequest(errVerify.Error()))
+	}
+	return c.JSON(http.StatusOK,
+		helper.ResponseSuccessNoData("success email verification sent"))
+}
+
+func (h *UserHandler) InsertFromVerificaton(c echo.Context) error {
+	encrypt := c.Param("encrypt")
+
+	err := h.userBusiness.ConfirmEmail(encrypt)
+	if err != nil {
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
+	}
+	return c.JSON(helper.ResponseCreateSuccess("success insert data"))
 }

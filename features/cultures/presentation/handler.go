@@ -71,7 +71,7 @@ func (h *CultureHandler) GetCulture(c echo.Context) error {
 	}
 
 	resp := response.FromCoreList(res)
-	return c.JSON(helper.ResponseStatusOkWithDataPage("Success get all your cultures", total,resp))
+	return c.JSON(helper.ResponseStatusOkWithDataPage("Success get all your cultures", total, resp))
 }
 
 func (h *CultureHandler) GetCulturebyIDCulture(c echo.Context) error {
@@ -89,7 +89,6 @@ func (h *CultureHandler) GetCulturebyIDCulture(c echo.Context) error {
 	response := response.FromCore(res)
 	return c.JSON(helper.ResponseStatusOkWithData("Success get culture by cultureID", response))
 }
-
 
 func (h *CultureHandler) PutCulture(c echo.Context) error {
 	userIDToken, userRole, errToken := middlewares.ExtractToken(c)
@@ -136,7 +135,7 @@ func (h *CultureHandler) DeleteCulture(c echo.Context) error {
 	if userRole != config.Admin {
 		return c.JSON(helper.ResponseForbidden("role not authorized"))
 	}
-	
+
 	cultureID, errConv := strconv.Atoi(c.Param("cultureID"))
 	if errConv != nil {
 		return c.JSON(helper.ResponseBadRequest("wrong param"))
@@ -170,6 +169,7 @@ func (h *CultureHandler) PostCultureReport(c echo.Context) error {
 
 	reportCore := request.ToCoreReport(report)
 	reportCore.CultureID = cultureID
+	reportCore.UserID = userIDToken
 
 	err := h.cultureBusiness.AddCultureReport(reportCore)
 	if err != nil {
@@ -180,7 +180,6 @@ func (h *CultureHandler) PostCultureReport(c echo.Context) error {
 
 }
 
-
 func (h *CultureHandler) GetCultureReport(c echo.Context) error {
 	userIDToken, userRole, errToken := middlewares.ExtractToken(c)
 	if userIDToken == 0 || errToken != nil {
@@ -189,7 +188,7 @@ func (h *CultureHandler) GetCultureReport(c echo.Context) error {
 	if userRole != config.Admin {
 		return c.JSON(helper.ResponseForbidden("role not authorized"))
 	}
-	
+
 	cultureID, errConv := strconv.Atoi(c.Param("cultureID"))
 	if errConv != nil {
 		return c.JSON(helper.ResponseBadRequest("wrong param"))
