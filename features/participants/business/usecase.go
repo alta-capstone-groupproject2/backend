@@ -3,6 +3,8 @@ package business
 import (
 	"errors"
 	"lami/app/features/participants"
+
+	"github.com/midtrans/midtrans-go/coreapi"
 )
 
 type participantUseCase struct {
@@ -59,4 +61,20 @@ func (uc *participantUseCase) AddParticipant(partRequest participants.Core) (err
 	}
 	err = uc.participantData.AddData(partRequest)
 	return err
+}
+
+func (uc *participantUseCase) GrossAmountEvent(userID int) (GrossAmount int64, err error) {
+	checkEvent, errCheckEvent := uc.participantData.SelectDataByID(userID)
+	if errCheckEvent != nil {
+		return 0, errCheckEvent
+	}
+	return int64(checkEvent.Price), nil
+}
+
+func (uc *participantUseCase) CreatePaymentBankTransfer(reqPay coreapi.ChargeReq) (resPay *coreapi.ChargeResponse, err error) {
+	createPay, errCreatePay := uc.participantData.CreateDataPayment(reqPay)
+	if errCreatePay != nil {
+		return nil, errors.New("failed get response payment")
+	}
+	return createPay, nil
 }

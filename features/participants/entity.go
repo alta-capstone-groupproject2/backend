@@ -3,6 +3,8 @@ package participants
 import (
 	"lami/app/features/events/data"
 	"time"
+
+	"github.com/midtrans/midtrans-go/coreapi"
 )
 
 type Core struct {
@@ -52,7 +54,8 @@ type Business interface {
 	DeleteParticipant(param, userID int) error
 
 	//Payment Event
-	// CreatePaymentBankTransferBCA(payment Core) (Payment, error)
+	GrossAmountEvent(id int) (GrossAmount int64, err error)
+	CreatePaymentBankTransfer(coreapi.ChargeReq) (*coreapi.ChargeResponse, error)
 }
 
 type Data interface {
@@ -60,4 +63,7 @@ type Data interface {
 	AddData(data Core) error
 	SelectDataEvent(userID int) (data []Core, err error)
 	DeleteData(param, userID int) error
+
+	//Payment Event Data
+	CreateDataPayment(coreapi.ChargeReq) (*coreapi.ChargeResponse, error)
 }

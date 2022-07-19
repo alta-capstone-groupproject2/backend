@@ -51,6 +51,9 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.GET("/events/participations", presenter.ParticipantPresenter.GetAllEventParticipant, middlewares.JWTMiddleware())
 	e.DELETE("/events/participations/:id", presenter.ParticipantPresenter.DeleteEventbyParticipant, middlewares.JWTMiddleware())
 
+	//Payment Event
+	e.POST("/events/payments", presenter.ParticipantPresenter.CreatePayment, middlewares.JWTMiddleware())
+
 	// Product
 	e.POST("/products", presenter.ProductPresenter.PostProduct, middlewares.JWTMiddleware())
 	e.PUT("/products/:productID", presenter.ProductPresenter.PutProduct, middlewares.JWTMiddleware())

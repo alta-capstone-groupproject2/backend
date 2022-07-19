@@ -3,8 +3,6 @@ package data
 import (
 	_event "lami/app/features/events/data"
 	"lami/app/features/participants"
-	"strconv"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -14,22 +12,11 @@ type Participant struct {
 	UserID        int
 	EventID       int
 	OrderID       string
-	GrossAmount   string
+	GrossAmount   int64
 	PaymentMethod string
 	TransactionID string
 	Status        string
 	Event         _event.Event
-}
-
-type Payment struct {
-	OrderID           string
-	TransactionID     string
-	PaymentMethod     string
-	BillNumber        string
-	Bank              string
-	GrossAmount       int64
-	TransactionTime   time.Time
-	TransactionExpire time.Time
 }
 
 func fromCore(core participants.Core) Participant {
@@ -37,7 +24,7 @@ func fromCore(core participants.Core) Participant {
 		UserID:        core.UserID,
 		EventID:       core.EventID,
 		OrderID:       core.OrderID,
-		GrossAmount:   strconv.Itoa(core.Event.Price),
+		GrossAmount:   int64(core.Event.Price),
 		PaymentMethod: core.PaymentMethod,
 		TransactionID: core.TransactionID,
 		Status:        core.Status,
