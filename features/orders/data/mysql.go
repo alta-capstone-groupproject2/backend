@@ -24,7 +24,7 @@ func (repo *mysqlOrderRepository) AddDataOrder(dataReq orders.Core, idUser int) 
 
 	dataCart := []_dataCart.Cart{}
 	dataProductCore := product.Core{}
-	var totalPrice float32 = 0
+	var totalPrice uint = 0
 	var totalQty int = 0
 
 	chechQty := repo.db.Preload("Product").Where("user_id = ?", idUser).Find(&dataCart)

@@ -9,26 +9,26 @@ type Product struct {
 	URL        string  `json:"url" form:"url"`
 	Name       string  `json:"name" form:"name"`
 	StoreName  string  `json:"store_name" form:"store_name"`
-	Price      float32 `json:"price" form:"price"`
+	Price      uint    `json:"price" form:"price"`
 	City       string  `json:"city" form:"city"`
-	MeanRating float32 `json:"mean_rating" form:"mean_rating"`
+	MeanRating float64 `json:"mean_rating" form:"mean_rating"`
 	Detail     string  `json:"detail" form:"detail"`
 }
 
 type MyProduct struct {
-	ID    int     `json:"product_id" form:"product_id"`
-	URL   string  `json:"url" form:"url"`
-	Name  string  `json:"name" form:"name"`
-	Price float32 `json:"price" form:"price"`
-	City  string  `json:"city" form:"city"`
+	ID    int    `json:"product_id" form:"product_id"`
+	URL   string `json:"url" form:"url"`
+	Name  string `json:"name" form:"name"`
+	Price uint   `json:"price" form:"price"`
+	City  string `json:"city" form:"city"`
 }
 
 type ProductRating struct {
-	ID          int    `json:"rating_id" form:"rating_id"`
-	URL         string `json:"url" form:"url"`
-	ProductName string `json:"name" form:"name"`
-	Rating      uint   `json:"rating" form:"rating"`
-	Review      string `json:"review" form:"review"`
+	ID          int     `json:"rating_id" form:"rating_id"`
+	URL         string  `json:"url" form:"url"`
+	ProductName string  `json:"name" form:"name"`
+	Rating      float64 `json:"rating" form:"rating"`
+	Review      string  `json:"review" form:"review"`
 }
 
 func FromCoreProductList(data product.Core) Product {
