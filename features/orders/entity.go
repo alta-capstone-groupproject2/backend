@@ -13,7 +13,7 @@ type Core struct {
 	Receiver    string
 	PhoneNumber string
 	Address     string
-	TotalPrice  float32
+	TotalPrice  uint
 	Status      string
 	User        _dataUser.User
 	Product     _dataProduct.Product
@@ -29,7 +29,7 @@ type CoreDetail struct {
 	Receiver   string
 	Address    string
 	Status     string
-	TotalPrice float32
+	TotalPrice uint
 	Qty        uint
 	User       _dataUser.User
 	Product    []Product
