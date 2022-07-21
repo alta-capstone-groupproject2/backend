@@ -28,12 +28,6 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.POST("/users/verify", presenter.UserPresenter.GmailVerification)
 	e.GET("/users/confirm/:encrypt", presenter.UserPresenter.InsertFromVerificaton)
 
-	//submission by user
-	e.GET("/events/submissions", presenter.EventPresenter.GetSubmissionAll, middlewares.JWTMiddleware())
-	e.GET("/events/submissions/:id", presenter.EventPresenter.GetSubmissionByID, middlewares.JWTMiddleware())
-	e.PUT("/events/submissions/:id", presenter.EventPresenter.UpdateData, middlewares.JWTMiddleware())
-	//event data
-	e.POST("/events", presenter.EventPresenter.InsertData, middlewares.JWTMiddleware())
 	e.POST("/cultures", presenter.CulturePresenter.PostCulture, middlewares.JWTMiddleware())
 	e.GET("/cultures", presenter.CulturePresenter.GetCulture)
 	e.GET("/cultures/:cultureID", presenter.CulturePresenter.GetCulturebyIDCulture)
@@ -43,6 +37,8 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.POST("/cultures/reports/:cultureID", presenter.CulturePresenter.PostCultureReport, middlewares.JWTMiddleware())
 	e.GET("/cultures/reports/:cultureID", presenter.CulturePresenter.GetCultureReport, middlewares.JWTMiddleware())
 
+	//event data
+	e.POST("/events", presenter.EventPresenter.InsertData, middlewares.JWTMiddleware())
 	e.GET("/events", presenter.EventPresenter.GetAll)
 	e.GET("/events/:id", presenter.EventPresenter.GetDataById)
 	e.DELETE("/events/:id", presenter.EventPresenter.DeleteData, middlewares.JWTMiddleware())
@@ -58,6 +54,10 @@ func New(presenter factory.Presenter) *echo.Echo {
 	//Payment Event
 	e.POST("/events/payments", presenter.ParticipantPresenter.CreatePayment, middlewares.JWTMiddleware())
 	e.POST("/events/payments/webhook", presenter.ParticipantPresenter.MidtransWebHook, middlewares.JWTMiddleware())
+	//submission by user
+	e.GET("/events/submissions", presenter.EventPresenter.GetSubmissionAll, middlewares.JWTMiddleware())
+	e.GET("/events/submissions/:id", presenter.EventPresenter.GetSubmissionByID, middlewares.JWTMiddleware())
+	e.PUT("/events/submissions/:id", presenter.EventPresenter.UpdateData, middlewares.JWTMiddleware())
 
 	// Product
 	e.POST("/products", presenter.ProductPresenter.PostProduct, middlewares.JWTMiddleware())

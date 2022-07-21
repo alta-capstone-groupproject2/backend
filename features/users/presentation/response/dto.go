@@ -6,36 +6,40 @@ import (
 )
 
 type User struct {
-	ID        int       `json:"id"`
-	Image     string    `json:"image"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Role      string    `json:"role"`
-	CreatedAt time.Time `json:"created_at"`
+	ID          int       `json:"id"`
+	Image       string    `json:"image"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	Role        string    `json:"role"`
+	CreatedAt   time.Time `json:"created_at"`
+	StoreStatus string    `json:"status"`
 }
 
 type UserStore struct {
-	ID        int       `json:"id"`
-	Image     string    `json:"image"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	StoreName string    `json:"storeName"`
-	Phone     string    `json:"phone"`
-	Role      string    `json:"role"`
-	Owner     string    `json:"owner"`
-	City      string    `json:"city"`
-	Address   string    `json:"address"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID          int       `json:"id"`
+	Image       string    `json:"image"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	StoreName   string    `json:"storeName"`
+	Phone       string    `json:"phone"`
+	Role        string    `json:"role"`
+	Owner       string    `json:"owner"`
+	City        string    `json:"city"`
+	Address     string    `json:"address"`
+	CreatedAt   time.Time `json:"createdAt"`
+	Document    string    `json:"document"`
+	StoreStatus string    `json:"status"`
 }
 
 func FromCore(data users.Core) User {
 	return User{
-		ID:        data.ID,
-		Image:     data.Image,
-		Name:      data.Name,
-		Email:     data.Email,
-		Role:      data.Role.RoleName,
-		CreatedAt: data.CreatedAt,
+		ID:          data.ID,
+		Image:       data.Image,
+		Name:        data.Name,
+		Email:       data.Email,
+		Role:        data.Role.RoleName,
+		CreatedAt:   data.CreatedAt,
+		StoreStatus: data.StoreStatus,
 	}
 }
 
@@ -49,18 +53,19 @@ func FromCoreList(data []users.Core) []User {
 
 func UserStoreFromCore(data users.Core) UserStore {
 	return UserStore{
-		ID:        data.ID,
-		Image:     data.Image,
-		Name:      data.Name,
-		Email:     data.Email,
-		CreatedAt: data.CreatedAt,
-		StoreName: data.StoreName,
-		Phone:     data.Phone,
-		Owner:     data.Owner,
-		City:      data.City,
-		Address:   data.Address,
-
-		Role: data.Role.RoleName,
+		ID:          data.ID,
+		Image:       data.Image,
+		Name:        data.Name,
+		Email:       data.Email,
+		CreatedAt:   data.CreatedAt,
+		StoreName:   data.StoreName,
+		Phone:       data.Phone,
+		Owner:       data.Owner,
+		City:        data.City,
+		Address:     data.Address,
+		Role:        data.Role.RoleName,
+		Document:    data.Document,
+		StoreStatus: data.StoreStatus,
 	}
 }
 

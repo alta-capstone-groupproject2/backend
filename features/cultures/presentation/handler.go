@@ -121,7 +121,7 @@ func (h *CultureHandler) PutCulture(c echo.Context) error {
 
 	err := h.cultureBusiness.UpdateCulture(cultureCore, cultureID, fileInfo, fileData)
 	if err != nil {
-		return c.JSON(helper.ResponseBadRequest("Failed to update data culture"))
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 	return c.JSON(helper.ResponseStatusOkNoData("Success to update data culture"))
 

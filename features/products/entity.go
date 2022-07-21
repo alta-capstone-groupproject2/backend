@@ -7,12 +7,12 @@ type Core struct {
 	UserID     int
 	Name       string
 	URL        string
-	Price      float32
+	Price      uint
 	Stock      uint
 	Detail     string
 	StoreName  string
 	City       string
-	MeanRating float32
+	MeanRating float64
 	User       data.User
 }
 
@@ -22,7 +22,7 @@ type CoreRating struct {
 	ProductID   int
 	ProductName string
 	URL         string
-	Rating      uint
+	Rating      float64
 	Review      string
 	User        data.User
 	Product     Core

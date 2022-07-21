@@ -14,9 +14,9 @@ type Order struct {
 }
 
 type OrderDetail struct {
-	OrderID     int     `json:"order_id" form:"order_id"`
-	Price       float32 `json:"price" form:"price"`
-	Qty         uint    `json:"qty" form:"qty"`
+	OrderID    int     `json:"order_id" form:"order_id"`
+	TotalPrice float32 `json:"totalprice" form:"totalprice"`
+	Qty        uint    `json:"qty" form:"qty"`
 }
 
 func ToCore(orderReq Order) orders.Core {

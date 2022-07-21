@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"lami/app/config"
 	"lami/app/features/cultures"
-	"lami/app/helper"
 	"mime/multipart"
 )
 
@@ -67,9 +66,17 @@ func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fi
 	updateMap := make(map[string]interface{})
 
 	if dataReq.Name != "" || dataReq.Name == " " {
+		errNameFormat := nameFormatValidation(dataReq.Name)
+		if errNameFormat != nil {
+			return errors.New(errNameFormat.Error())
+		}
 		updateMap["name"] = &dataReq.Name
 	}
 	if dataReq.City != "" || dataReq.City == " " {
+		errEmailFormat := cityFormatValidation(dataReq.City)
+		if errEmailFormat != nil {
+			return errors.New(errEmailFormat.Error())
+		}
 		updateMap["city"] = &dataReq.City
 	}
 	if dataReq.Details != "" || dataReq.Details == " " {
@@ -86,6 +93,7 @@ func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fi
 	fmt.Println(updateMap["image"])
 	err := uc.cultureData.UpdateDataCulture(updateMap, cultureID)
 	if err != nil {
+		fmt.Println(err)
 		return errors.New("failed to update data culture")
 	}
 
@@ -98,9 +106,9 @@ func (uc *cultureUseCase) AddCultureReport(dataReq cultures.CoreReport) error {
 	if err != nil {
 		return errors.New("failed to insert data report culture")
 	}
-	userData, _ := uc.cultureData.SelectUser(dataReq.UserID)
+	// userData, _ := uc.cultureData.SelectUser(dataReq.UserID)
 
-	helper.SendGmailNotify(userData.Email, "Success Add Report")
+	// helper.SendGmailNotify(userData.Email, "Success Add Report")
 	return nil
 }
 

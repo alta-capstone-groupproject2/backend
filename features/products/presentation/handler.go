@@ -170,7 +170,7 @@ func (h *ProductHandler) GetProductList(c echo.Context) error {
 		return c.JSON(helper.ResponseBadRequest("failed get all data"))
 	}
 	resp := response.FromCoreListProductList(res)
-	return c.JSON(http.StatusOK, helper.ResponseSuccessWithDataPage("Success get all events", total, resp))
+	return c.JSON(http.StatusOK, helper.ResponseSuccessWithDataPage("Success get all products", total, resp))
 }
 
 func (h *ProductHandler) PostProductRating(c echo.Context) error {

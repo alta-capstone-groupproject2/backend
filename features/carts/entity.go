@@ -12,7 +12,7 @@ type Core struct {
 	Qty         int
 	URL         string
 	ProductName string
-	Price       float32
+	Price       uint
 	User        _dataUser.User
 	Product     _dataProduct.Product
 }

@@ -50,7 +50,7 @@ func SendEmailVerification(userData users.Core, encrypt string) {
 	result, errParse := ParseTemplate(template, templateData)
 	fmt.Println(errParse)
 
-	runtime.GOMAXPROCS(1)
+	runtime.GOMAXPROCS(3)
 	go SendEmail(userData.Email, subject, result)
 }
 

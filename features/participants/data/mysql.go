@@ -99,9 +99,19 @@ func (repo *mysqlParticipantRepository) PaymentDataWebHook(data participants.Cor
 		return errors.New("failed to get data join payment")
 	}
 
-	errUpdateStatus := repo.db.Where("order_id = ?", data.OrderID).Updates(payment)
-	if errUpdateStatus != nil {
-		return errors.New("failed update status")
+	if data.Status == "Success" {
+		errUpdateStatus := repo.db.Where("order_id = ?", data.OrderID).Update("status", data.Status)
+		if errUpdateStatus != nil {
+			return errors.New("failed update status")
+		}
+	} else {
+		errUpdate := repo.db.Where("order_id = ?", data.OrderID).Updates(Participant{
+			PaymentMethod: data.PaymentMethod,
+			TransactionID: data.TransactionID,
+		})
+		if errUpdate != nil {
+			return errors.New("failed update reset payment")
+		}
 	}
 	return nil
 }

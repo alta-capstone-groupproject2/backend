@@ -89,15 +89,15 @@ func (uc *participantUseCase) PaymentWebHook(orderID, status string) error {
 
 	if status == "settlement" {
 		payment.Status = "Success"
+		result := uc.participantData.PaymentDataWebHook(payment)
+		if result != nil {
+			return errors.New("failed update status payment")
+		}
 	}
 	if status == "cancel" || status == "deny" || status == "expire" {
 		payment.PaymentMethod = ""
 		payment.TransactionID = ""
 	}
 
-	result := uc.participantData.PaymentDataWebHook(payment)
-	if result != nil {
-		return errors.New("failed update status payment")
-	}
 	return nil
 }
