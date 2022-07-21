@@ -5,15 +5,15 @@ import (
 )
 
 type Culture struct {
-	ID      int    `json:"culture_id"`
-	Image   string `json:"Image"`
+	ID      int    `json:"cultureID"`
+	Image   string `json:"image"`
 	Name    string `json:"name"`
 	City    string `json:"city"`
 	Details string `json:"details"`
 }
 
 type CultureReport struct {
-	ID        int       `json:"report_id"`
+	ID        int       `json:"reportID"`
 	Message   string    `json:"message"`
 	CreatedAt string `json:"createdAt"`
 }
