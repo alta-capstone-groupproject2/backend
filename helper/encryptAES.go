@@ -10,7 +10,7 @@ import (
 )
 
 func Encrypt(stringToEncrypt string, keyString string) (encryptedString string) {
-	
+
 	//Since the key is in string, we need to convert decode it to bytes
 	key, _ := hex.DecodeString(keyString)
 	plaintext := []byte(stringToEncrypt)

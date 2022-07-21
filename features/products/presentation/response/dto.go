@@ -31,6 +31,7 @@ type ProductRating struct {
 	Review      string  `json:"review" form:"review"`
 }
 
+//	GetProductList
 func FromCoreProductList(data product.Core) Product {
 	return Product{
 		ID:    data.ID,
@@ -49,7 +50,8 @@ func FromCoreListProductList(data []product.Core) []Product {
 	return res
 }
 
-func FromCore(core product.Core) Product {
+//	GetProductbyIDProduct
+func FromCorebyIDProduct(core product.Core) Product {
 	return Product{
 		ID:         core.ID,
 		URL:        core.URL,
@@ -62,6 +64,7 @@ func FromCore(core product.Core) Product {
 	}
 }
 
+//	GetProductRating
 func FromCoreRating(core product.CoreRating) ProductRating {
 	return ProductRating{
 		ID:          core.ID,
@@ -80,7 +83,7 @@ func FromCoreListRating(data []product.CoreRating) []ProductRating {
 	return res
 }
 
-// Get MyProduct
+//	GetMyProduct
 func FromCoreMyProduct(core product.Core) MyProduct {
 	return MyProduct{
 		ID:    core.ID,
@@ -91,7 +94,7 @@ func FromCoreMyProduct(core product.Core) MyProduct {
 	}
 }
 
-func FromCoreList(data []product.Core) []MyProduct {
+func FromCoreListMyProduct(data []product.Core) []MyProduct {
 	result := []MyProduct{}
 	for key := range data {
 		result = append(result, FromCoreMyProduct(data[key]))

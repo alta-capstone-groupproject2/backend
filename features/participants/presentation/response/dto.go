@@ -1,9 +1,11 @@
 package response
 
 import (
+	"lami/app/config"
+	"lami/app/features/participants"
 	"time"
 
-	"lami/app/features/participants"
+	"github.com/midtrans/midtrans-go/coreapi"
 )
 
 type Participant struct {
@@ -11,8 +13,8 @@ type Participant struct {
 	Name          string    `json:"name" form:"name"`
 	Detail        string    `json:"details" form:"details"`
 	Image         string    `json:"image" form:"image"`
-	Date          time.Time `json:"date" form:"date"`
 	HostedBy      string    `json:"hostedby" form:"hostedby"`
+	Date          time.Time `json:"date" form:"date"`
 	City          string    `json:"city" form:"city"`
 	Location      string    `json:"location" form:"location"`
 	GrossAmount   int64     `json:"gross_amount"`
@@ -22,14 +24,14 @@ type Participant struct {
 }
 
 type Payment struct {
-	OrderID           string    `json:"order_id"`
-	TransactionID     string    `json:"transaction_id"`
-	PaymentMethod     string    `json:"payment_method"`
-	BillNumber        string    `json:"bill_number"`
-	Bank              string    `json:"bank"`
-	GrossAmount       int64     `json:"gross_amount"`
-	TransactionTime   time.Time `json:"transaction_time"`
-	TransactionExpire time.Time `json:"transaction_expire"`
+	OrderID           string
+	TransactionID     string
+	PaymentMethod     string
+	BillNumber        string
+	Bank              string
+	GrossAmount       string
+	TransactionTime   string
+	TransactionExpire string
 }
 
 func FromCore(core participants.Core) Participant {
@@ -38,8 +40,8 @@ func FromCore(core participants.Core) Participant {
 		Name:          core.Event.Name,
 		Detail:        core.Event.Detail,
 		Image:         core.Event.Image,
-		Date:          core.Event.Date,
 		HostedBy:      core.Event.HostedBy,
+		Date:          core.Date,
 		City:          core.Event.City,
 		Location:      core.Event.Location,
 		GrossAmount:   core.GrossAmount,
@@ -55,4 +57,16 @@ func FromCoreList(data []participants.Core) []Participant {
 		result = append(result, FromCore(data[key]))
 	}
 	return result
+}
+
+func FromMidtransToPayment(resMidtrans *coreapi.ChargeResponse) Payment {
+	return Payment{
+		OrderID:         resMidtrans.OrderID,
+		TransactionID:   resMidtrans.TransactionID,
+		PaymentMethod:   config.PaymentBankTransferBCA,
+		BillNumber:      resMidtrans.VaNumbers[0].VANumber,
+		Bank:            resMidtrans.VaNumbers[0].Bank,
+		GrossAmount:     resMidtrans.GrossAmount,
+		TransactionTime: resMidtrans.TransactionTime,
+	}
 }

@@ -6,6 +6,7 @@ import (
 	_eventData "lami/app/features/events/data"
 	"lami/app/features/participants"
 
+	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
 )
 
@@ -60,6 +61,57 @@ func (repo *mysqlParticipantRepository) AddData(ParticipantData participants.Cor
 	}
 	if result.RowsAffected == 0 {
 		return errors.New("failed insert join")
+	}
+	return nil
+}
+
+// --------------Payment------------///
+
+func (repo *mysqlParticipantRepository) CreateDataPayment(reqPay coreapi.ChargeReq) (res *coreapi.ChargeResponse, err error) {
+	payment, errPayment := coreapi.ChargeTransaction(&reqPay)
+	if errPayment != nil {
+		return nil, errors.New("failed to connect midtrans")
+	}
+	return payment, nil
+}
+
+func (repo *mysqlParticipantRepository) UpdateDataPayment(pay *coreapi.ChargeResponse, req participants.Core) error {
+	Model := fromCore(req)
+	result := repo.db.Where("user_id = ? AND event_id = ?", req.UserID, req.EventID).Model(&Model).Updates(Participant{
+		OrderID:       req.OrderID,
+		GrossAmount:   req.GrossAmount,
+		PaymentMethod: req.PaymentMethod,
+		TransactionID: pay.TransactionID,
+		Status:        pay.TransactionStatus,
+	})
+
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (repo *mysqlParticipantRepository) PaymentDataWebHook(data participants.Core) error {
+	payment := Participant{}
+
+	findData := repo.db.Where("orderID", data.OrderID).Find(&payment)
+	if findData.Error != nil {
+		return errors.New("failed to get data join payment")
+	}
+
+	if data.Status == "Success" {
+		errUpdateStatus := repo.db.Where("order_id = ?", data.OrderID).Update("status", data.Status)
+		if errUpdateStatus != nil {
+			return errors.New("failed update status")
+		}
+	} else {
+		errUpdate := repo.db.Where("order_id = ?", data.OrderID).Updates(Participant{
+			PaymentMethod: data.PaymentMethod,
+			TransactionID: data.TransactionID,
+		})
+		if errUpdate != nil {
+			return errors.New("failed update reset payment")
+		}
 	}
 	return nil
 }

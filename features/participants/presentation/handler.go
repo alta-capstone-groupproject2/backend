@@ -1,14 +1,18 @@
 package presentation
 
 import (
+	"fmt"
 	"lami/app/features/participants"
 	_request_participant "lami/app/features/participants/presentation/request"
 	_response_participant "lami/app/features/participants/presentation/response"
 	"lami/app/helper"
 	"lami/app/middlewares"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
 )
 
 type ParticipantHandler struct {
@@ -73,4 +77,61 @@ func (h *ParticipantHandler) DeleteEventbyParticipant(c echo.Context) error {
 		return c.JSON(helper.ResponseBadRequest("failed to delete your event"))
 	}
 	return c.JSON(helper.ResponseNoContent("success to delete your event"))
+}
+
+func (h *ParticipantHandler) CreatePayment(c echo.Context) error {
+	currentTime := time.Now()
+	userID_token, _, errToken := middlewares.ExtractToken(c)
+	if userID_token == 0 || errToken != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to get user id"))
+	}
+
+	reqPay := _request_participant.Participant{}
+	errBind := c.Bind(&reqPay)
+	if errBind != nil {
+		return c.JSON(helper.ResponseBadRequest("error bind data"))
+	}
+
+	reqPayCore := _request_participant.ToCore(reqPay)
+
+	reqPayCore.UserID = userID_token
+
+	grossAmount, _ := h.participantBusiness.GrossAmountEvent(reqPayCore.EventID)
+	reqPayCore.GrossAmount = grossAmount
+	date := currentTime.Format("2006-01-02")
+	time := currentTime.Format("15:04:05")
+
+	orderIDPay := fmt.Sprintf("Tiket-%d-%s-%s", reqPay.EventID, date, time)
+
+	reqPayCore.OrderID = orderIDPay
+
+	inputPay := _request_participant.ToCoreMidtrans(reqPayCore)
+	if reqPay.PaymentMethod == "BANK_TRANSFER_BCA" {
+		reqPayCore.PaymentMethod = "BANK_TRANSFER_BCA"
+		inputPay.BankTransfer = &coreapi.BankTransferDetails{
+			Bank: midtrans.BankBca,
+		}
+	}
+	reqCreatePay, errReqCreatePay := h.participantBusiness.CreatePaymentBankTransfer(inputPay, reqPayCore)
+
+	if errReqCreatePay != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to payment"))
+	}
+	result := _response_participant.FromMidtransToPayment(reqCreatePay)
+
+	return c.JSON(helper.ResponseStatusOkWithData("success create payment", result))
+}
+
+func (h *ParticipantHandler) MidtransWebHook(c echo.Context) error {
+	midtransRequest := _request_participant.MidtransHookRequest{}
+	err_bind := c.Bind(&midtransRequest)
+	if err_bind != nil {
+		return c.JSON(helper.ResponseBadRequest("error bind data"))
+	}
+
+	errUpdateStatusPay := h.participantBusiness.PaymentWebHook(midtransRequest.OrderID, midtransRequest.TransactionStatus)
+	if errUpdateStatusPay != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to update status payment"))
+	}
+	return c.JSON(helper.ResponseStatusOkNoData("success to update status payment"))
 }

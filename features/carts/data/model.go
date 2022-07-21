@@ -29,10 +29,10 @@ func fromCore(core cart.Core) Cart {
 func (data *Cart) toCore() cart.Core {
 	return cart.Core{
 		ID: int(data.ID),
-		Product:     _dataProduct.Product{
-			Name:   data.Product.Name,
-			URL:    data.Product.URL,
-			Price:  data.Product.Price,
+		Product: _dataProduct.Product{
+			Name:  data.Product.Name,
+			URL:   data.Product.URL,
+			Price: data.Product.Price,
 		},
 		Qty: data.Qty,
 	}
