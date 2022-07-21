@@ -68,6 +68,7 @@ type Data interface {
 	DeleteData(param, userID int) error
 
 	//Payment Event Data
+	SelectPayment(orderID string) (Core, error)
 	CreateDataPayment(coreapi.ChargeReq) (*coreapi.ChargeResponse, error)
 	PaymentDataWebHook(data Core) error
 }

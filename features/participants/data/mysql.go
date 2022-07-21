@@ -91,21 +91,26 @@ func (repo *mysqlParticipantRepository) UpdateDataPayment(pay *coreapi.ChargeRes
 	return nil
 }
 
-func (repo *mysqlParticipantRepository) PaymentDataWebHook(data participants.Core) error {
+func (repo *mysqlParticipantRepository) SelectPayment(orderID string) (participants.Core, error) {
 	payment := Participant{}
 
-	findData := repo.db.Where("orderID", data.OrderID).Find(&payment)
+	findData := repo.db.Where("orderID", orderID).Find(&payment)
 	if findData.Error != nil {
-		return errors.New("failed to get data join payment")
+		return participants.Core{}, errors.New("failed to get data join payment")
 	}
+	result := payment.toCoreMidtrans()
+	return result, nil
+}
 
-	if data.Status == "Success" {
+func (repo *mysqlParticipantRepository) PaymentDataWebHook(data participants.Core) error {
+	if data.Status == "success" {
 		errUpdateStatus := repo.db.Where("order_id = ?", data.OrderID).Update("status", data.Status)
 		if errUpdateStatus != nil {
 			return errors.New("failed update status")
 		}
 	} else {
 		errUpdate := repo.db.Where("order_id = ?", data.OrderID).Updates(Participant{
+			Status:        data.Status,
 			PaymentMethod: data.PaymentMethod,
 			TransactionID: data.TransactionID,
 		})

@@ -84,20 +84,23 @@ func (uc *participantUseCase) CreatePaymentBankTransfer(reqPay coreapi.ChargeReq
 }
 
 func (uc *participantUseCase) PaymentWebHook(orderID, status string) error {
-	payment := participants.Core{}
-	payment.OrderID = orderID
+	payment, errPayment := uc.participantData.SelectPayment(orderID)
+	if errPayment != nil {
+		return errors.New("failed to get data join")
+	}
 
 	if status == "settlement" {
-		payment.Status = "Success"
-		result := uc.participantData.PaymentDataWebHook(payment)
-		if result != nil {
-			return errors.New("failed update status payment")
-		}
+		payment.Status = "success"
 	}
 	if status == "cancel" || status == "deny" || status == "expire" {
+		payment.Status = "failed"
 		payment.PaymentMethod = ""
 		payment.TransactionID = ""
 	}
 
+	result := uc.participantData.PaymentDataWebHook(payment)
+	if result != nil {
+		return errors.New("failed update status payment")
+	}
 	return nil
 }

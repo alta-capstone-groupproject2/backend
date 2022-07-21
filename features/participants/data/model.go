@@ -53,3 +53,16 @@ func ToCoreList(data []Participant) []participants.Core {
 	}
 	return result
 }
+
+func (data *Participant) toCoreMidtrans() participants.Core {
+	return participants.Core{
+		ID:            int(data.ID),
+		UserID:        data.UserID,
+		EventID:       data.EventID,
+		OrderID:       data.OrderID,
+		GrossAmount:   int64(data.Event.Price),
+		PaymentMethod: data.PaymentMethod,
+		TransactionID: data.TransactionID,
+		Status:        data.Status,
+	}
+}
