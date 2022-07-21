@@ -30,6 +30,7 @@ type Rating struct {
 	User      data.User `gorm:"foreignKey:UserID"`
 }
 
+//	AddProduct
 func fromCore(core product.Core) Product {
 	return Product{
 		UserID: core.UserID,
@@ -41,6 +42,7 @@ func fromCore(core product.Core) Product {
 	}
 }
 
+//	AddProductRating
 func fromCoreRating(core product.CoreRating) Rating {
 	return Rating{
 		UserID:    core.UserID,
@@ -50,6 +52,7 @@ func fromCoreRating(core product.CoreRating) Rating {
 	}
 }
 
+//	SelectDataProductbyIDProduct
 func (data *Product) toCorebyProductID() product.Core {
 	return product.Core{
 		ID:        int(data.ID),
@@ -66,6 +69,7 @@ func ToCorebyProductID(data Product) product.Core {
 	return data.toCorebyProductID()
 }
 
+//	//	SelectProductList
 func (data *Product) toCoreProductList() product.Core {
 	return product.Core{
 		ID:    int(data.ID),
@@ -84,6 +88,7 @@ func ToCoreListProductList(data []Product) []product.Core {
 	return res
 }
 
+//	SelectDataRating
 func (data *Rating) toCoreRating() product.CoreRating {
 	return product.CoreRating{
 		ID:          int(data.ID),

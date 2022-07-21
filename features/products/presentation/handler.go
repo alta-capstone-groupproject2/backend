@@ -216,7 +216,7 @@ func (h *ProductHandler) GetProductbyIDProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed get product by idProduct"))
 	}
 
-	response := response.FromCore(res)
+	response := response.FromCorebyIDProduct(res)
 	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get product by idProduct", response))
 }
 
@@ -231,7 +231,7 @@ func (h *ProductHandler) GetMyProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get all your products"))
 	}
 
-	resp := response.FromCoreList(res)
+	resp := response.FromCoreListMyProduct(res)
 	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get all your products", resp))
 }
 
