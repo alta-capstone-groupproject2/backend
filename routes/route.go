@@ -80,5 +80,9 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.PUT("/carts/:cartID", presenter.CartPresenter.PutCart, middlewares.JWTMiddleware())
 	e.DELETE("carts/:cartID", presenter.CartPresenter.DeletedCart, middlewares.JWTMiddleware())
 
+	// PaymentOrder
+	e.POST("/payments/:type", presenter.PaymentPresenter.PostPayment, middlewares.JWTMiddleware())
+	e.PUT("/payments/confirm", presenter.PaymentPresenter.PutPayment, middlewares.JWTMiddleware())
+
 	return e
 }

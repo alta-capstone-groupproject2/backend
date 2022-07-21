@@ -28,6 +28,7 @@ type CoreDetail struct {
 	OrderID    int
 	Receiver   string
 	Address    string
+	TotalPrice uint
 	Status     string
 	Qty        uint
 	User       _dataUser.User
@@ -43,10 +44,10 @@ type Product struct {
 
 type Business interface {
 	AddOrder(dataReq Core, idUser int) error
-	SelectHistoryOrder(idUser int) (CoreDetail, error)
+	SelectHistoryOrder(idOrder, idUser int) (CoreDetail, error)
 }
 
 type Data interface {
 	AddDataOrder(dataReq Core, idUser int) error
-	SelectDataHistoryOrder(idUser int) (CoreDetail, error)
+	SelectDataHistoryOrder(idOrder, idUser int) (CoreDetail, error)
 }

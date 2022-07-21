@@ -37,6 +37,10 @@ import (
 	_orderData "lami/app/features/orders/data"
 	_orderPresentation "lami/app/features/orders/presentation"
 
+	_paymentBusiness "lami/app/features/paymentsorder/business"
+	_paymentData "lami/app/features/paymentsorder/data"
+	_paymentPresentation "lami/app/features/paymentsorder/presentation"
+
 	"gorm.io/gorm"
 )
 
@@ -50,6 +54,7 @@ type Presenter struct {
 	CartPresenter        *_cartPresentation.CartHandler
 	CulturePresenter     *_culturePresentation.CultureHandler
 	OrderPresenter       *_orderPresentation.OrderHandler
+	PaymentPresenter     *_paymentPresentation.PaymentsHandler
 }
 
 func InitFactory(dbConn *gorm.DB) Presenter {
@@ -90,6 +95,10 @@ func InitFactory(dbConn *gorm.DB) Presenter {
 	orderBusiness := _orderBusiness.NewOrderBusiness(orderData)
 	orderPresentation := _orderPresentation.NewOrderHandler(orderBusiness)
 
+	paymentData := _paymentData.NewPaymentsRepository(dbConn)
+	paymentBusiness := _paymentBusiness.NewPaymentsBusiness(paymentData)
+	paymentPresentation := _paymentPresentation.NewPaymentHandler(paymentBusiness)
+
 	return Presenter{
 		UserPresenter:        userPresentation,
 		AuthPresenter:        authPresentation,
@@ -100,5 +109,6 @@ func InitFactory(dbConn *gorm.DB) Presenter {
 		CartPresenter:        cartPresentation,
 		CulturePresenter:     culturePresentation,
 		OrderPresenter:       orderPresentation,
+		PaymentPresenter:     paymentPresentation,
 	}
 }

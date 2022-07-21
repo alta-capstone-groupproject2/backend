@@ -10,6 +10,7 @@ type Product struct {
 	URL        string  `json:"file" form:"file"`
 	Price      uint    `json:"price" form:"price"`
 	Stock      uint    `json:"stock" form:"stock"`
+	City       string  `json:"city" form:"city"`
 	Detail     string  `json:"detail" form:"detail"`
 	MeanRating float64 `json:"mean_rating" form:"mean_rating"`
 	UserID     data.User
@@ -30,6 +31,7 @@ func ToCore(productReq Product) product.Core {
 		Name:       productReq.Name,
 		Price:      productReq.Price,
 		Stock:      productReq.Stock,
+		City:       productReq.City,
 		Detail:     productReq.Detail,
 		MeanRating: productReq.MeanRating,
 	}
