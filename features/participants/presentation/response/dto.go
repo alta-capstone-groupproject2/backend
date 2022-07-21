@@ -3,7 +3,10 @@ package response
 import (
 	"time"
 
+	"lami/app/config"
 	"lami/app/features/participants"
+
+	"github.com/midtrans/midtrans-go/coreapi"
 )
 
 type Participant struct {
@@ -22,14 +25,14 @@ type Participant struct {
 }
 
 type Payment struct {
-	OrderID           string    `json:"order_id"`
-	TransactionID     string    `json:"transaction_id"`
-	PaymentMethod     string    `json:"payment_method"`
-	BillNumber        string    `json:"bill_number"`
-	Bank              string    `json:"bank"`
-	GrossAmount       int64     `json:"gross_amount"`
-	TransactionTime   time.Time `json:"transaction_time"`
-	TransactionExpire time.Time `json:"transaction_expire"`
+	OrderID           string
+	TransactionID     string
+	PaymentMethod     string
+	BillNumber        string
+	Bank              string
+	GrossAmount       string
+	TransactionTime   string
+	TransactionExpire string
 }
 
 func FromCore(core participants.Core) Participant {
@@ -55,4 +58,16 @@ func FromCoreList(data []participants.Core) []Participant {
 		result = append(result, FromCore(data[key]))
 	}
 	return result
+}
+
+func FromMidtransToPayment(resMidtrans *coreapi.ChargeResponse) Payment {
+	return Payment{
+		OrderID:         resMidtrans.OrderID,
+		TransactionID:   resMidtrans.TransactionID,
+		PaymentMethod:   config.PaymentBankTransferBCA,
+		BillNumber:      resMidtrans.VaNumbers[0].VANumber,
+		Bank:            resMidtrans.VaNumbers[0].Bank,
+		GrossAmount:     resMidtrans.GrossAmount,
+		TransactionTime: resMidtrans.TransactionTime,
+	}
 }

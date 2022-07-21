@@ -144,8 +144,10 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 }
 
 func (h *EventHandler) DeleteData(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("eventID"))
-
+	id, errID := strconv.Atoi(c.Param("id"))
+    if errID != nil {
+        return c.JSON(helper.ResponseBadRequest("fail parameter"))
+    }
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
@@ -158,7 +160,10 @@ func (h *EventHandler) DeleteData(c echo.Context) error {
 }
 
 func (h *EventHandler) UpdateData(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, errID := strconv.Atoi(c.Param("id"))
+    if errID != nil {
+        return c.JSON(helper.ResponseBadRequest("fail parameter eventID"))
+    }
 	statusReq := _request_event.UpdateEvent{}
 	err_bind := c.Bind(&statusReq)
 
@@ -222,8 +227,10 @@ func (h *EventHandler) GetSubmissionAll(c echo.Context) (err error) {
 }
 
 func (h *EventHandler) GetSubmissionByID(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
-
+	id, errID := strconv.Atoi(c.Param("id"))
+    if errID != nil {
+        return c.JSON(helper.ResponseBadRequest("fail parameter eventID"))
+    }
 	_, role, errToken := middlewares.ExtractToken(c)
 	if errToken != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
@@ -233,6 +240,7 @@ func (h *EventHandler) GetSubmissionByID(c echo.Context) error {
 		if err != nil {
 			return c.JSON(helper.ResponseInternalServerError("failed to get apply event"))
 		}
+		
 		data := _response_event.FromCore(result)
 		return c.JSON(helper.ResponseStatusOkWithData("success to get apply event", data))
 	}

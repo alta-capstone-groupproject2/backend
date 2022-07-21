@@ -6,6 +6,7 @@ import (
 	_eventData "lami/app/features/events/data"
 	"lami/app/features/participants"
 
+	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
 )
 
@@ -62,4 +63,14 @@ func (repo *mysqlParticipantRepository) AddData(ParticipantData participants.Cor
 		return errors.New("failed insert join")
 	}
 	return nil
+}
+
+// --------------Payment------------///
+
+func (repo mysqlParticipantRepository) CreateDataPayment(req coreapi.ChargeReq) (res *coreapi.ChargeResponse, err error) {
+	payment, errPayment := coreapi.ChargeTransaction(&req)
+	if errPayment != nil {
+		return nil, errors.New("failed to connect midtrans")
+	}
+	return payment, errPayment
 }
