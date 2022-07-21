@@ -66,9 +66,17 @@ func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fi
 	updateMap := make(map[string]interface{})
 
 	if dataReq.Name != "" || dataReq.Name == " " {
+		errNameFormat := nameFormatValidation(dataReq.Name)
+		if errNameFormat != nil {
+			return errors.New(errNameFormat.Error())
+		}
 		updateMap["name"] = &dataReq.Name
 	}
 	if dataReq.City != "" || dataReq.City == " " {
+		errEmailFormat := cityFormatValidation(dataReq.City)
+		if errEmailFormat != nil {
+			return errors.New(errEmailFormat.Error())
+		}
 		updateMap["city"] = &dataReq.City
 	}
 	if dataReq.Details != "" || dataReq.Details == " " {
