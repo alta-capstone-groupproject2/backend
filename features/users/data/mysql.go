@@ -95,10 +95,10 @@ func (repo *mysqlUserRepository) InsertStoreData(dataReq users.Core, id int) err
 	return nil
 }
 
-func (repo *mysqlUserRepository) UpdateAccountRole(status string, id int) error {
+func (repo *mysqlUserRepository) UpdateAccountRole(status string, roleId int, id int) error {
 	model := User{}
 	model.ID = uint(id)
-	result := repo.db.Model(model).Updates(map[string]interface{}{"store_status": status, "role_id": 3})
+	result := repo.db.Model(model).Updates(map[string]interface{}{"store_status": status, "role_id": roleId})
 	if result.Error != nil {
 		return result.Error
 	}
