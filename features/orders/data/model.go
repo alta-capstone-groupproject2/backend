@@ -23,11 +23,10 @@ type Order struct {
 
 type OrderDetail struct {
 	gorm.Model
-	OrderID    int   `json:"order_id" form:"order_id"`
-	ProductID  int   `json:"product_id" form:"product_id"`
-	TotalPrice uint  `json:"price" form:"price"`
-	Qty        uint  `json:"qty" form:"qty"`
-	Order      Order `gorm:"foreignKey:ID"`
+	OrderID   int   `json:"order_id" form:"order_id"`
+	ProductID int   `json:"product_id" form:"product_id"`
+	Qty       uint  `json:"qty" form:"qty"`
+	Order     Order `gorm:"foreignKey:ID"`
 }
 
 type Product struct {
@@ -52,7 +51,6 @@ func fromCoreDetail(core orders.CoreDetail) OrderDetail {
 	return OrderDetail{
 		OrderID:    core.OrderID,
 		ProductID:  core.ProductID,
-		TotalPrice: core.TotalPrice,
 		Qty:        core.Qty,
 	}
 }
@@ -62,8 +60,6 @@ func (data *OrderDetail) toCore() orders.CoreDetail {
 		Receiver:   data.Order.Receiver,
 		Address:    data.Order.Address,
 		Status:     data.Order.Status,
-		TotalPrice: data.TotalPrice,
-		// Product:    []orders.Product{},
 	}
 }
 

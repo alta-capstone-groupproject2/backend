@@ -29,7 +29,6 @@ type CoreDetail struct {
 	Receiver   string
 	Address    string
 	Status     string
-	TotalPrice uint
 	Qty        uint
 	User       _dataUser.User
 	Product    []Product
