@@ -38,7 +38,6 @@ func (data *Participant) toCore() participants.Core {
 			Image:    data.Event.Image,
 			Name:     data.Event.Name,
 			HostedBy: data.Event.HostedBy,
-			Date:     data.Event.Date,
 			City:     data.Event.City,
 			Location: data.Event.Location,
 			Detail:   data.Event.Detail,

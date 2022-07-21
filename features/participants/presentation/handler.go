@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
 )
 
 type ParticipantHandler struct {
@@ -94,22 +96,42 @@ func (h *ParticipantHandler) CreatePayment(c echo.Context) error {
 
 	reqPayCore.UserID = userID_token
 
-	grossAmount, _ := h.participantBusiness.GrossAmountEvent(reqPayCore.UserID)
-	reqPayCore.GrossAmount = 50000
-    fmt.Println("GrossAmount", grossAmount)
+	grossAmount, _ := h.participantBusiness.GrossAmountEvent(reqPayCore.EventID)
+	reqPayCore.GrossAmount = grossAmount
+	date := currentTime.Format("2006-01-02")
+	time := currentTime.Format("15:04:05")
 
-	orderIDPay := fmt.Sprintf("Tiket-%d-%s", reqPay.EventID, currentTime.Format("2006-01-02"))
+	orderIDPay := fmt.Sprintf("Tiket-%d-%s-%s", reqPay.EventID, date, time)
+
 	reqPayCore.OrderID = orderIDPay
 
 	inputPay := _request_participant.ToCoreMidtrans(reqPayCore)
-
-	reqCreatePay, errReqCreatePay := h.participantBusiness.CreatePaymentBankTransfer(inputPay)
+	if reqPay.PaymentMethod == "BANK_TRANSFER_BCA" {
+		reqPayCore.PaymentMethod = "BANK_TRANSFER_BCA"
+		inputPay.BankTransfer = &coreapi.BankTransferDetails{
+			Bank: midtrans.BankBca,
+		}
+	}
+	reqCreatePay, errReqCreatePay := h.participantBusiness.CreatePaymentBankTransfer(inputPay, reqPayCore)
 
 	if errReqCreatePay != nil {
 		return c.JSON(helper.ResponseBadRequest("failed to payment"))
 	}
-
 	result := _response_participant.FromMidtransToPayment(reqCreatePay)
 
 	return c.JSON(helper.ResponseStatusOkWithData("success create payment", result))
+}
+
+func (h *ParticipantHandler) MidtransWebHook(c echo.Context) error {
+	midtransRequest := _request_participant.MidtransHookRequest{}
+	err_bind := c.Bind(&midtransRequest)
+	if err_bind != nil {
+		return c.JSON(helper.ResponseBadRequest("error bind data"))
+	}
+
+	errUpdateStatusPay := h.participantBusiness.PaymentWebHook(midtransRequest.OrderID, midtransRequest.TransactionStatus)
+	if errUpdateStatusPay != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to update status payment"))
+	}
+	return c.JSON(helper.ResponseStatusOkNoData("success to update status payment"))
 }

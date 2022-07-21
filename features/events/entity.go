@@ -11,7 +11,8 @@ type Core struct {
 	Name        string
 	HostedBy    string
 	Phone       string
-	Date        time.Time
+	StartDate   time.Time
+	EndDate     time.Time
 	City        string
 	Location    string
 	Detail      string
@@ -30,12 +31,13 @@ type Participant struct {
 }
 
 type Submission struct {
-	ID       int
-	Name     string
-	UserName string
-	City     string
-	Date     time.Time
-	Status   string
+	ID        int
+	Name      string
+	UserName  string
+	City      string
+	StartDate time.Time
+	EndDate   time.Time
+	Status    string
 }
 
 type Business interface {

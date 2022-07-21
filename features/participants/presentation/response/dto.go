@@ -1,10 +1,9 @@
 package response
 
 import (
-	"time"
-
 	"lami/app/config"
 	"lami/app/features/participants"
+	"time"
 
 	"github.com/midtrans/midtrans-go/coreapi"
 )
@@ -14,8 +13,8 @@ type Participant struct {
 	Name          string    `json:"name" form:"name"`
 	Detail        string    `json:"details" form:"details"`
 	Image         string    `json:"image" form:"image"`
-	Date          time.Time `json:"date" form:"date"`
 	HostedBy      string    `json:"hostedby" form:"hostedby"`
+	Date          time.Time `json:"date" form:"date"`
 	City          string    `json:"city" form:"city"`
 	Location      string    `json:"location" form:"location"`
 	GrossAmount   int64     `json:"gross_amount"`
@@ -41,8 +40,8 @@ func FromCore(core participants.Core) Participant {
 		Name:          core.Event.Name,
 		Detail:        core.Event.Detail,
 		Image:         core.Event.Image,
-		Date:          core.Event.Date,
 		HostedBy:      core.Event.HostedBy,
+		Date:          core.Date,
 		City:          core.Event.City,
 		Location:      core.Event.Location,
 		GrossAmount:   core.GrossAmount,

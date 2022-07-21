@@ -55,7 +55,7 @@ func (uc *participantUseCase) AddParticipant(partRequest participants.Core) (err
 	}
 
 	for i := 0; i < len(checkDate); i++ {
-		if checkDate[i].Event.Date == checkEvent.Date {
+		if checkDate[i].Event.Date.Before(checkEvent.EndDate) && checkDate[i].Event.Date.After(checkEvent.StartDate) {
 			return errors.New("can't both events")
 		}
 	}
@@ -63,18 +63,41 @@ func (uc *participantUseCase) AddParticipant(partRequest participants.Core) (err
 	return err
 }
 
-func (uc *participantUseCase) GrossAmountEvent(userID int) (GrossAmount int64, err error) {
-	checkEvent, errCheckEvent := uc.participantData.SelectDataByID(userID)
+func (uc *participantUseCase) GrossAmountEvent(eventID int) (GrossAmount int64, err error) {
+	checkEvent, errCheckEvent := uc.participantData.SelectDataByID(eventID)
 	if errCheckEvent != nil {
 		return 0, errCheckEvent
 	}
 	return int64(checkEvent.Price), nil
 }
 
-func (uc *participantUseCase) CreatePaymentBankTransfer(reqPay coreapi.ChargeReq) (resPay *coreapi.ChargeResponse, err error) {
+func (uc *participantUseCase) CreatePaymentBankTransfer(reqPay coreapi.ChargeReq, reqJoin participants.Core) (resPay *coreapi.ChargeResponse, err error) {
 	createPay, errCreatePay := uc.participantData.CreateDataPayment(reqPay)
 	if errCreatePay != nil {
 		return nil, errors.New("failed get response payment")
 	}
+	updateJoin := uc.participantData.UpdateDataPayment(createPay, reqJoin)
+	if updateJoin != nil {
+		return nil, errors.New("failed to connect update")
+	}
 	return createPay, nil
+}
+
+func (uc *participantUseCase) PaymentWebHook(orderID, status string) error {
+	payment := participants.Core{}
+	payment.OrderID = orderID
+
+	if status == "settlement" {
+		payment.Status = "Success"
+	}
+	if status == "cancel" || status == "deny" || status == "expire" {
+		payment.PaymentMethod = ""
+		payment.TransactionID = ""
+	}
+
+	result := uc.participantData.PaymentDataWebHook(payment)
+	if result != nil {
+		return errors.New("failed update status payment")
+	}
+	return nil
 }

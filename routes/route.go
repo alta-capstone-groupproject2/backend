@@ -57,6 +57,7 @@ func New(presenter factory.Presenter) *echo.Echo {
 
 	//Payment Event
 	e.POST("/events/payments", presenter.ParticipantPresenter.CreatePayment, middlewares.JWTMiddleware())
+	e.POST("/events/payments/webhook", presenter.ParticipantPresenter.MidtransWebHook, middlewares.JWTMiddleware())
 
 	// Product
 	e.POST("/products", presenter.ProductPresenter.PostProduct, middlewares.JWTMiddleware())
