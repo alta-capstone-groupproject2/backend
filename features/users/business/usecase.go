@@ -144,7 +144,13 @@ func (uc *userUseCase) UpgradeAccount(dataReq users.Core, id int, fileInfo *mult
 	return nil
 }
 func (uc *userUseCase) UpdateStatusUser(status string, id int) error {
-	err := uc.userData.UpdateAccountRole(status, id)
+	roleId := 0
+	if status == "approve" {
+		roleId = 3
+	} else {
+		roleId = 2
+	}
+	err := uc.userData.UpdateAccountRole(status, roleId, id)
 	if err != nil {
 		return err
 	}
