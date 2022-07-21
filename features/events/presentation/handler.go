@@ -42,7 +42,10 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 }
 
 func (h *EventHandler) GetDataById(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, errID := strconv.Atoi(c.Param("id"))
+	if errID != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to parameter"))
+	}
 	result, err := h.eventBusiness.GetEventByID(id)
 	if err != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get event"))
@@ -213,7 +216,7 @@ func (h *EventHandler) GetEventByUser(c echo.Context) error {
 }
 
 func (h *EventHandler) GetSubmissionAll(c echo.Context) (err error) {
-	page, _ := strconv.Atoi(c.Param("page"))
+	page, _ := strconv.Atoi(c.QueryParam("page"))
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
 	_, role, errToken := middlewares.ExtractToken(c)
