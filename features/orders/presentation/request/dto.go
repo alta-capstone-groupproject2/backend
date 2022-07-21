@@ -34,12 +34,3 @@ func ToCore(orderReq Order) orders.Core {
 	}
 
 }
-
-// func ToCoreDetail(orderDetailReq OrderDetail) orders.CoreDetail {
-// 	return orders.CoreDetail{
-// 		OrderID:     orderDetailReq.OrderID,
-// 		ProductName: orderDetailReq.ProductName,
-// 		Price:       orderDetailReq.TotalPrice,
-// 		Qty:         orderDetailReq.Qty,
-// 	}
-// }
