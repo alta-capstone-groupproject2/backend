@@ -29,7 +29,6 @@ func (repo *mysqlProductRepository) SelectDataRating(idProduct int) ([]product.C
 	dataRating := []Rating{}
 
 	res := repo.db.Preload("Product").Where("product_id = ?", idProduct).Find(&dataRating)
-	fmt.Println("res rating from mysql.go:", res)
 	if res.Error != nil {
 		return []product.CoreRating{}, res.Error
 	}
