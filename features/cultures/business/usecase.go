@@ -93,6 +93,7 @@ func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fi
 	fmt.Println(updateMap["image"])
 	err := uc.cultureData.UpdateDataCulture(updateMap, cultureID)
 	if err != nil {
+		fmt.Println(err)
 		return errors.New("failed to update data culture")
 	}
 
