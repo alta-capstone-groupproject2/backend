@@ -9,6 +9,14 @@ type productUseCase struct {
 	productData product.Data
 }
 
+// SelectProductList implements product.Business
+func (uc *productUseCase) SelectProductList(limit int, page int, city string, name string) ([]product.Core, int64, error) {
+	offset := limit * (page - 1)
+	resp, total, errData := uc.productData.SelectProductList(limit, offset, name, city)
+	total = total/int64(limit) + 1
+	return resp, total, errData
+}
+
 // SelectRating implements product.Business
 func (uc *productUseCase) SelectRating(idProduct int) ([]product.CoreRating, error) {
 	resp, err := uc.productData.SelectDataRating(idProduct)

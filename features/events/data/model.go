@@ -32,6 +32,7 @@ type Participant struct {
 	Name    string
 	Image   string
 	User    data.User
+	Event   Event
 }
 
 //DTO
@@ -117,7 +118,3 @@ func ToCoreSubmissionList(data []Event) []events.Submission {
 	}
 	return result
 }
-
-// func toSubmissionCore(data Event) events.Submission {
-// 	return data.toSubmissionCore()
-// }

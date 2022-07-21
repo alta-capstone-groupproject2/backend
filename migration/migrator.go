@@ -2,6 +2,7 @@ package migration
 
 import (
 	_mComment "lami/app/features/comments/data"
+	_mProduct "lami/app/features/products/data"
 	_mCulture "lami/app/features/cultures/data"
 	_mEvent "lami/app/features/events/data"
 	_mParticipant "lami/app/features/participants/data"
@@ -18,4 +19,6 @@ func Migration(db *gorm.DB) {
 	db.AutoMigrate(_mComment.Comment{})
 	db.AutoMigrate(_mCulture.Culture{})
 	db.AutoMigrate(_mCulture.Report{})
+	db.AutoMigrate(_mProduct.Product{})
+	db.AutoMigrate(_mProduct.Rating{})
 }

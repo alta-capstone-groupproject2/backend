@@ -37,8 +37,8 @@ type Business interface {
 	UpdateData(dataReq Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) (err error)
 	UpgradeAccount(dataReq Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) error
 	UpdateStatusUser(status string, id int) error
-	VerifyEmail(Core)(error)
-	ConfirmEmail(encryptData string)(error)
+	VerifyEmail(Core) error
+	ConfirmEmail(encryptData string) error
 }
 
 type Data interface {
@@ -48,5 +48,5 @@ type Data interface {
 	DeleteData(param int) (err error)
 	UpdateData(dataReq map[string]interface{}, id int) (err error)
 	InsertStoreData(dataReq Core, id int) error
-	UpdateAccountRole(status string, id int) error
+	UpdateAccountRole(status string, roleID int, id int) error
 }

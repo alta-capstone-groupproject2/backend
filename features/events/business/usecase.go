@@ -72,3 +72,11 @@ func (uc *eventUseCase) GetEventSubmission(limit, page int) (data []events.Submi
 	total = total/int64(limit) + 1
 	return resp, total, errData
 }
+
+func (uc *eventUseCase) GetEventSubmissionByID(id int) (data events.Core, err error) {
+	result, err := uc.eventData.SelectDataSubmissionByID(id)
+	if err != nil {
+		return events.Core{}, err
+	}
+	return result, err
+}

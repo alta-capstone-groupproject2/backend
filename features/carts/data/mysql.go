@@ -57,12 +57,17 @@ func (repo *mysqlCartRepository) SelectDataCart(idUser int) ([]cart.Core, error)
 func (repo *mysqlCartRepository) AddDataCart(dataReq cart.Core) (int, error) {
 	model := fromCore(dataReq)
 
-	res := repo.db.Create(&model)
+	res := repo.db.Where(Cart{ProductID: dataReq.ProductID, UserID: dataReq.UserID}).FirstOrCreate(&model)
+	if res.RowsAffected >= 0 {
+		dataReq.Qty++
+		err := repo.db.Model(Cart{}).Where("product_id = ? AND user_id = ?", dataReq.ProductID, dataReq.UserID).Updates(dataReq)
+		if err.Error != nil {
+			return -1, err.Error
+		}
+	}
+
 	if res.Error != nil {
 		return -1, res.Error
-	}
-	if res.RowsAffected == 0 {
-		return 0, errors.New("failed")
 	}
 
 	return int(res.RowsAffected), nil

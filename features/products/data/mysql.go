@@ -1,8 +1,8 @@
 package data
 
 import (
-	"fmt" 
 	"errors"
+	"fmt"
 	"lami/app/features/products"
 
 	"gorm.io/gorm"
@@ -10,6 +10,18 @@ import (
 
 type mysqlProductRepository struct {
 	db *gorm.DB
+}
+
+// SelectProductList implements product.Data
+func (repo *mysqlProductRepository) SelectProductList(limit int, page int, city string, name string) ([]product.Core, int64, error) {
+	var dataProduct []Product
+	var count int64
+	res := repo.db.Order("id asc").Where("city LIKE ? and name LIKE ?", "%"+city+"%", "%"+name+"%").Limit(limit).Offset(page).Find(&dataProduct).Count(&count)
+	if res.Error != nil {
+		return []product.Core{}, 0, res.Error
+	}
+
+	return ToCoreListProductList(dataProduct), count, res.Error
 }
 
 // SelectDataRating implements product.Data
@@ -48,7 +60,34 @@ func (repo *mysqlProductRepository) SelectDataProductbyIDProduct(idProduct int) 
 		return product.Core{}, res.Error
 	}
 
-	return ToCore(dataProduct), res.Error
+	//	Get Rating from rating database
+	rows, err := repo.db.Model(&Rating{}).Where("product_id = ?", idProduct).Select("rating").Rows()
+	defer rows.Close()
+	if err != nil {
+		return product.Core{}, res.Error
+	}
+	var meanrating []float64
+	for rows.Next() {
+		var data float64
+		if errRows := rows.Scan(&data); errRows != nil {
+			panic(errRows)
+		}
+		meanrating = append(meanrating, data)
+	}
+
+	var sum float64
+	for i := 0; i < len(meanrating); i++ {
+		sum = sum + float64(meanrating[i])
+	}
+	dataProduct.MeanRating = (sum) / float64(len(meanrating))
+
+	//	Update rating in product database
+	updateMeanRating := repo.db.Raw("UPDATE products SET mean_rating = ? WHERE id = ?", dataProduct.MeanRating, idProduct)
+	if updateMeanRating.Error != nil {
+		return product.Core{}, updateMeanRating.Error
+	}
+
+	return ToCorebyProductID(dataProduct), res.Error
 }
 
 // DeleteDataProduct implements product.Data
