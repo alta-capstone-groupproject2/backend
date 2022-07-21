@@ -40,7 +40,7 @@ func (h *CartHandler) PostCart(c echo.Context) error {
 	cartCore.Qty = 1
 
 	row, err := h.cartBusiness.AddCart(cartCore)
-	if err != nil || row != 1 {
+	if err != nil || row != 0 {
 		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 

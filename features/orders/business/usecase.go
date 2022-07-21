@@ -10,8 +10,8 @@ type orderUseCase struct {
 }
 
 // SelectHistoryOrder implements orders.Business
-func (uc *orderUseCase) SelectHistoryOrder(idUser int) (orders.CoreDetail, error) {
-	resp, err := uc.orderData.SelectDataHistoryOrder(idUser)
+func (uc *orderUseCase) SelectHistoryOrder(idOrder, idUser int) (orders.CoreDetail, error) {
+	resp, err := uc.orderData.SelectDataHistoryOrder(idOrder, idUser)
 	return resp, err
 }
 

@@ -15,7 +15,7 @@ type mysqlOrderRepository struct {
 }
 
 // SelectDataHistoryOrder implements orders.Data
-func (repo *mysqlOrderRepository) SelectDataHistoryOrder(idUser int) (orders.CoreDetail, error) {
+func (repo *mysqlOrderRepository) SelectDataHistoryOrder(idOrder, idUser int) (orders.CoreDetail, error) {
 	panic("unimplemented")
 }
 

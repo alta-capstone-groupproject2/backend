@@ -38,6 +38,7 @@ func fromCore(core product.Core) Product {
 		Name:   core.Name,
 		Price:  core.Price,
 		Stock:  core.Stock,
+		City:   core.User.City,
 		Detail: core.Detail,
 	}
 }

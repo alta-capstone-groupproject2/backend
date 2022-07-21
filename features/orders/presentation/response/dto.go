@@ -13,11 +13,12 @@ type Order struct {
 }
 
 type OrderDetail struct {
-	Receiver string `json:"receiver" form:"receiver"`
-	Address  string `json:"address" form:"address"`
-	Status   string `json:"status" form:"status"`
-	Product  []Product
-	Order    Order
+	Receiver   string `json:"receiver" form:"receiver"`
+	Address    string `json:"address" form:"address"`
+	TotalPrice uint   `json:"totalprice" form:"totalprice"`
+	Status     string `json:"status" form:"status"`
+	Product    []Product
+	Order      Order
 }
 
 type Product struct {
@@ -29,10 +30,11 @@ type Product struct {
 
 func FromCore(data orders.CoreDetail) OrderDetail {
 	return OrderDetail{
-		Receiver: data.Receiver,
-		Address:  data.Address,
-		Status:   data.Status,
-		Product:  FromOrderCoreList(data.Product),
+		Receiver:   data.Receiver,
+		Address:    data.Address,
+		TotalPrice: data.TotalPrice,
+		Status:     data.Status,
+		Product:    FromOrderCoreList(data.Product),
 	}
 }
 
