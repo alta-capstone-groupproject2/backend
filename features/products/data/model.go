@@ -12,11 +12,11 @@ type Product struct {
 	UserID     int       `json:"user_id" form:"user_id"`
 	Name       string    `json:"name" form:"name"`
 	URL        string    `json:"url" form:"url"`
-	Price      float32   `json:"price" form:"price"`
+	Price      uint      `json:"price" form:"price"`
 	Stock      uint      `json:"stock" form:"stock"`
 	City       string    `json:"city" form:"city"`
 	Detail     string    `json:"detail" form:"detail"`
-	MeanRating float32   `json:"mean_rating" form:"mean_rating"`
+	MeanRating float64   `json:"mean_rating" form:"mean_rating"`
 	User       data.User `gorm:"foreignKey:UserID"`
 }
 
@@ -24,7 +24,7 @@ type Rating struct {
 	gorm.Model
 	UserID    int       `json:"user_id" form:"user_id"`
 	ProductID int       `json:"productID" form:"productID"`
-	Rating    uint      `json:"rating" form:"rating"`
+	Rating    float64   `json:"rating" form:"rating"`
 	Review    string    `json:"review" form:"review"`
 	Product   Product   `gorm:"foreignKey:ProductID"`
 	User      data.User `gorm:"foreignKey:UserID"`
@@ -50,7 +50,7 @@ func fromCoreRating(core product.CoreRating) Rating {
 	}
 }
 
-func (data *Product) toCore() product.Core {
+func (data *Product) toCorebyProductID() product.Core {
 	return product.Core{
 		ID:        int(data.ID),
 		URL:       data.URL,
@@ -62,8 +62,8 @@ func (data *Product) toCore() product.Core {
 	}
 }
 
-func ToCore(data Product) product.Core {
-	return data.toCore()
+func ToCorebyProductID(data Product) product.Core {
+	return data.toCorebyProductID()
 }
 
 func (data *Product) toCoreProductList() product.Core {

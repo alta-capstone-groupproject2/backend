@@ -3,11 +3,11 @@ package response
 import "lami/app/features/carts"
 
 type Cart struct {
-	ID          int     `json:"id" form:"id"`
-	Qty         int     `json:"qty" form:"qty"`
-	URL         string  `json:"url" form:"url"`
-	ProductName string  `json:"product_name" form:"product_name"`
-	Price       float32 `json:"price" form:"price"`
+	ID          int    `json:"id" form:"id"`
+	Qty         int    `json:"qty" form:"qty"`
+	URL         string `json:"url" form:"url"`
+	ProductName string `json:"product_name" form:"product_name"`
+	Price       uint   `json:"price" form:"price"`
 }
 
 // For Get Cart

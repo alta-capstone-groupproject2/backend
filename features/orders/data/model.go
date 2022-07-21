@@ -14,7 +14,7 @@ type Order struct {
 	Receiver    string               `json:"receiver" form:"receiver"`
 	PhoneNumber string               `json:"phone" form:"phone"`
 	Address     string               `json:"address" form:"address"`
-	TotalPrice  float32              `json:"totalprice" form:"totalprice"`
+	TotalPrice  uint                 `json:"totalprice" form:"totalprice"`
 	Status      string               `json:"status" form:"status"`
 	Cart        _dataCart.Cart       `gorm:"foreignKey:UserID"`
 	Product     _dataProduct.Product `gorm:"foreignKey:ID"`
@@ -23,11 +23,11 @@ type Order struct {
 
 type OrderDetail struct {
 	gorm.Model
-	OrderID    int     `json:"order_id" form:"order_id"`
-	ProductID  int     `json:"product_id" form:"product_id"`
-	TotalPrice float32 `json:"price" form:"price"`
-	Qty        uint    `json:"qty" form:"qty"`
-	Order      Order   `gorm:"foreignKey:ID"`
+	OrderID    int   `json:"order_id" form:"order_id"`
+	ProductID  int   `json:"product_id" form:"product_id"`
+	TotalPrice uint  `json:"price" form:"price"`
+	Qty        uint  `json:"qty" form:"qty"`
+	Order      Order `gorm:"foreignKey:ID"`
 }
 
 type Product struct {
