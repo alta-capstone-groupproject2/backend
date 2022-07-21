@@ -24,13 +24,10 @@ func InsertEvent(eventCore events.Core, email string) (eventId string, err error
 			TimeZone: "Asia/Jakarta",
 		},
 		Attendees: []*calendar.EventAttendee{
-			{
-				Email: email,
-			},
+			{Email: email},
 		},
 	}
 	calendarID := "primary"
-
 	event, err = srv.Events.Insert(calendarID, event).SendNotifications(true).Do()
 	if err != nil {
 		return "", err
