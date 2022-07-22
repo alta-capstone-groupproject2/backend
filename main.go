@@ -13,16 +13,16 @@ import (
 )
 
 var event coreapi.Client
-var order coreapi.Client
+
+// var order coreapi.Client
 
 func main() {
-	
+
 	midtrans.ServerKey = config.MidtransServerKey()
 	event.New(midtrans.ServerKey, midtrans.Sandbox)
 
-	midtrans.ServerKey = config.MidtransOrderServerKey()
-	order.New(midtrans.ServerKey, midtrans.Sandbox)
-
+	// midtrans.ServerKey = config.MidtransOrderServerKey()
+	// order.New(midtrans.ServerKey, midtrans.Sandbox)
 
 	// connection database
 	dbConn := config.InitDB()
