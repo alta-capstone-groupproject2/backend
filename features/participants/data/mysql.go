@@ -65,6 +65,16 @@ func (repo *mysqlParticipantRepository) AddData(ParticipantData participants.Cor
 	return nil
 }
 
+//Validasi data join event by userID
+
+func (repo *mysqlParticipantRepository) SelectValidasi(userID, eventID int) bool {
+	result := repo.db.Where("user_id = ? AND event_id = ?", userID, eventID).Find(&Participant{})
+	if int(result.RowsAffected) != 0 {
+		return true
+	}
+	return false
+}
+
 // --------------Payment------------///
 
 func (repo *mysqlParticipantRepository) CreateDataPayment(reqPay coreapi.ChargeReq) (res *coreapi.ChargeResponse, err error) {
@@ -94,7 +104,7 @@ func (repo *mysqlParticipantRepository) UpdateDataPayment(pay *coreapi.ChargeRes
 func (repo *mysqlParticipantRepository) SelectPayment(orderID string) (participants.Core, error) {
 	payment := Participant{}
 
-	findData := repo.db.Where("orderID", orderID).Find(&payment)
+	findData := repo.db.Where("order_id = ?", orderID).Find(&payment)
 	if findData.Error != nil {
 		return participants.Core{}, errors.New("failed to get data join payment")
 	}
@@ -103,13 +113,14 @@ func (repo *mysqlParticipantRepository) SelectPayment(orderID string) (participa
 }
 
 func (repo *mysqlParticipantRepository) PaymentDataWebHook(data participants.Core) error {
-	if data.Status == "success" {
-		errUpdateStatus := repo.db.Where("order_id = ?", data.OrderID).Update("status", data.Status)
+	Model := fromCore(data)
+	if data.Status == "paid" {
+		errUpdateStatus := repo.db.Where("order_id = ?", data.OrderID).Model(&Model).Update("status", data.Status)
 		if errUpdateStatus != nil {
 			return errors.New("failed update status")
 		}
 	} else {
-		errUpdate := repo.db.Where("order_id = ?", data.OrderID).Updates(Participant{
+		errUpdate := repo.db.Where("order_id = ?", data.OrderID).Model(&Model).Updates(Participant{
 			Status:        data.Status,
 			PaymentMethod: data.PaymentMethod,
 			TransactionID: data.TransactionID,

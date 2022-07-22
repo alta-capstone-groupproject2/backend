@@ -52,7 +52,7 @@ func (repo *mysqlEventRepository) InsertData(EventData events.Core) error {
 
 func (repo *mysqlEventRepository) DeleteDataByID(id int, userId int) error {
 	dataEvent := Event{}
-	result := repo.db.Where("user_id = ?", dataEvent.UserID).Delete(&dataEvent, id)
+	result := repo.db.Where("user_id = ?", userId).Delete(&dataEvent, id)
 	if result.RowsAffected == 0 {
 		return errors.New("no rows affected")
 	}

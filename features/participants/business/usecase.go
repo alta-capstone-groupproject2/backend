@@ -59,6 +59,11 @@ func (uc *participantUseCase) AddParticipant(partRequest participants.Core) (err
 			return errors.New("can't both events")
 		}
 	}
+
+	result := uc.participantData.SelectValidasi(partRequest.UserID, partRequest.EventID)
+	if result {
+		return errors.New("user have a join")
+	}
 	err = uc.participantData.AddData(partRequest)
 	return err
 }
@@ -90,7 +95,7 @@ func (uc *participantUseCase) PaymentWebHook(orderID, status string) error {
 	}
 
 	if status == "settlement" {
-		payment.Status = "success"
+		payment.Status = "paid"
 	}
 	if status == "cancel" || status == "deny" || status == "expire" {
 		payment.Status = "failed"
