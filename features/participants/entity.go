@@ -67,6 +67,9 @@ type Data interface {
 	SelectDataEvent(eventID int) (data []Core, err error)
 	DeleteData(param, userID int) error
 
+	//validasi join event
+	SelectValidasi(userID, eventID int) bool
+
 	//Payment Event Data
 	SelectPayment(orderID string) (Core, error)
 	CreateDataPayment(coreapi.ChargeReq) (*coreapi.ChargeResponse, error)
