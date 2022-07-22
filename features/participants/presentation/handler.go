@@ -2,6 +2,7 @@ package presentation
 
 import (
 	"fmt"
+	"lami/app/config"
 	"lami/app/features/participants"
 	_request_participant "lami/app/features/participants/presentation/request"
 	_response_participant "lami/app/features/participants/presentation/response"
@@ -39,6 +40,7 @@ func (h *ParticipantHandler) Joined(c echo.Context) error {
 
 	participantCore := _request_participant.ToCore(participant)
 	participantCore.UserID = userID_token
+	participantCore.Status = config.PaymentStatus
 
 	err := h.participantBusiness.AddParticipant(participantCore)
 	if err != nil {
@@ -99,9 +101,9 @@ func (h *ParticipantHandler) CreatePayment(c echo.Context) error {
 	grossAmount, _ := h.participantBusiness.GrossAmountEvent(reqPayCore.EventID)
 	reqPayCore.GrossAmount = grossAmount
 	date := currentTime.Format("2006-01-02")
-	time := currentTime.Format("15:04:05")
+	timer := currentTime.Format("15:04:05")
 
-	orderIDPay := fmt.Sprintf("Tiket-%d-%s-%s", reqPay.EventID, date, time)
+	orderIDPay := fmt.Sprintf("Tiket-%d-%s-%s", reqPay.EventID, date, timer)
 
 	reqPayCore.OrderID = orderIDPay
 
@@ -118,6 +120,10 @@ func (h *ParticipantHandler) CreatePayment(c echo.Context) error {
 		return c.JSON(helper.ResponseBadRequest("failed to payment"))
 	}
 	result := _response_participant.FromMidtransToPayment(reqCreatePay)
+	layout := "2006-01-02 15:04:05"
+	trTime, _ := time.Parse(layout, reqCreatePay.TransactionTime)
+	result.TransactionTime = trTime
+	result.TransactionExpire = trTime.Add(time.Hour * 24)
 
 	return c.JSON(helper.ResponseStatusOkWithData("success create payment", result))
 }

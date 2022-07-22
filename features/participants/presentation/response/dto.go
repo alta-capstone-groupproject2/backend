@@ -30,8 +30,8 @@ type Payment struct {
 	BillNumber        string
 	Bank              string
 	GrossAmount       string
-	TransactionTime   string
-	TransactionExpire string
+	TransactionTime   time.Time
+	TransactionExpire time.Time
 }
 
 func FromCore(core participants.Core) Participant {
@@ -41,7 +41,7 @@ func FromCore(core participants.Core) Participant {
 		Detail:        core.Event.Detail,
 		Image:         core.Event.Image,
 		HostedBy:      core.Event.HostedBy,
-		Date:          core.Date,
+		Date:          core.CreatedAt,
 		City:          core.Event.City,
 		Location:      core.Event.Location,
 		GrossAmount:   core.GrossAmount,
@@ -61,12 +61,11 @@ func FromCoreList(data []participants.Core) []Participant {
 
 func FromMidtransToPayment(resMidtrans *coreapi.ChargeResponse) Payment {
 	return Payment{
-		OrderID:         resMidtrans.OrderID,
-		TransactionID:   resMidtrans.TransactionID,
-		PaymentMethod:   config.PaymentBankTransferBCA,
-		BillNumber:      resMidtrans.VaNumbers[0].VANumber,
-		Bank:            resMidtrans.VaNumbers[0].Bank,
-		GrossAmount:     resMidtrans.GrossAmount,
-		TransactionTime: resMidtrans.TransactionTime,
+		OrderID:       resMidtrans.OrderID,
+		TransactionID: resMidtrans.TransactionID,
+		PaymentMethod: config.PaymentBankTransferBCA,
+		BillNumber:    resMidtrans.VaNumbers[0].VANumber,
+		Bank:          resMidtrans.VaNumbers[0].Bank,
+		GrossAmount:   resMidtrans.GrossAmount,
 	}
 }
