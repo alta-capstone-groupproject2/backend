@@ -1,7 +1,7 @@
 package data
 
 import (
-	"lami/app/features/products"
+	product "lami/app/features/products"
 	"lami/app/features/users/data"
 
 	"gorm.io/gorm"
@@ -77,7 +77,7 @@ func (data *Product) toCoreProductList() product.Core {
 		Name:  data.Name,
 		URL:   data.URL,
 		Price: data.Price,
-		City:  data.City,
+		City:  data.User.City,
 	}
 }
 

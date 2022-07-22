@@ -2,7 +2,7 @@ package business
 
 import (
 	"errors"
-	"lami/app/features/products"
+	product "lami/app/features/products"
 )
 
 type productUseCase struct {
