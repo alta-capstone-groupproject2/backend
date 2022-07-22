@@ -1,9 +1,9 @@
 package config
 
 import (
-    "fmt"
+	"fmt"
 	"os"
-	
+
 	"github.com/joho/godotenv"
 )
 
@@ -20,6 +20,7 @@ const Approved = "approved"
 /**
 * @Method Payment with Midtrans
 **/
+const PaymentStatus = "unpaid"
 const MethodPost = "POST"
 const PaymentBankTransferBCA = "BANK_TRANSFER_BCA"
 
@@ -34,7 +35,7 @@ func EncryptKey() string {
 }
 
 func MidtransServerKey() string {
-    err := godotenv.Load(".env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Println("error loading .env file")
 	}
