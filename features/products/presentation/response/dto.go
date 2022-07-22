@@ -1,42 +1,42 @@
 package response
 
 import (
-	"lami/app/features/products"
+	product "lami/app/features/products"
 )
 
 type Product struct {
-	ID         int     `json:"product_id" form:"product_id"`
-	URL        string  `json:"url" form:"url"`
-	Name       string  `json:"name" form:"name"`
-	StoreName  string  `json:"store_name" form:"store_name"`
-	Price      uint    `json:"price" form:"price"`
-	City       string  `json:"city" form:"city"`
-	MeanRating float64 `json:"mean_rating" form:"mean_rating"`
-	Detail     string  `json:"detail" form:"detail"`
+	ID         int     `json:"productID"`
+	URL        string  `json:"image"`
+	Name       string  `json:"productName"`
+	StoreName  string  `json:"storeName"`
+	Price      uint    `json:"price"`
+	City       string  `json:"city"`
+	MeanRating float64 `json:"meanRating"`
+	Detail     string  `json:"details"`
 }
 
 type MyProduct struct {
-	ID    int    `json:"product_id" form:"product_id"`
-	URL   string `json:"url" form:"url"`
-	Name  string `json:"name" form:"name"`
-	Price uint   `json:"price" form:"price"`
-	City  string `json:"city" form:"city"`
+	ID    int    `json:"productID"`
+	URL   string `json:"image"`
+	Name  string `json:"productName"`
+	Price uint   `json:"price"`
+	City  string `json:"city"`
 }
 
 type ProductRating struct {
-	ID          int     `json:"rating_id" form:"rating_id"`
-	URL         string  `json:"url" form:"url"`
-	ProductName string  `json:"name" form:"name"`
-	Rating      float64 `json:"rating" form:"rating"`
-	Review      string  `json:"review" form:"review"`
+	ID          int     `json:"ratingID"`
+	URL         string  `json:"image"`
+	ProductName string  `json:"name"`
+	Rating      float64 `json:"rating"`
+	Review      string  `json:"review"`
 }
 
 type ProductList struct {
-	ID    int    `json:"product_id" form:"product_id"`
-	URL   string `json:"url" form:"url"`
-	Name  string `json:"name" form:"name"`
-	Price uint   `json:"price" form:"price"`
-	City  string `json:"city" form:"city"`
+	ID    int    `json:"productIDd"`
+	URL   string `json:"image"`
+	Name  string `json:"productName"`
+	Price uint   `json:"price"`
+	City  string `json:"city"`
 }
 
 //	GetProductList

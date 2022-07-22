@@ -45,7 +45,7 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 	// 	return c.JSON(helper.ResponseBadRequest("failed format date"))
 	// }
 
-	fileData, fileInfo, fileErr := c.Request().FormFile("file")
+	fileData, fileInfo, fileErr := c.Request().FormFile("image")
 	if fileErr == http.ErrMissingFile || fileErr != nil {
 		return c.JSON(helper.ResponseBadRequest("failed to get file"))
 	}
@@ -64,7 +64,7 @@ func (h *ProductHandler) PostProduct(c echo.Context) error {
 	// memberikan nama file
 	fileName := strconv.Itoa(userID_token) + "_" + product.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-	url, errUploadImg := helper.UploadFileToS3(config.ProductImages, config.ContentImage, fileName, fileData)
+	url, errUploadImg := helper.UploadFileToS3(config.ProductImages, fileName, config.ContentImage,  fileData)
 
 	if errUploadImg != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed to upload file"))
@@ -105,7 +105,7 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 
 	productCore := request.ToCoreUpdate(product)
 
-	fileData, fileInfo, fileErr := c.Request().FormFile("file")
+	fileData, fileInfo, fileErr := c.Request().FormFile("image")
 	if fileErr != http.ErrMissingFile {
 		if fileErr != nil {
 			return c.JSON(helper.ResponseBadRequest("failed to get file"))
@@ -125,7 +125,7 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 		// memberikan nama file
 		fileName := strconv.Itoa(userID_token) + "_" + product.Name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
 
-		url, errUploadImg := helper.UploadFileToS3(config.ProductImages, config.ContentImage, fileName, fileData)
+		url, errUploadImg := helper.UploadFileToS3(config.ProductImages, fileName, config.ContentImage, fileData)
 
 		if errUploadImg != nil {
 			return c.JSON(helper.ResponseBadRequest("failed to upload file"))
@@ -155,17 +155,21 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 
-	return c.JSON(helper.ResponseNoContent("Success to delete data product"))
+	return c.JSON(helper.ResponseStatusOkNoData("Success to delete data product"))
 }
 
 func (h *ProductHandler) GetProductList(c echo.Context) error {
 	page := c.QueryParam("page")
+	limit := c.QueryParam("limit")
 	name := c.QueryParam("name")
 	city := c.QueryParam("city")
-	offset, _ := strconv.Atoi(page)
-	limit := 12
+	pageint, errPage := strconv.Atoi(page)
+	limitint, errLimit := strconv.Atoi(limit)
+	if errPage != nil || errLimit != nil{
+		return c.JSON(helper.ResponseBadRequest("wrong query param"))
+	}
 
-	res, total, err := h.productBusiness.SelectProductList(limit, offset, name, city)
+	res, total, err := h.productBusiness.SelectProductList(limitint, pageint, name, city)
 	if err != nil {
 		return c.JSON(helper.ResponseBadRequest("failed get all data"))
 	}
