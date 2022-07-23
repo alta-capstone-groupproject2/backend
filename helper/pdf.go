@@ -21,9 +21,8 @@ func ExportPDF(data events.Core) string {
 
 	buildHeading(m, data)
 	buildFruitList(m, data.AttendeesData)
-	buf, _ := m.Output()
+	buf, err := m.Output()
 
-	err := m.OutputFileAndClose("./helper/temp.pdf")
 	if err != nil {
 		fmt.Println("⚠️  Could not get PDF:", err)
 		os.Exit(1)

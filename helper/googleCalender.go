@@ -63,21 +63,3 @@ func UpdateEvent(srv *calendar.Service, eventID string) {
 	fmt.Printf("Event updated: %s %s\n", event.HtmlLink, event.Id)
 
 }
-
-func eventList(srv *calendar.Service) {
-	calendarID := "primary"
-	events, err := srv.Events.List(calendarID).OrderBy("startTime").Do()
-	fmt.Println(err)
-	if len(events.Items) == 0 {
-		fmt.Println("No upcoming events found.")
-	} else {
-		for _, item := range events.Items {
-			date := item.Start.DateTime
-			eventID := item.Id
-			if date == "" {
-				date = item.Start.Date
-			}
-			fmt.Printf("%s %v (%v)\n", eventID, item.Summary, date)
-		}
-	}
-}

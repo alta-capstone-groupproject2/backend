@@ -15,7 +15,8 @@ import (
 
 type BodylinkEmail struct {
 	SUBJECT string
-	Name    string
+	ACT     string
+	DETAIL  string
 	URL     string
 }
 
@@ -23,9 +24,11 @@ func SendGmailNotify(email, subject string) {
 	template, errPath := filepath.Abs("./helper/templates/emailNotif.html")
 	fmt.Print(errPath)
 	//template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailNotif.html"
+	var detail string
 
 	templateData := BodylinkEmail{
-		SUBJECT: subject,
+		ACT:    subject,
+		DETAIL: detail,
 	}
 	result, errParse := ParseTemplate(template, templateData)
 	fmt.Println(errParse)
@@ -43,9 +46,7 @@ func SendEmailVerification(userData users.Core, encrypt string) {
 	url := "https://lamiapp.site/users/confirm/" + encrypt
 
 	templateData := BodylinkEmail{
-		Name:    userData.Name,
-		SUBJECT: subject,
-		URL:     url,
+		URL: url,
 	}
 	result, errParse := ParseTemplate(template, templateData)
 	fmt.Println(errParse)
