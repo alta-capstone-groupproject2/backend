@@ -78,18 +78,17 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.POST("/products/ratings/:productID", presenter.ProductPresenter.PostProductRating, middlewares.JWTMiddleware())
 	e.GET("/products/ratings/:productID", presenter.ProductPresenter.GetProductRating)
 
-	// Order
-	e.POST("/orders", presenter.OrderPresenter.PostOrder, middlewares.JWTMiddleware())
-
 	// Cart
 	e.POST("/carts", presenter.CartPresenter.PostCart, middlewares.JWTMiddleware())
 	e.GET("/carts", presenter.CartPresenter.GetCart, middlewares.JWTMiddleware())
 	e.PUT("/carts/:cartID", presenter.CartPresenter.PutCart, middlewares.JWTMiddleware())
 	e.DELETE("carts/:cartID", presenter.CartPresenter.DeletedCart, middlewares.JWTMiddleware())
 
+	// Order
+	e.POST("/orders/:type", presenter.OrderPresenter.PostOrder, middlewares.JWTMiddleware())
+
 	// PaymentOrder
-	e.POST("/payments/:type", presenter.PaymentPresenter.PostPayment, middlewares.JWTMiddleware())
-	e.PUT("/payments/confirm", presenter.PaymentPresenter.PutPayment, middlewares.JWTMiddleware())
+	e.POST("/payments/confirm", presenter.PaymentPresenter.PutPayment, middlewares.JWTMiddleware())
 
 	return e
 }
