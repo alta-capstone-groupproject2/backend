@@ -111,7 +111,7 @@ func (repo *mysqlUserRepository) UpdateAccountRole(status string, roleId int, id
 func (repo *mysqlUserRepository) SelectDataSubmissionStore(limit, offset int) (response []users.Core, total int64, err error) {
 	var dataUser []User
 	var count int64
-	result := repo.db.Limit(limit).Offset(offset).Preload("Role").Where("store_status is not null").Find(&dataUser).Count(&count)
+	result := repo.db.Order("updated_at desc").Limit(limit).Offset(offset).Preload("Role").Where("store_status is not null").Find(&dataUser).Count(&count)
 	if result.Error != nil {
 		return []users.Core{}, 0, result.Error
 	}

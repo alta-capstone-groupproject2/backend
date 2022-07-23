@@ -65,6 +65,9 @@ func (mock mockEventDataSucces) CheckUserID(id int) (userID int, err error) {
 func (mock mockEventDataSucces) SelectDateEventJoin(date time.Time, userID int) (row int, err error) {
 	return 1, nil
 }
+func (mock mockEventDataSucces) SelectAttendeeData(id_event int) (data []events.AttendeesData, err error) {
+	return nil, nil
+}
 
 //mock data failed case
 type mockEventDataFailed struct{}
@@ -111,6 +114,9 @@ func (mock mockEventDataFailed) CheckUserID(id int) (userID int, err error) {
 
 func (mock mockEventDataFailed) SelectDateEventJoin(date time.Time, userID int) (row int, err error) {
 	return 0, err
+}
+func (mock mockEventDataFailed) SelectAttendeeData(id_event int) (data []events.AttendeesData, err error) {
+	return nil, err
 }
 
 func TestGetAllEvent(t *testing.T) {
