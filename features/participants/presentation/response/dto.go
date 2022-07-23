@@ -24,14 +24,15 @@ type Participant struct {
 }
 
 type Payment struct {
-	OrderID           string
-	TransactionID     string
-	PaymentMethod     string
-	BillNumber        string
-	Bank              string
-	GrossAmount       string
-	TransactionTime   time.Time
-	TransactionExpire time.Time
+	OrderID           string    `json:"orderID" form:"orderID"`
+	TransactionID     string    `json:"transactionID" form:"transactionID"`
+	PaymentMethod     string    `json:"paymentMethod" form:"paymentMethod"`
+	BillNumber        string    `json:"billNumber" form:"billNumber"`
+	Bank              string    `json:"bank" form:"bank"`
+	GrossAmount       string    `json:"grossAmount" form:"grossAmount"`
+	TransactionTime   time.Time `json:"transactionTime" form:"transactionTime"`
+	TransactionExpire time.Time `json:"transactionExpired" form:"transactionExpired"`
+	TransactionStatus string    `json:"transactionStatus" form:"transactionStatus"`
 }
 
 func FromCore(core participants.Core) Participant {
@@ -41,6 +42,20 @@ func FromCore(core participants.Core) Participant {
 		Detail:        core.Event.Detail,
 		Image:         core.Event.Image,
 		HostedBy:      core.Event.HostedBy,
+		Date:          core.CreatedAt,
+		City:          core.Event.City,
+		Location:      core.Event.Location,
+		GrossAmount:   core.GrossAmount,
+		PaymentMethod: core.PaymentMethod,
+		TransactionID: core.TransactionID,
+		Status:        core.Status,
+	}
+}
+
+func FromCoreToDetailPayment(core participants.Core) Participant {
+	return Participant{
+		ID:            core.ID,
+		Name:          core.Event.Name,
 		Date:          core.CreatedAt,
 		City:          core.Event.City,
 		Location:      core.Event.Location,
@@ -61,11 +76,24 @@ func FromCoreList(data []participants.Core) []Participant {
 
 func FromMidtransToPayment(resMidtrans *coreapi.ChargeResponse) Payment {
 	return Payment{
-		OrderID:       resMidtrans.OrderID,
-		TransactionID: resMidtrans.TransactionID,
-		PaymentMethod: config.PaymentBankTransferBCA,
-		BillNumber:    resMidtrans.VaNumbers[0].VANumber,
-		Bank:          resMidtrans.VaNumbers[0].Bank,
-		GrossAmount:   resMidtrans.GrossAmount,
+		OrderID:           resMidtrans.OrderID,
+		TransactionID:     resMidtrans.TransactionID,
+		PaymentMethod:     config.PaymentBankTransferBCA,
+		BillNumber:        resMidtrans.VaNumbers[0].VANumber,
+		Bank:              resMidtrans.VaNumbers[0].Bank,
+		GrossAmount:       resMidtrans.GrossAmount,
+		TransactionStatus: resMidtrans.TransactionStatus,
+	}
+}
+
+func FromMidtransToStatusPayment(resMidtrans *coreapi.TransactionStatusResponse) Payment {
+	return Payment{
+		OrderID:           resMidtrans.OrderID,
+		TransactionID:     resMidtrans.TransactionID,
+		PaymentMethod:     config.PaymentBankTransferBCA,
+		BillNumber:        resMidtrans.VaNumbers[0].VANumber,
+		Bank:              resMidtrans.VaNumbers[0].Bank,
+		GrossAmount:       resMidtrans.GrossAmount,
+		TransactionStatus: resMidtrans.TransactionStatus,
 	}
 }

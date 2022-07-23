@@ -56,14 +56,15 @@ type Business interface {
 
 	//Payment Event
 	GrossAmountEvent(id int) (GrossAmount int64, err error)
+	GetDetailPayment(orderID string) (Core, error)
 	CreatePaymentBankTransfer(coreapi.ChargeReq, Core) (*coreapi.ChargeResponse, error)
+	CheckStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error)
 	PaymentWebHook(orderID, status string) error
 }
 
 type Data interface {
 	SelectDataByID(id int) (response data.Event, err error)
 	AddData(data Core) error
-	UpdateDataPayment(*coreapi.ChargeResponse, Core) error
 	SelectDataEvent(eventID int) (data []Core, err error)
 	DeleteData(param, userID int) error
 
@@ -71,7 +72,9 @@ type Data interface {
 	SelectValidasi(userID, eventID int) bool
 
 	//Payment Event Data
+	UpdateDataPayment(*coreapi.ChargeResponse, Core) error
 	SelectPayment(orderID string) (Core, error)
 	CreateDataPayment(coreapi.ChargeReq) (*coreapi.ChargeResponse, error)
+	CheckDataStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error)
 	PaymentDataWebHook(data Core) error
 }

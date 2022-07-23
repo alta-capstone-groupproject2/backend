@@ -28,14 +28,41 @@ func NewEventHandler(business events.Business) *EventHandler {
 }
 
 func (h *EventHandler) GetAll(c echo.Context) error {
-	name := c.QueryParam("name")
-	city := c.QueryParam("city")
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	name := ""
+	nameParam := c.QueryParam("name")
+	nameIsInt, _ := strconv.Atoi(nameParam)
+	if nameIsInt != 0 {
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
+	} else {
+		name = nameParam
+	}
+
+	city := ""
+	cityParam := c.QueryParam("city")
+	cityIsInt, _ := strconv.Atoi(cityParam)
+	if cityIsInt != 0 {
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
+	} else {
+		city = cityParam
+	}
+	limit := 0
+	var errLimit error
+	page, errPage := strconv.Atoi(c.QueryParam("page"))
+	if errPage != nil {
+		c.JSON(helper.ResponseBadRequest("failed parameter"))
+	} else {
+		limit, errLimit = strconv.Atoi(c.QueryParam("limit"))
+		if errLimit != nil {
+			c.JSON(helper.ResponseBadRequest("failed parameter"))
+		}
+	}
 
 	result, total, err := h.eventBusiness.GetAllEvent(limit, page, name, city)
 	if err != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed get all data"))
+		return c.JSON(helper.ResponseInternalServerError("failed process get events"))
+	}
+	if result == nil {
+		return c.JSON(helper.ResponseBadRequest("failed get all events"))
 	}
 	respons := _response_event.FromCoreList(result)
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success get all events", total, respons))
@@ -44,15 +71,13 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 func (h *EventHandler) GetDataById(c echo.Context) error {
 	id, errID := strconv.Atoi(c.Param("id"))
 	if errID != nil {
-		return c.JSON(helper.ResponseBadRequest("failed to parameter"))
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
 	}
 	result, err := h.eventBusiness.GetEventByID(id)
 	if err != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get event"))
 	}
-
 	response := _response_event.FromCoreByID(result)
-
 	return c.JSON(helper.ResponseStatusOkWithData("success get event", response))
 }
 
@@ -64,7 +89,6 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 
 	event := _request_event.Event{}
 	err_bind := c.Bind(&event)
-
 	if err_bind != nil {
 		log.Print(err_bind)
 		return c.JSON(helper.ResponseBadRequest("failed bind data"))
@@ -155,7 +179,7 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 func (h *EventHandler) DeleteData(c echo.Context) error {
 	id, errID := strconv.Atoi(c.Param("id"))
 	if errID != nil {
-		return c.JSON(helper.ResponseBadRequest("fail parameter"))
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
 	}
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
@@ -171,7 +195,7 @@ func (h *EventHandler) DeleteData(c echo.Context) error {
 func (h *EventHandler) UpdateData(c echo.Context) error {
 	id, errID := strconv.Atoi(c.Param("id"))
 	if errID != nil {
-		return c.JSON(helper.ResponseBadRequest("fail parameter eventID"))
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
 	}
 	statusReq := _request_event.UpdateEvent{}
 	err_bind := c.Bind(&statusReq)
@@ -198,12 +222,18 @@ func (h *EventHandler) UpdateData(c echo.Context) error {
 }
 
 func (h *EventHandler) GetEventByUser(c echo.Context) error {
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	page, errPage := strconv.Atoi(c.QueryParam("page"))
+	if errPage != nil {
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
+	}
+	limit, errLimit := strconv.Atoi(c.QueryParam("limit"))
+	if errLimit != nil {
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
+	}
 
 	userID, _, errToken := middlewares.ExtractToken(c)
 	if errToken != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed get user id"))
+		return c.JSON(helper.ResponseInternalServerError("failed to get user id"))
 	}
 
 	result, total, err := h.eventBusiness.GetEventByUserID(userID, limit, page)
@@ -216,8 +246,14 @@ func (h *EventHandler) GetEventByUser(c echo.Context) error {
 }
 
 func (h *EventHandler) GetSubmissionAll(c echo.Context) (err error) {
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	page, errPage := strconv.Atoi(c.QueryParam("page"))
+	if errPage != nil {
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
+	}
+	limit, errLimit := strconv.Atoi(c.QueryParam("limit"))
+	if errLimit != nil {
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
+	}
 
 	_, role, errToken := middlewares.ExtractToken(c)
 	if errToken != nil {
@@ -238,7 +274,7 @@ func (h *EventHandler) GetSubmissionAll(c echo.Context) (err error) {
 func (h *EventHandler) GetSubmissionByID(c echo.Context) error {
 	id, errID := strconv.Atoi(c.Param("id"))
 	if errID != nil {
-		return c.JSON(helper.ResponseBadRequest("fail parameter eventID"))
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
 	}
 	_, role, errToken := middlewares.ExtractToken(c)
 	if errToken != nil {

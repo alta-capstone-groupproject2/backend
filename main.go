@@ -7,23 +7,9 @@ import (
 	"lami/app/routes"
 
 	"lami/app/config"
-
-	"github.com/midtrans/midtrans-go"
-	"github.com/midtrans/midtrans-go/coreapi"
 )
 
-var event coreapi.Client
-
-// var order coreapi.Client
-
 func main() {
-
-	midtrans.ServerKey = config.MidtransServerKey()
-	event.New(midtrans.ServerKey, midtrans.Sandbox)
-
-	// midtrans.ServerKey = config.MidtransOrderServerKey()
-	// order.New(midtrans.ServerKey, midtrans.Sandbox)
-
 	// connection database
 	dbConn := config.InitDB()
 	// migration table

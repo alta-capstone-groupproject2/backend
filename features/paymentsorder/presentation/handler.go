@@ -2,6 +2,7 @@ package presentation
 
 import (
 	"fmt"
+	"lami/app/config"
 	"lami/app/features/paymentsorder"
 	"lami/app/features/paymentsorder/presentation/request"
 	"lami/app/features/paymentsorder/presentation/response"
@@ -26,8 +27,11 @@ func NewPaymentHandler(business paymentsorder.Business) *PaymentsHandler {
 	}
 }
 
-func (h *PaymentsHandler) PostPayment(c echo.Context) error {
+var order coreapi.Client
 
+func (h *PaymentsHandler) PostPayment(c echo.Context) error {
+	midtrans.ServerKey = config.MidtransOrderServerKey()
+	order.New(midtrans.ServerKey, midtrans.Sandbox)
 	typeName := c.Param("type")
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)

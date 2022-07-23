@@ -26,6 +26,8 @@ func NewParticipantHandler(business participants.Business) *ParticipantHandler {
 	}
 }
 
+var event coreapi.Client
+
 func (h *ParticipantHandler) Joined(c echo.Context) error {
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
@@ -82,6 +84,9 @@ func (h *ParticipantHandler) DeleteEventbyParticipant(c echo.Context) error {
 }
 
 func (h *ParticipantHandler) CreatePayment(c echo.Context) error {
+	midtrans.ServerKey = config.MidtransServerKey()
+	event.New(midtrans.ServerKey, midtrans.Sandbox)
+
 	currentTime := time.Now()
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
@@ -128,6 +133,44 @@ func (h *ParticipantHandler) CreatePayment(c echo.Context) error {
 	return c.JSON(helper.ResponseStatusOkWithData("success create payment", result))
 }
 
+func (h *ParticipantHandler) GetDetailPayment(c echo.Context) error {
+	getPay := _request_participant.Participant{}
+	err_bind := c.Bind(&getPay)
+	if err_bind != nil {
+		return c.JSON(helper.ResponseBadRequest("error bind data"))
+	}
+
+	response, err := h.participantBusiness.GetDetailPayment(getPay.OrderID)
+	if err != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to get detail payment"))
+	}
+	result := _response_participant.FromCoreToDetailPayment(response)
+	return c.JSON(helper.ResponseStatusOkWithData("success get detail payment", result))
+}
+
+func (h *ParticipantHandler) CheckStatusPayment(c echo.Context) error {
+	midtrans.ServerKey = config.MidtransServerKey()
+	event.New(midtrans.ServerKey, midtrans.Sandbox)
+
+	reqPay := _request_participant.Participant{}
+	err_bind := c.Bind(&reqPay)
+	if err_bind != nil {
+		return c.JSON(helper.ResponseBadRequest("error bind data"))
+	}
+
+	response, err := h.participantBusiness.CheckStatusPayment(reqPay.OrderID)
+	if err != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to get status payment"))
+	}
+	result := _response_participant.FromMidtransToStatusPayment(response)
+	layout := "2006-01-02 15:04:05"
+	trTime, _ := time.Parse(layout, response.TransactionTime)
+	result.TransactionTime = trTime
+	result.TransactionExpire = trTime.Add(time.Hour * 24)
+
+	return c.JSON(helper.ResponseStatusOkWithData("success to get status payment", result))
+}
+
 func (h *ParticipantHandler) MidtransWebHook(c echo.Context) error {
 	midtransRequest := _request_participant.MidtransHookRequest{}
 	err_bind := c.Bind(&midtransRequest)
@@ -139,5 +182,6 @@ func (h *ParticipantHandler) MidtransWebHook(c echo.Context) error {
 	if errUpdateStatusPay != nil {
 		return c.JSON(helper.ResponseBadRequest("failed to update status payment"))
 	}
+	fmt.Println(errUpdateStatusPay)
 	return c.JSON(helper.ResponseStatusOkNoData("success to update status payment"))
 }

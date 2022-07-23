@@ -80,7 +80,7 @@ func (repo *mysqlParticipantRepository) SelectValidasi(userID, eventID int) bool
 func (repo *mysqlParticipantRepository) CreateDataPayment(reqPay coreapi.ChargeReq) (res *coreapi.ChargeResponse, err error) {
 	payment, errPayment := coreapi.ChargeTransaction(&reqPay)
 	if errPayment != nil {
-		return nil, errors.New("failed to connect midtrans")
+		return nil, errPayment.RawError
 	}
 	return payment, nil
 }
@@ -104,30 +104,39 @@ func (repo *mysqlParticipantRepository) UpdateDataPayment(pay *coreapi.ChargeRes
 func (repo *mysqlParticipantRepository) SelectPayment(orderID string) (participants.Core, error) {
 	payment := Participant{}
 
-	findData := repo.db.Where("order_id = ?", orderID).Find(&payment)
+	findData := repo.db.Order("id desc").Where("order_id = ?", orderID).Find(&payment)
 	if findData.Error != nil {
-		return participants.Core{}, errors.New("failed to get data join payment")
+		return participants.Core{}, findData.Error
 	}
 	result := payment.toCoreMidtrans()
 	return result, nil
+}
+
+func (repo *mysqlParticipantRepository) CheckDataStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error) {
+	checkStatus, err := coreapi.CheckTransaction(orderID)
+	if err != nil {
+		return nil, err
+	}
+	return checkStatus, nil
 }
 
 func (repo *mysqlParticipantRepository) PaymentDataWebHook(data participants.Core) error {
 	Model := fromCore(data)
 	if data.Status == "paid" {
 		errUpdateStatus := repo.db.Where("order_id = ?", data.OrderID).Model(&Model).Update("status", data.Status)
-		if errUpdateStatus != nil {
-			return errors.New("failed update status")
+		if errUpdateStatus.Error != nil {
+			return errUpdateStatus.Error
 		}
+		return nil
 	} else {
 		errUpdate := repo.db.Where("order_id = ?", data.OrderID).Model(&Model).Updates(Participant{
 			Status:        data.Status,
 			PaymentMethod: data.PaymentMethod,
 			TransactionID: data.TransactionID,
 		})
-		if errUpdate != nil {
-			return errors.New("failed update reset payment")
+		if errUpdate.Error != nil {
+			return errUpdate.Error
 		}
+		return nil
 	}
-	return nil
 }
