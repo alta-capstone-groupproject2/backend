@@ -9,21 +9,21 @@ import (
 
 type Participant struct {
 	ID            int
-	UserID        int `json:"userID" form:"userID"`
-	EventID       int `json:"eventID" form:"eventID"`
-	OrderID       string
+	UserID        int    `json:"userID" form:"userID"`
+	EventID       int    `json:"eventID" form:"eventID"`
+	OrderID       string `json:"orderID" form:"orderID"`
 	GrossAmount   int64
 	PaymentMethod string `json:"paymentMethod" form:"paymentMethod"`
 }
 
-func ToCore(partReq Participant) participants.Core {
+func ToCore(req Participant) participants.Core {
 	return participants.Core{
-		ID:            partReq.ID,
-		UserID:        partReq.UserID,
-		EventID:       partReq.EventID,
-		OrderID:       partReq.OrderID,
-		GrossAmount:   partReq.GrossAmount,
-		PaymentMethod: partReq.PaymentMethod,
+		ID:            req.ID,
+		UserID:        req.UserID,
+		EventID:       req.EventID,
+		OrderID:       req.OrderID,
+		GrossAmount:   req.GrossAmount,
+		PaymentMethod: req.PaymentMethod,
 	}
 }
 

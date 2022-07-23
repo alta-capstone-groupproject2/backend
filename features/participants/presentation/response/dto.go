@@ -23,15 +23,28 @@ type Participant struct {
 	Status        string    `json:"status"`
 }
 
+type PaymentDetails struct {
+	ID            int       `json:"participantID" form:"participantID"`
+	Name          string    `json:"name" form:"name"`
+	Date          time.Time `json:"date" form:"date"`
+	City          string    `json:"city" form:"city"`
+	OrderID       string    `json:"orderID" form:"orderID"`
+	GrossAmount   int64     `json:"grossAmount"`
+	PaymentMethod string    `json:"paymentMethod"`
+	TransactionID string    `json:"transactionID"`
+	Status        string    `json:"status"`
+}
+
 type Payment struct {
-	OrderID           string
-	TransactionID     string
-	PaymentMethod     string
-	BillNumber        string
-	Bank              string
-	GrossAmount       string
-	TransactionTime   time.Time
-	TransactionExpire time.Time
+	OrderID           string    `json:"orderID" form:"orderID"`
+	TransactionID     string    `json:"transactionID" form:"transactionID"`
+	PaymentMethod     string    `json:"paymentMethod" form:"paymentMethod"`
+	BillNumber        string    `json:"billNumber" form:"billNumber"`
+	Bank              string    `json:"bank" form:"bank"`
+	GrossAmount       string    `json:"grossAmount" form:"grossAmount"`
+	TransactionTime   time.Time `json:"transactionTime" form:"transactionTime"`
+	TransactionExpire time.Time `json:"transactionExpired" form:"transactionExpired"`
+	TransactionStatus string    `json:"transactionStatus" form:"transactionStatus"`
 }
 
 func FromCore(core participants.Core) Participant {
@@ -51,6 +64,28 @@ func FromCore(core participants.Core) Participant {
 	}
 }
 
+func FromCoreToDetailPayment(core participants.Core) PaymentDetails {
+	return PaymentDetails{
+		ID:            core.ID,
+		Name:          core.Event.Name,
+		Date:          core.Date,
+		City:          core.Event.City,
+		OrderID:       core.OrderID,
+		GrossAmount:   core.GrossAmount,
+		PaymentMethod: core.PaymentMethod,
+		TransactionID: core.TransactionID,
+		Status:        core.Status,
+	}
+}
+
+func FromCoreToDetailPaymentList(data []participants.Core) []PaymentDetails {
+	result := []PaymentDetails{}
+	for key := range data {
+		result = append(result, FromCoreToDetailPayment(data[key]))
+	}
+	return result
+}
+
 func FromCoreList(data []participants.Core) []Participant {
 	result := []Participant{}
 	for key := range data {
@@ -61,11 +96,24 @@ func FromCoreList(data []participants.Core) []Participant {
 
 func FromMidtransToPayment(resMidtrans *coreapi.ChargeResponse) Payment {
 	return Payment{
-		OrderID:       resMidtrans.OrderID,
-		TransactionID: resMidtrans.TransactionID,
-		PaymentMethod: config.PaymentBankTransferBCA,
-		BillNumber:    resMidtrans.VaNumbers[0].VANumber,
-		Bank:          resMidtrans.VaNumbers[0].Bank,
-		GrossAmount:   resMidtrans.GrossAmount,
+		OrderID:           resMidtrans.OrderID,
+		TransactionID:     resMidtrans.TransactionID,
+		PaymentMethod:     config.PaymentBankTransferBCA,
+		BillNumber:        resMidtrans.VaNumbers[0].VANumber,
+		Bank:              resMidtrans.VaNumbers[0].Bank,
+		GrossAmount:       resMidtrans.GrossAmount,
+		TransactionStatus: resMidtrans.TransactionStatus,
+	}
+}
+
+func FromMidtransToStatusPayment(resMidtrans *coreapi.TransactionStatusResponse) Payment {
+	return Payment{
+		OrderID:           resMidtrans.OrderID,
+		TransactionID:     resMidtrans.TransactionID,
+		PaymentMethod:     config.PaymentBankTransferBCA,
+		BillNumber:        resMidtrans.VaNumbers[0].VANumber,
+		Bank:              resMidtrans.VaNumbers[0].Bank,
+		GrossAmount:       resMidtrans.GrossAmount,
+		TransactionStatus: resMidtrans.TransactionStatus,
 	}
 }

@@ -88,6 +88,24 @@ func (uc *participantUseCase) CreatePaymentBankTransfer(reqPay coreapi.ChargeReq
 	return createPay, nil
 }
 
+func (uc *participantUseCase) GetDetailPayment(limit, page, userID int) (res []participants.Core, total int64, err error) {
+	offset := limit * (page - 1)
+	result, total, err := uc.participantData.SelectPaymentList(limit, offset, userID)
+	if err != nil {
+		return []participants.Core{}, 0, err
+	}
+	total = total/int64(limit) + 1
+	return result, total, nil
+}
+
+func (uc *participantUseCase) CheckStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error) {
+	result, err := uc.participantData.CheckDataStatusPayment(orderID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (uc *participantUseCase) PaymentWebHook(orderID, status string) error {
 	payment, errPayment := uc.participantData.SelectPayment(orderID)
 	if errPayment != nil {
@@ -105,7 +123,7 @@ func (uc *participantUseCase) PaymentWebHook(orderID, status string) error {
 
 	result := uc.participantData.PaymentDataWebHook(payment)
 	if result != nil {
-		return errors.New("failed update status payment")
+		return result
 	}
 	return nil
 }

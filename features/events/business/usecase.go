@@ -19,8 +19,11 @@ func NewEventBusiness(usrData events.Data) events.Business {
 func (uc *eventUseCase) GetAllEvent(limit int, page int, name string, city string) (response []events.Core, total int64, err error) {
 	offset := limit * (page - 1)
 	resp, total, errData := uc.eventData.SelectData(limit, offset, name, city)
+	if errData != nil {
+		return []events.Core{}, 0, errData
+	}
 	total = total/int64(limit) + 1
-	return resp, total, errData
+	return resp, total, nil
 }
 
 func (uc *eventUseCase) GetEventByID(id int) (response events.Core, err error) {
