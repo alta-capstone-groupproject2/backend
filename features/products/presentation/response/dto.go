@@ -34,7 +34,7 @@ type ProductRating struct {
 }
 
 type ProductList struct {
-	ID    int    `json:"productIDd"`
+	ID    int    `json:"productID"`
 	URL   string `json:"image"`
 	Name  string `json:"productName"`
 	Price uint   `json:"price"`
