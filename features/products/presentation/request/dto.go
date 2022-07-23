@@ -1,18 +1,18 @@
 package request
 
 import (
-	"lami/app/features/products"
+	product "lami/app/features/products"
 	"lami/app/features/users/data"
 )
 
 type Product struct {
 	Name       string  `json:"name" form:"name"`
-	URL        string  `json:"file" form:"file"`
+	URL        string  `json:"image" form:"image"`
 	Price      uint    `json:"price" form:"price"`
 	Stock      uint    `json:"stock" form:"stock"`
 	City       string  `json:"city" form:"city"`
-	Detail     string  `json:"detail" form:"detail"`
-	MeanRating float64 `json:"mean_rating" form:"mean_rating"`
+	Detail     string  `json:"details" form:"details"`
+	MeanRating float64 `json:"meanRating" form:"meanRating"`
 	UserID     data.User
 }
 

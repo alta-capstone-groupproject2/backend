@@ -23,6 +23,18 @@ type Participant struct {
 	Status        string    `json:"status"`
 }
 
+type PaymentDetails struct {
+	ID            int       `json:"participantID" form:"participantID"`
+	Name          string    `json:"name" form:"name"`
+	Date          time.Time `json:"date" form:"date"`
+	City          string    `json:"city" form:"city"`
+	OrderID       string    `json:"orderID" form:"orderID"`
+	GrossAmount   int64     `json:"grossAmount"`
+	PaymentMethod string    `json:"paymentMethod"`
+	TransactionID string    `json:"transactionID"`
+	Status        string    `json:"status"`
+}
+
 type Payment struct {
 	OrderID           string    `json:"orderID" form:"orderID"`
 	TransactionID     string    `json:"transactionID" form:"transactionID"`
@@ -52,18 +64,26 @@ func FromCore(core participants.Core) Participant {
 	}
 }
 
-func FromCoreToDetailPayment(core participants.Core) Participant {
-	return Participant{
+func FromCoreToDetailPayment(core participants.Core) PaymentDetails {
+	return PaymentDetails{
 		ID:            core.ID,
 		Name:          core.Event.Name,
-		Date:          core.CreatedAt,
+		Date:          core.Date,
 		City:          core.Event.City,
-		Location:      core.Event.Location,
+		OrderID:       core.OrderID,
 		GrossAmount:   core.GrossAmount,
 		PaymentMethod: core.PaymentMethod,
 		TransactionID: core.TransactionID,
 		Status:        core.Status,
 	}
+}
+
+func FromCoreToDetailPaymentList(data []participants.Core) []PaymentDetails {
+	result := []PaymentDetails{}
+	for key := range data {
+		result = append(result, FromCoreToDetailPayment(data[key]))
+	}
+	return result
 }
 
 func FromCoreList(data []participants.Core) []Participant {

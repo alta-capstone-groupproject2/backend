@@ -134,18 +134,23 @@ func (h *ParticipantHandler) CreatePayment(c echo.Context) error {
 }
 
 func (h *ParticipantHandler) GetDetailPayment(c echo.Context) error {
-	getPay := _request_participant.Participant{}
-	err_bind := c.Bind(&getPay)
-	if err_bind != nil {
-		return c.JSON(helper.ResponseBadRequest("error bind data"))
+	limit, errLimit := strconv.Atoi(c.QueryParam("limit"))
+	page, errPage := strconv.Atoi(c.QueryParam("page"))
+	if errLimit != nil || limit == 0 || errPage != nil || page == 0 {
+		return c.JSON(helper.ResponseBadRequest("invalid query param"))
 	}
 
-	response, err := h.participantBusiness.GetDetailPayment(getPay.OrderID)
+	userID_token, _, errToken := middlewares.ExtractToken(c)
+	if userID_token == 0 || errToken != nil {
+		return c.JSON(helper.ResponseBadRequest("failed to get user id"))
+	}
+
+	response, totalPage, err := h.participantBusiness.GetDetailPayment(limit, page, userID_token)
 	if err != nil {
 		return c.JSON(helper.ResponseBadRequest("failed to get detail payment"))
 	}
-	result := _response_participant.FromCoreToDetailPayment(response)
-	return c.JSON(helper.ResponseStatusOkWithData("success get detail payment", result))
+	result := _response_participant.FromCoreToDetailPaymentList(response)
+	return c.JSON(helper.ResponseStatusOkWithDataPage("success get detail payment", totalPage, result))
 }
 
 func (h *ParticipantHandler) CheckStatusPayment(c echo.Context) error {

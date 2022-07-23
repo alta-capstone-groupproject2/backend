@@ -112,6 +112,16 @@ func (repo *mysqlParticipantRepository) SelectPayment(orderID string) (participa
 	return result, nil
 }
 
+func (repo *mysqlParticipantRepository) SelectPaymentList(limit, offset, userID int) ([]participants.Core, int64, error) {
+	payment := []Participant{}
+	var count int64
+	findData := repo.db.Order("id desc").Where("user_id = ?", userID).Limit(limit).Offset(offset).Preload("Event").Find(&payment).Count(&count)
+	if findData.Error != nil {
+		return []participants.Core{}, 0, findData.Error
+	}
+	return ToCoreMidtransList(payment), count, nil
+}
+
 func (repo *mysqlParticipantRepository) CheckDataStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error) {
 	checkStatus, err := coreapi.CheckTransaction(orderID)
 	if err != nil {

@@ -56,7 +56,12 @@ func ToCoreList(data []Participant) []participants.Core {
 
 func (data *Participant) toCoreMidtrans() participants.Core {
 	return participants.Core{
-		ID:            int(data.ID),
+		ID: int(data.ID),
+		Event: participants.Event{
+			Name: data.Event.Name,
+			City: data.Event.City,
+		},
+		Date:          data.CreatedAt,
 		UserID:        data.UserID,
 		EventID:       data.EventID,
 		OrderID:       data.OrderID,
@@ -65,4 +70,12 @@ func (data *Participant) toCoreMidtrans() participants.Core {
 		TransactionID: data.TransactionID,
 		Status:        data.Status,
 	}
+}
+
+func ToCoreMidtransList(data []Participant) []participants.Core {
+	result := []participants.Core{}
+	for key := range data {
+		result = append(result, data[key].toCoreMidtrans())
+	}
+	return result
 }

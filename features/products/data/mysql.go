@@ -2,8 +2,7 @@ package data
 
 import (
 	"errors"
-	"fmt"
-	"lami/app/features/products"
+	product "lami/app/features/products"
 
 	"gorm.io/gorm"
 )
@@ -16,11 +15,11 @@ type mysqlProductRepository struct {
 func (repo *mysqlProductRepository) SelectProductList(limit int, page int, city string, name string) ([]product.Core, int64, error) {
 	var dataProduct []Product
 	var count int64
-	res := repo.db.Order("id asc").Where("city LIKE ? and name LIKE ?", "%"+city+"%", "%"+name+"%").Limit(limit).Offset(page).Find(&dataProduct).Count(&count)
+
+	res := repo.db.Preload("User").Order("id desc").Where("city LIKE ? and name LIKE ?", "%"+city+"%", "%"+name+"%").Limit(limit).Offset(page).Find(&dataProduct).Count(&count)
 	if res.Error != nil {
 		return []product.Core{}, 0, res.Error
 	}
-
 	return ToCoreListProductList(dataProduct), count, res.Error
 }
 
@@ -41,7 +40,6 @@ func (repo *mysqlProductRepository) SelectDataMyProduct(idUser int) ([]product.C
 	dataMyProduct := []Product{}
 
 	res := repo.db.Preload("User").Where("user_id = ?", idUser).Find(&dataMyProduct)
-	fmt.Println("res from mysql.go", res)
 	if res.Error != nil {
 		return []product.Core{}, res.Error
 	}
@@ -54,7 +52,6 @@ func (repo *mysqlProductRepository) SelectDataProductbyIDProduct(idProduct int) 
 	dataProduct := Product{}
 
 	res := repo.db.Preload("User").Where("id = ?", idProduct).Find(&dataProduct)
-	fmt.Println("res from mysql.go:", res)
 	if res.Error != nil {
 		return product.Core{}, res.Error
 	}
@@ -105,7 +102,7 @@ func (repo *mysqlProductRepository) DeleteDataProduct(idProduct int, idUser int)
 }
 
 // UpdateDataProduct implements product.Data
-func (repo *mysqlProductRepository) UpdateDataProduct(dataReq product.Core, idProduct, idUser int) error {
+func (repo *mysqlProductRepository) UpdateDataProduct(dataReq map[string]interface{}, idProduct, idUser int) error {
 
 	model := Product{}
 	model.ID = uint(idProduct)

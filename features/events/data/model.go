@@ -122,3 +122,20 @@ func ToCoreSubmissionList(data []Event) []events.Submission {
 	}
 	return result
 }
+
+func (data *Participant) toAttendeeCore() events.AttendeesData {
+	return events.AttendeesData{
+		Name:    data.User.Name,
+		Email:   data.User.Email,
+		City:    data.User.City,
+		Present: "",
+	}
+}
+
+func ToAttendeeCoreList(data []Participant) []events.AttendeesData {
+	result := []events.AttendeesData{}
+	for key := range data {
+		result = append(result, data[key].toAttendeeCore())
+	}
+	return result
+}

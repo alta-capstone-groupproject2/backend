@@ -44,6 +44,9 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.DELETE("/events/:id", presenter.EventPresenter.DeleteData, middlewares.JWTMiddleware())
 	e.GET("/users/events", presenter.EventPresenter.GetEventByUser, middlewares.JWTMiddleware())
 
+	//Attendee Event
+	e.GET("/events/attendees/:id", presenter.EventPresenter.GetEventAttendeesData, middlewares.JWTMiddleware())
+
 	e.POST("/events/comments", presenter.CommentPresenter.Add, middlewares.JWTMiddleware())
 	e.GET("/events/comments/:id", presenter.CommentPresenter.Get, middlewares.JWTMiddleware())
 
@@ -53,7 +56,7 @@ func New(presenter factory.Presenter) *echo.Echo {
 
 	//Payment Event
 	e.POST("/events/payments", presenter.ParticipantPresenter.CreatePayment, middlewares.JWTMiddleware())
-	e.GET("/events/payments", presenter.ParticipantPresenter.CreatePayment, middlewares.JWTMiddleware())
+	e.GET("/events/payment_details", presenter.ParticipantPresenter.GetDetailPayment, middlewares.JWTMiddleware())
 	e.GET("/events/payments/status", presenter.ParticipantPresenter.CheckStatusPayment, middlewares.JWTMiddleware())
 	//Midtrans Web Hook
 	e.POST("/events/payments/webhook", presenter.ParticipantPresenter.MidtransWebHook)

@@ -2,7 +2,7 @@ package business
 
 import (
 	"errors"
-	"lami/app/features/products"
+	product "lami/app/features/products"
 )
 
 type productUseCase struct {
@@ -43,11 +43,24 @@ func (uc *productUseCase) DeleteProduct(idProduct int, idUser int) error {
 
 // UpdateProduct implements product.Business
 func (uc *productUseCase) UpdateProduct(dataReq product.Core, idProduct, idUser int) error {
-	if dataReq.Price == 0 || dataReq.Stock == 0 || dataReq.Detail == "" {
-		return errors.New("all data must be filled")
-	}
+	updateMap := make(map[string]interface{})
 
-	err := uc.productData.UpdateDataProduct(dataReq, idProduct, idUser)
+	if dataReq.Name != "" || dataReq.Name == " " {
+		updateMap["name"] = &dataReq.Name
+	}
+	if dataReq.Stock != 0 {
+		updateMap["stock"] = &dataReq.Stock
+	}
+	if dataReq.Detail != "" || dataReq.Detail == " " {
+		updateMap["detail"] = &dataReq.Detail
+	}
+	if dataReq.Price != 0 {
+		updateMap["price"] = &dataReq.Price
+	}
+	if dataReq.URL != "" {
+		updateMap["url"] = &dataReq.URL
+	}
+	err := uc.productData.UpdateDataProduct(updateMap, idProduct, idUser)
 	if err != nil {
 		return errors.New("failed to insert data product")
 	}

@@ -88,12 +88,14 @@ func (uc *participantUseCase) CreatePaymentBankTransfer(reqPay coreapi.ChargeReq
 	return createPay, nil
 }
 
-func (uc *participantUseCase) GetDetailPayment(orderID string) (res participants.Core, err error) {
-	result, err := uc.participantData.SelectPayment(orderID)
+func (uc *participantUseCase) GetDetailPayment(limit, page, userID int) (res []participants.Core, total int64, err error) {
+	offset := limit * (page - 1)
+	result, total, err := uc.participantData.SelectPaymentList(limit, offset, userID)
 	if err != nil {
-		return participants.Core{}, err
+		return []participants.Core{}, 0, err
 	}
-	return result, nil
+	total = total/int64(limit) + 1
+	return result, total, nil
 }
 
 func (uc *participantUseCase) CheckStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error) {

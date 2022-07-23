@@ -56,7 +56,7 @@ type Business interface {
 
 	//Payment Event
 	GrossAmountEvent(id int) (GrossAmount int64, err error)
-	GetDetailPayment(orderID string) (Core, error)
+	GetDetailPayment(limit, page, userID int) ([]Core, int64, error)
 	CreatePaymentBankTransfer(coreapi.ChargeReq, Core) (*coreapi.ChargeResponse, error)
 	CheckStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error)
 	PaymentWebHook(orderID, status string) error
@@ -74,6 +74,7 @@ type Data interface {
 	//Payment Event Data
 	UpdateDataPayment(*coreapi.ChargeResponse, Core) error
 	SelectPayment(orderID string) (Core, error)
+	SelectPaymentList(limit, page, userID int) ([]Core, int64, error)
 	CreateDataPayment(coreapi.ChargeReq) (*coreapi.ChargeResponse, error)
 	CheckDataStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error)
 	PaymentDataWebHook(data Core) error
