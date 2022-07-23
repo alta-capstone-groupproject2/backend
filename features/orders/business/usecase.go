@@ -10,30 +10,73 @@ type orderUseCase struct {
 }
 
 // SelectHistoryOrder implements orders.Business
-func (uc *orderUseCase) SelectHistoryOrder(idUser int) (orders.CoreDetail, error) {
+func (uc *orderUseCase) SelectHistoryOrder(idUser int) ([]orders.Core, error) {
 	resp, err := uc.orderData.SelectDataHistoryOrder(idUser)
 	return resp, err
 }
 
 // AddOrder implements orders.Business
-func (uc *orderUseCase) AddOrder(dataReq orders.Core, idUser int) error {
+func (uc *orderUseCase) Order(dataReq orders.Core, idUser int) (int64, error) {
+
 	//	Check length []cartID
 	if len(dataReq.CartID) == 0 {
-		return errors.New("empty cartID")
+		return -1, errors.New("failed")
 	}
 
-	//	Check input receiver, phonenumber, address
-	if dataReq.Receiver == "" || dataReq.PhoneNumber == "" || dataReq.Address == "" {
-		return errors.New("all data must be filedd")
+	//	Update stock on product plus count total price
+	total, err2 := uc.orderData.UpdateStockOnProductPlusCountTotalPrice(dataReq, idUser)
+	if err2 != nil {
+		return -1, errors.New("failed")
 	}
 
-	err := uc.orderData.AddDataOrder(dataReq, idUser)
-	if err != nil {
-		return errors.New("failed")
+	//	Add data order plus count rows
+	rows, err5 := uc.orderData.AddDataOrder(dataReq, idUser, total)
+	if err5 != nil {
+		return -1, errors.New("failed")
 	}
 
-	return nil
+	//	Add data order detail
+	err6 := uc.orderData.AddDataOrderDetail(dataReq, rows, idUser)
+	if err6 != nil {
+		return -1, errors.New("failed")
+	}
 
+	//	Delete data on cart database
+	err4 := uc.orderData.DeleteDataCart(dataReq, idUser)
+	if err4 != nil {
+		return -1, errors.New("failed")
+	}
+
+	return 0, nil
+
+}
+
+// PaymentGrossAmount implements paymentsorder.Business
+func (uc *orderUseCase) PaymentGrossAmount(idUser int) (int, error) {
+	if idUser == 0 {
+		return -1, errors.New("failed get idUser in usecase")
+	}
+
+	grossamount, res := uc.orderData.DataPaymentsGrossAmount(idUser)
+	if res != nil {
+		return -1, errors.New("failed to get gross amount")
+	}
+
+	return grossamount, nil
+}
+
+// PaymentsOrderID implements paymentsorder.Business
+func (uc *orderUseCase) PaymentsOrderID(idUser int) (int, error) {
+	if idUser == 0 {
+		return -1, errors.New("failed get idUser in usecase")
+	}
+
+	grossamount, res := uc.orderData.DataPaymentsOrderID(idUser)
+	if res != nil {
+		return -1, errors.New("failed to get gross amount")
+	}
+
+	return grossamount, nil
 }
 
 func NewOrderBusiness(odrData orders.Data) orders.Business {

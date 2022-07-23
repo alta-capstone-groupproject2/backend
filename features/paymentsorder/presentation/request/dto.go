@@ -1,50 +1,21 @@
 package request
 
 import (
-	"lami/app/features/orders"
 	"strconv"
 	"time"
 
-	_dataorder "lami/app/features/orders/data"
+	_dataOrder "lami/app/features/orders/data"
 
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 )
-
-type Order struct {
-	CartID      []int   `json:"cart_id" form:"cart_id"`
-	UserID      int     `json:"user_id" form:"user_id"`
-	Receiver    string  `json:"receiver" form:"receiver"`
-	PhoneNumber string  `json:"phone" form:"phone"`
-	Address     string  `json:"address" form:"address"`
-	TotalPrice  float32 `json:"totalprice" form:"totalprice"`
-	Status      string  `json:"status" form:"status"`
-}
-
-func ToCore(orderReq Order) orders.Core {
-	var dataCartID []int
-	for key := range orderReq.CartID {
-		dataCartID = append(dataCartID, key)
-	}
-
-	return orders.Core{
-		UserID:      orderReq.UserID,
-		CartID:      dataCartID,
-		Receiver:    orderReq.Receiver,
-		PhoneNumber: orderReq.PhoneNumber,
-		Address:     orderReq.Address,
-	}
-
-}
-
-//	Payment
 
 type ChargeRequest struct {
 	PaymentType        coreapi.CoreapiPaymentType
 	TransactionDetails midtrans.TransactionDetails
 	BankTransfer       *coreapi.BankTransferDetails
 	EChannelDetails    coreapi.EChannelDetail
-	Order              _dataorder.Order
+	Order              _dataOrder.Order
 }
 
 func ToCoreMidtransBank(dataReq ChargeRequest) coreapi.ChargeReq {
@@ -62,7 +33,7 @@ func ToCoreMidtransBank(dataReq ChargeRequest) coreapi.ChargeReq {
 }
 
 func ToCoreMidtransPermata(dataReq ChargeRequest) coreapi.ChargeReq {
-
+	
 	return coreapi.ChargeReq{
 		PaymentType: "bank_transfer",
 		TransactionDetails: midtrans.TransactionDetails{

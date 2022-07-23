@@ -3,6 +3,8 @@ package business
 import (
 	"errors"
 	"lami/app/features/participants"
+
+	"github.com/midtrans/midtrans-go/coreapi"
 )
 
 type participantUseCase struct {
@@ -53,10 +55,75 @@ func (uc *participantUseCase) AddParticipant(partRequest participants.Core) (err
 	}
 
 	for i := 0; i < len(checkDate); i++ {
-		if checkDate[i].Event.Date == checkEvent.Date {
+		if checkDate[i].Event.Date.Before(checkEvent.EndDate) && checkDate[i].Event.Date.After(checkEvent.StartDate) {
 			return errors.New("can't both events")
 		}
 	}
+
+	result := uc.participantData.SelectValidasi(partRequest.UserID, partRequest.EventID)
+	if result {
+		return errors.New("user have a join")
+	}
 	err = uc.participantData.AddData(partRequest)
 	return err
+}
+
+func (uc *participantUseCase) GrossAmountEvent(eventID int) (GrossAmount int64, err error) {
+	checkEvent, errCheckEvent := uc.participantData.SelectDataByID(eventID)
+	if errCheckEvent != nil {
+		return 0, errCheckEvent
+	}
+	return int64(checkEvent.Price), nil
+}
+
+func (uc *participantUseCase) CreatePaymentBankTransfer(reqPay coreapi.ChargeReq, reqJoin participants.Core) (resPay *coreapi.ChargeResponse, err error) {
+	createPay, errCreatePay := uc.participantData.CreateDataPayment(reqPay)
+	if errCreatePay != nil {
+		return nil, errors.New("failed get response payment")
+	}
+	updateJoin := uc.participantData.UpdateDataPayment(createPay, reqJoin)
+	if updateJoin != nil {
+		return nil, errors.New("failed to connect update")
+	}
+	return createPay, nil
+}
+
+func (uc *participantUseCase) GetDetailPayment(limit, page, userID int) (res []participants.Core, total int64, err error) {
+	offset := limit * (page - 1)
+	result, total, err := uc.participantData.SelectPaymentList(limit, offset, userID)
+	if err != nil {
+		return []participants.Core{}, 0, err
+	}
+	total = total/int64(limit) + 1
+	return result, total, nil
+}
+
+func (uc *participantUseCase) CheckStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error) {
+	result, err := uc.participantData.CheckDataStatusPayment(orderID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (uc *participantUseCase) PaymentWebHook(orderID, status string) error {
+	payment, errPayment := uc.participantData.SelectPayment(orderID)
+	if errPayment != nil {
+		return errors.New("failed to get data join")
+	}
+
+	if status == "settlement" {
+		payment.Status = "paid"
+	}
+	if status == "cancel" || status == "deny" || status == "expire" {
+		payment.Status = "failed"
+		payment.PaymentMethod = ""
+		payment.TransactionID = ""
+	}
+
+	result := uc.participantData.PaymentDataWebHook(payment)
+	if result != nil {
+		return result
+	}
+	return nil
 }

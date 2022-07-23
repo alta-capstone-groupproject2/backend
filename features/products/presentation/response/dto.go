@@ -1,38 +1,49 @@
 package response
 
 import (
-	"lami/app/features/products"
+	product "lami/app/features/products"
 )
 
 type Product struct {
-	ID         int     `json:"product_id" form:"product_id"`
-	URL        string  `json:"url" form:"url"`
-	Name       string  `json:"name" form:"name"`
-	StoreName  string  `json:"store_name" form:"store_name"`
-	Price      uint    `json:"price" form:"price"`
-	City       string  `json:"city" form:"city"`
-	MeanRating float64 `json:"mean_rating" form:"mean_rating"`
-	Detail     string  `json:"detail" form:"detail"`
+	ID         int     `json:"productID"`
+	URL        string  `json:"image"`
+	Name       string  `json:"productName"`
+	StoreName  string  `json:"storeName"`
+	Price      uint    `json:"price"`
+	City       string  `json:"city"`
+	Stock      int     `json:"stock"`
+	MeanRating float64 `json:"meanRating"`
+	Detail     string  `json:"details"`
 }
 
 type MyProduct struct {
-	ID    int    `json:"product_id" form:"product_id"`
-	URL   string `json:"url" form:"url"`
-	Name  string `json:"name" form:"name"`
-	Price uint   `json:"price" form:"price"`
-	City  string `json:"city" form:"city"`
+	ID    int    `json:"productID"`
+	URL   string `json:"image"`
+	Name  string `json:"productName"`
+	Price uint   `json:"price"`
+	City  string `json:"city"`
+	Stock int    `json:"stock"`
 }
 
 type ProductRating struct {
-	ID          int     `json:"rating_id" form:"rating_id"`
-	URL         string  `json:"url" form:"url"`
-	ProductName string  `json:"name" form:"name"`
-	Rating      float64 `json:"rating" form:"rating"`
-	Review      string  `json:"review" form:"review"`
+	ID          int     `json:"ratingID"`
+	URL         string  `json:"image"`
+	ProductName string  `json:"name"`
+	Rating      float64 `json:"rating"`
+	Review      string  `json:"review"`
 }
 
-func FromCoreProductList(data product.Core) Product {
-	return Product{
+type ProductList struct {
+	ID    int    `json:"productID"`
+	URL   string `json:"image"`
+	Name  string `json:"productName"`
+	Price uint   `json:"price"`
+	City  string `json:"city"`
+}
+
+//	GetProductList
+func FromCoreProductList(data product.Core) ProductList {
+	return ProductList{
 		ID:    data.ID,
 		URL:   data.URL,
 		Name:  data.Name,
@@ -41,15 +52,16 @@ func FromCoreProductList(data product.Core) Product {
 	}
 }
 
-func FromCoreListProductList(data []product.Core) []Product {
-	res := []Product{}
+func FromCoreListProductList(data []product.Core) []ProductList {
+	res := []ProductList{}
 	for key := range data {
 		res = append(res, FromCoreProductList(data[key]))
 	}
 	return res
 }
 
-func FromCore(core product.Core) Product {
+//	GetProductbyIDProduct
+func FromCorebyIDProduct(core product.Core) Product {
 	return Product{
 		ID:         core.ID,
 		URL:        core.URL,
@@ -57,11 +69,13 @@ func FromCore(core product.Core) Product {
 		StoreName:  core.StoreName,
 		Price:      core.Price,
 		City:       core.City,
+		Stock:      int(core.Stock),
 		MeanRating: core.MeanRating,
 		Detail:     core.Detail,
 	}
 }
 
+//	GetProductRating
 func FromCoreRating(core product.CoreRating) ProductRating {
 	return ProductRating{
 		ID:          core.ID,
@@ -80,7 +94,7 @@ func FromCoreListRating(data []product.CoreRating) []ProductRating {
 	return res
 }
 
-// Get MyProduct
+//	GetMyProduct
 func FromCoreMyProduct(core product.Core) MyProduct {
 	return MyProduct{
 		ID:    core.ID,
@@ -88,10 +102,11 @@ func FromCoreMyProduct(core product.Core) MyProduct {
 		Name:  core.Name,
 		Price: core.Price,
 		City:  core.City,
+		Stock: int(core.Stock),
 	}
 }
 
-func FromCoreList(data []product.Core) []MyProduct {
+func FromCoreListMyProduct(data []product.Core) []MyProduct {
 	result := []MyProduct{}
 	for key := range data {
 		result = append(result, FromCoreMyProduct(data[key]))

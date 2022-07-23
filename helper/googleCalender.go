@@ -16,11 +16,11 @@ func InsertEvent(eventCore events.Core, email string) (eventId string, err error
 		Location:    eventCore.City,
 		Description: eventCore.Detail,
 		Start: &calendar.EventDateTime{
-			DateTime: eventCore.Date.GoString(),
+			DateTime: eventCore.StartDate.GoString(),
 			TimeZone: "Asia/Jakarta",
 		},
 		End: &calendar.EventDateTime{
-			DateTime: eventCore.Date.GoString(),
+			DateTime: eventCore.EndDate.GoString(),
 			TimeZone: "Asia/Jakarta",
 		},
 		Attendees: []*calendar.EventAttendee{

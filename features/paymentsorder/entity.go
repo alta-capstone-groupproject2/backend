@@ -1,61 +1,15 @@
-package orders
+package paymentsorder
 
-type Core struct {
-	ID          int
-	CartID      []int
-	UserID      int
-	Receiver    string
-	PhoneNumber string
-	Address     string
-	TotalPrice  uint
-	Status      string
-	OrderDetail []CoreDetail
-}
-
-type CoreDetail struct {
-	ID        int
-	OrderID   int
-	ProductID int
-	Qty       uint
-	Product   Product
-}
-
-type CoreResponse struct {
-	Receiver   string
-	Address    string
-	TotalPrice uint
-	Status     string
-	Product    []CoreDetail
-}
-
-type Product struct {
-	ID   int
-	Name string
-	Url  string
-	Qty  uint
-}
+import _dataOrder "lami/app/features/orders/data"
 
 type Business interface {
-	Order(dataReq Core, idUser int) (int64, error)
-	SelectHistoryOrder(idUser int) ([]Core, error)
-
-	PaymentsOrderID(idUser int) (int, error)
-	PaymentGrossAmount(idUser int) (int, error)
+	Payments(idUser int) (int, int, error)
 }
 
 type Data interface {
-	SelectDataHistoryOrder(idUser int) ([]Core, error)
-
-	UpdateStockOnProductPlusCountTotalPrice(dataReq Core, idUser int) (int, error)
-	DeleteDataCart(dataReq Core, idUser int) error
-	AddDataOrder(dataReq Core, idUser, totalprice int) (int64, error)
-	AddDataOrderDetail(dataReq Core, row int64, idUser int) error
-
-	DataPaymentsOrderID(idUser int) (int, error)
-	DataPaymentsGrossAmount(idUser int) (int, error)
+	DataPayments(idUser int) (int, int, error)
 }
 
-//	Payments
 type CoreChargeRequest struct {
 	PaymentType        string
 	Items              ItemDetails
@@ -67,7 +21,7 @@ type CoreChargeRequest struct {
 	GoPay              GopayDetails
 	ShoopePay          ShoopePayDetails
 	ConvStore          ConvStoreDetails
-	Order              Core
+	Order              _dataOrder.Order
 }
 
 type TransactionDetails struct {

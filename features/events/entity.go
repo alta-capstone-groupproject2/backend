@@ -5,22 +5,24 @@ import (
 )
 
 type Core struct {
-	ID          int
-	Image       string
-	Document    string
-	Name        string
-	HostedBy    string
-	Phone       string
-	Date        time.Time
-	City        string
-	Location    string
-	Detail      string
-	Price       int
-	Status      string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	UserID      int
-	Participant []Participant
+	ID            int
+	Image         string
+	Document      string
+	Name          string
+	HostedBy      string
+	Phone         string
+	StartDate     time.Time
+	EndDate       time.Time
+	City          string
+	Location      string
+	Detail        string
+	Price         int
+	Status        string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	UserID        int
+	Participant   []Participant
+	AttendeesData []AttendeesData
 }
 
 type Participant struct {
@@ -30,12 +32,21 @@ type Participant struct {
 }
 
 type Submission struct {
-	ID       int
-	Name     string
-	UserName string
-	City     string
-	Date     time.Time
-	Status   string
+	ID        int
+	Name      string
+	UserName  string
+	City      string
+	StartDate time.Time
+	EndDate   time.Time
+	Status    string
+}
+
+type AttendeesData struct {
+	Num     int
+	Name    string
+	Email   string
+	City    string
+	Present string
 }
 
 type Business interface {
@@ -47,6 +58,7 @@ type Business interface {
 	GetEventByUserID(id_user, limit, offset int) (data []Core, total int64, err error)
 	GetEventSubmission(limit, offset int) (data []Submission, total int64, err error)
 	GetEventSubmissionByID(id int) (data Core, err error)
+	GetEventAttendee(id, userID int) (urlPDF string, err error)
 }
 
 type Data interface {
@@ -67,4 +79,6 @@ type Data interface {
 
 	SelectDataSubmission(limit, offset int) (data []Submission, total int64, err error)
 	SelectDataSubmissionByID(id int) (data Core, err error)
+
+	SelectAttendeeData(id_event int) (data []AttendeesData, err error)
 }

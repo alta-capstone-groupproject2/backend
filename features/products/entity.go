@@ -42,7 +42,7 @@ type Business interface {
 
 type Data interface {
 	AddDataProduct(dataReq Core) (int, error)
-	UpdateDataProduct(dataReq Core, idProduct, idUser int) error
+	UpdateDataProduct(dataReq map[string]interface{}, idProduct, idUser int) error
 	DeleteDataProduct(idProduct, idUser int) error
 	SelectProductList(limit int, page int, city string, name string) ([]Core, int64, error)
 	SelectDataProductbyIDProduct(idProduct int) (Core, error)

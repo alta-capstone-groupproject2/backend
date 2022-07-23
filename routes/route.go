@@ -44,12 +44,22 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.DELETE("/events/:id", presenter.EventPresenter.DeleteData, middlewares.JWTMiddleware())
 	e.GET("/users/events", presenter.EventPresenter.GetEventByUser, middlewares.JWTMiddleware())
 
+	//Attendee Event
+	e.GET("/events/attendees/:id", presenter.EventPresenter.GetEventAttendeesData, middlewares.JWTMiddleware())
+
 	e.POST("/events/comments", presenter.CommentPresenter.Add, middlewares.JWTMiddleware())
 	e.GET("/events/comments/:id", presenter.CommentPresenter.Get, middlewares.JWTMiddleware())
 
 	e.POST("/events/participations", presenter.ParticipantPresenter.Joined, middlewares.JWTMiddleware())
 	e.GET("/events/participations", presenter.ParticipantPresenter.GetAllEventParticipant, middlewares.JWTMiddleware())
 	e.DELETE("/events/participations/:id", presenter.ParticipantPresenter.DeleteEventbyParticipant, middlewares.JWTMiddleware())
+
+	//Payment Event
+	e.POST("/events/payments", presenter.ParticipantPresenter.CreatePayment, middlewares.JWTMiddleware())
+	e.GET("/events/payment_details", presenter.ParticipantPresenter.GetDetailPayment, middlewares.JWTMiddleware())
+	e.GET("/events/payments/status", presenter.ParticipantPresenter.CheckStatusPayment, middlewares.JWTMiddleware())
+	//Midtrans Web Hook
+	e.POST("/events/payments/webhook", presenter.ParticipantPresenter.MidtransWebHook)
 
 	//submission by user
 	e.GET("/events/submissions", presenter.EventPresenter.GetSubmissionAll, middlewares.JWTMiddleware())
@@ -68,14 +78,17 @@ func New(presenter factory.Presenter) *echo.Echo {
 	e.POST("/products/ratings/:productID", presenter.ProductPresenter.PostProductRating, middlewares.JWTMiddleware())
 	e.GET("/products/ratings/:productID", presenter.ProductPresenter.GetProductRating)
 
-	// Order
-	e.POST("/orders", presenter.OrderPresenter.PostOrder, middlewares.JWTMiddleware())
-
 	// Cart
 	e.POST("/carts", presenter.CartPresenter.PostCart, middlewares.JWTMiddleware())
 	e.GET("/carts", presenter.CartPresenter.GetCart, middlewares.JWTMiddleware())
 	e.PUT("/carts/:cartID", presenter.CartPresenter.PutCart, middlewares.JWTMiddleware())
 	e.DELETE("carts/:cartID", presenter.CartPresenter.DeletedCart, middlewares.JWTMiddleware())
+
+	// Order
+	e.POST("/orders/:type", presenter.OrderPresenter.PostOrder, middlewares.JWTMiddleware())
+
+	// PaymentOrder
+	e.POST("/payments/confirm", presenter.PaymentPresenter.PutPayment, middlewares.JWTMiddleware())
 
 	return e
 }

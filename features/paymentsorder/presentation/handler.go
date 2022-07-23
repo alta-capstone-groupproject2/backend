@@ -2,31 +2,36 @@ package presentation
 
 import (
 	"fmt"
-	"lami/app/features/orders"
-	"lami/app/features/orders/presentation/request"
-	"lami/app/features/orders/presentation/response"
+	"lami/app/config"
+	"lami/app/features/paymentsorder"
+	"lami/app/features/paymentsorder/presentation/request"
+	"lami/app/features/paymentsorder/presentation/response"
 	"lami/app/helper"
 	"lami/app/middlewares"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 )
 
-type OrderHandler struct {
-	orderBusiness orders.Business
+type PaymentsHandler struct {
+	paymentBusiness paymentsorder.Business
 }
 
-func NewOrderHandler(business orders.Business) *OrderHandler {
-	return &OrderHandler{
-		orderBusiness: business,
+func NewPaymentHandler(business paymentsorder.Business) *PaymentsHandler {
+	return &PaymentsHandler{
+		paymentBusiness: business,
 	}
 }
 
-func (h *OrderHandler) PostOrder(c echo.Context) error {
+var order coreapi.Client
 
+func (h *PaymentsHandler) PostPayment(c echo.Context) error {
+	midtrans.ServerKey = config.MidtransOrderServerKey()
+	order.New(midtrans.ServerKey, midtrans.Sandbox)
 	typeName := c.Param("type")
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
@@ -34,29 +39,9 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		return c.JSON(helper.ResponseForbidden("user not found"))
 	}
 
-	order := request.Order{}
-	err_bind := c.Bind(&order)
-	if err_bind != nil {
-		return c.JSON(helper.ResponseBadRequest("failed to bind data order"))
-	}
-
-	orderCore := request.ToCore(order)
-	orderCore.UserID = userID_token
-
-	res, err := h.orderBusiness.Order(orderCore, userID_token)
-	if err != nil && res == -1 {
-		return c.JSON(helper.ResponseBadRequest(err.Error()))
-	}
-
-	//	Payments
-	idOrder, errorderid := h.orderBusiness.PaymentsOrderID(userID_token)
-	if errorderid != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed get order_id for payments"))
-	}
-
-	grossamount, errgrossamount := h.orderBusiness.PaymentGrossAmount(userID_token)
-	if errgrossamount != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed get gross amount for payments"))
+	idOrder, totalprice, errOrder := h.paymentBusiness.Payments(userID_token)
+	if errOrder != nil {
+		return c.JSON(http.StatusInternalServerError, "failed h.paymentBusiness")
 	}
 
 	var Transfer request.ChargeRequest
@@ -65,7 +50,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
 				OrderID:  strconv.Itoa(idOrder),
-				GrossAmt: int64(grossamount),
+				GrossAmt: int64(totalprice),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
 				Bank: midtrans.BankBni,
@@ -75,7 +60,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
 				OrderID:  strconv.Itoa(idOrder),
-				GrossAmt: int64(grossamount),
+				GrossAmt: int64(totalprice),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
 				Bank: midtrans.BankBca,
@@ -85,7 +70,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
 				OrderID:  strconv.Itoa(idOrder) + "bri",
-				GrossAmt: int64(grossamount),
+				GrossAmt: int64(totalprice),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
 				Bank: midtrans.BankBri,
@@ -95,7 +80,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
 				OrderID:  strconv.Itoa(idOrder) + "permata1",
-				GrossAmt: int64(grossamount),
+				GrossAmt: int64(totalprice),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
 				Bank: midtrans.BankPermata,
@@ -108,7 +93,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
 				OrderID:  strconv.Itoa(idOrder),
-				GrossAmt: int64(grossamount),
+				GrossAmt: int64(totalprice),
 			},
 			EChannelDetails: coreapi.EChannelDetail{
 				BillInfo1: "BillInfo1",
@@ -120,20 +105,24 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	}
 
 	var TransferCore coreapi.ChargeReq
-	if typeName == "permata" {
+	if typeName == "bni" || typeName == "bca" || typeName == "bri" {
+		TransferCore = request.ToCoreMidtransBank(Transfer)
+	} else if typeName == "permata" {
 		TransferCore = request.ToCoreMidtransPermata(Transfer)
 	} else if typeName == "mandiri" {
 		TransferCore = request.ToCoreMidtransMandiri(Transfer)
 	} else {
-		TransferCore = request.ToCoreMidtransBank(Transfer)
+		TransferCore = request.ToCoreMidtransEMoney(Transfer)
 	}
 
-	resp, errcharge := coreapi.ChargeTransaction(&TransferCore)
-	if errcharge != nil {
-		fmt.Println("Error coreapi api, with global config", errcharge.GetMessage())
+	resp, err := coreapi.ChargeTransaction(&TransferCore)
+	if err != nil {
+		fmt.Println("Error coreapi api, with global config", err.GetMessage())
 	}
 
-	if typeName == "permata" {
+	if typeName == "bni" || typeName == "bca" || typeName == "bri" || typeName == "permata" {
+		return c.JSON(http.StatusOK, response.FromCoreChargeMidtrans(*resp))
+	} else if typeName == "permata" {
 		return c.JSON(http.StatusOK, response.FromCoreChargePermata(*resp))
 	} else if typeName == "mandiri" {
 		return c.JSON(http.StatusOK, response.FromCoreChargeMandiri(*resp))
@@ -143,17 +132,11 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 
 }
 
-func (h *OrderHandler) GetHistoryOrder(c echo.Context) error {
-	userID_token, _, errToken := middlewares.ExtractToken(c)
-	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, "failed to extract token")
-	}
+func (h *PaymentsHandler) PutPayment(c echo.Context) error {
+	panic("unimplemented")
+}
 
-	resp, err := h.orderBusiness.SelectHistoryOrder(userID_token)
-	if err != nil {
-		return c.JSON(helper.ResponseNotFound("failed get history order"))
-	}
-
-	response := response.FromCoreList(resp)
-	return c.JSON(helper.ResponseStatusOkWithData("success get history order", response))
+func Random() string {
+	time.Sleep(500 * time.Millisecond)
+	return strconv.FormatInt(time.Now().Unix(), 10)
 }

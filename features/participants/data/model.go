@@ -3,8 +3,6 @@ package data
 import (
 	_event "lami/app/features/events/data"
 	"lami/app/features/participants"
-	"strconv"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -14,22 +12,11 @@ type Participant struct {
 	UserID        int
 	EventID       int
 	OrderID       string
-	GrossAmount   string
+	GrossAmount   int64
 	PaymentMethod string
 	TransactionID string
 	Status        string
 	Event         _event.Event
-}
-
-type Payment struct {
-	OrderID           string
-	TransactionID     string
-	PaymentMethod     string
-	BillNumber        string
-	Bank              string
-	GrossAmount       int64
-	TransactionTime   time.Time
-	TransactionExpire time.Time
 }
 
 func fromCore(core participants.Core) Participant {
@@ -37,7 +24,7 @@ func fromCore(core participants.Core) Participant {
 		UserID:        core.UserID,
 		EventID:       core.EventID,
 		OrderID:       core.OrderID,
-		GrossAmount:   strconv.Itoa(core.Event.Price),
+		GrossAmount:   int64(core.Event.Price),
 		PaymentMethod: core.PaymentMethod,
 		TransactionID: core.TransactionID,
 		Status:        core.Status,
@@ -51,7 +38,6 @@ func (data *Participant) toCore() participants.Core {
 			Image:    data.Event.Image,
 			Name:     data.Event.Name,
 			HostedBy: data.Event.HostedBy,
-			Date:     data.Event.Date,
 			City:     data.Event.City,
 			Location: data.Event.Location,
 			Detail:   data.Event.Detail,
@@ -64,6 +50,32 @@ func ToCoreList(data []Participant) []participants.Core {
 	result := []participants.Core{}
 	for key := range data {
 		result = append(result, data[key].toCore())
+	}
+	return result
+}
+
+func (data *Participant) toCoreMidtrans() participants.Core {
+	return participants.Core{
+		ID: int(data.ID),
+		Event: participants.Event{
+			Name: data.Event.Name,
+			City: data.Event.City,
+		},
+		Date:          data.CreatedAt,
+		UserID:        data.UserID,
+		EventID:       data.EventID,
+		OrderID:       data.OrderID,
+		GrossAmount:   int64(data.Event.Price),
+		PaymentMethod: data.PaymentMethod,
+		TransactionID: data.TransactionID,
+		Status:        data.Status,
+	}
+}
+
+func ToCoreMidtransList(data []Participant) []participants.Core {
+	result := []participants.Core{}
+	for key := range data {
+		result = append(result, data[key].toCoreMidtrans())
 	}
 	return result
 }

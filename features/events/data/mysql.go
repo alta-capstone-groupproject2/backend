@@ -52,7 +52,7 @@ func (repo *mysqlEventRepository) InsertData(EventData events.Core) error {
 
 func (repo *mysqlEventRepository) DeleteDataByID(id int, userId int) error {
 	dataEvent := Event{}
-	result := repo.db.Where("user_id = ?", dataEvent.UserID).Delete(&dataEvent, id)
+	result := repo.db.Where("user_id = ?", userId).Delete(&dataEvent, id)
 	if result.RowsAffected == 0 {
 		return errors.New("no rows affected")
 	}
@@ -107,7 +107,7 @@ func (repo *mysqlEventRepository) SelectParticipantData(id_event int) (response 
 func (repo *mysqlEventRepository) SelectDataSubmission(limit, offset int) (data []events.Submission, total int64, err error) {
 	var dataSubmit []Event
 	var count int64
-	result := repo.db.Limit(limit).Offset(offset).Preload("User").Find(&dataSubmit).Count(&count)
+	result := repo.db.Order("updated_at desc").Limit(limit).Offset(offset).Preload("User").Find(&dataSubmit).Count(&count)
 	if result.Error != nil {
 		return []events.Submission{}, 0, result.Error
 	}
@@ -121,4 +121,15 @@ func (repo *mysqlEventRepository) SelectDataSubmissionByID(id int) (data events.
 		return events.Core{}, result.Error
 	}
 	return dataSubmit.toCore(), result.Error
+}
+
+func (repo *mysqlEventRepository) SelectAttendeeData(id_event int) (response []events.AttendeesData, err error) {
+	var dataParticipant []Participant
+
+	result := repo.db.Preload("User").Find(&dataParticipant, "event_id = ?", id_event)
+	if result.Error != nil {
+		return []events.AttendeesData{}, result.Error
+	}
+
+	return ToAttendeeCoreList(dataParticipant), result.Error
 }

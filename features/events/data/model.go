@@ -10,19 +10,20 @@ import (
 
 type Event struct {
 	gorm.Model
-	Image    string
-	Document string
-	Name     string
-	HostedBy string
-	Phone    string
-	Date     time.Time
-	City     string
-	Location string
-	Detail   string
-	Price    int
-	Status   string
-	UserID   int
-	User     data.User
+	Image     string
+	Document  string
+	Name      string
+	HostedBy  string
+	Phone     string
+	StartDate time.Time
+	EndDate   time.Time
+	City      string
+	Location  string
+	Detail    string
+	Price     int
+	Status    string
+	UserID    int
+	User      data.User
 }
 
 type Participant struct {
@@ -39,19 +40,20 @@ type Participant struct {
 
 func (data *Event) toCore() events.Core {
 	return events.Core{
-		ID:       int(data.ID),
-		Document: data.Document,
-		Image:    data.Image,
-		Name:     data.Name,
-		HostedBy: data.HostedBy,
-		Phone:    data.Phone,
-		Date:     data.Date,
-		City:     data.City,
-		Location: data.Location,
-		Detail:   data.Detail,
-		Price:    data.Price,
-		Status:   data.Status,
-		UserID:   data.UserID,
+		ID:        int(data.ID),
+		Document:  data.Document,
+		Image:     data.Image,
+		Name:      data.Name,
+		HostedBy:  data.HostedBy,
+		Phone:     data.Phone,
+		StartDate: data.StartDate,
+		EndDate:   data.EndDate,
+		City:      data.City,
+		Location:  data.Location,
+		Detail:    data.Detail,
+		Price:     data.Price,
+		Status:    data.Status,
+		UserID:    data.UserID,
 	}
 }
 
@@ -65,18 +67,19 @@ func ToCoreList(data []Event) []events.Core {
 
 func fromCore(core events.Core) Event {
 	return Event{
-		Image:    core.Image,
-		Document: core.Document,
-		Name:     core.Name,
-		HostedBy: core.HostedBy,
-		Phone:    core.Phone,
-		Date:     core.Date,
-		City:     core.City,
-		Location: core.Location,
-		Detail:   core.Detail,
-		Price:    core.Price,
-		Status:   core.Status,
-		UserID:   core.UserID,
+		Image:     core.Image,
+		Document:  core.Document,
+		Name:      core.Name,
+		HostedBy:  core.HostedBy,
+		Phone:     core.Phone,
+		StartDate: core.StartDate,
+		EndDate:   core.EndDate,
+		City:      core.City,
+		Location:  core.Location,
+		Detail:    core.Detail,
+		Price:     core.Price,
+		Status:    core.Status,
+		UserID:    core.UserID,
 	}
 }
 
@@ -102,12 +105,13 @@ func ToParticipantCoreList(data []Participant) []events.Participant {
 
 func (data *Event) toSubmissionCore() events.Submission {
 	return events.Submission{
-		ID:       int(data.ID),
-		Name:     data.Name,
-		UserName: data.User.Name,
-		City:     data.City,
-		Date:     data.Date,
-		Status:   data.Status,
+		ID:        int(data.ID),
+		Name:      data.Name,
+		UserName:  data.User.Name,
+		City:      data.City,
+		StartDate: data.StartDate,
+		EndDate:   data.EndDate,
+		Status:    data.Status,
 	}
 }
 
@@ -115,6 +119,23 @@ func ToCoreSubmissionList(data []Event) []events.Submission {
 	result := []events.Submission{}
 	for key := range data {
 		result = append(result, data[key].toSubmissionCore())
+	}
+	return result
+}
+
+func (data *Participant) toAttendeeCore() events.AttendeesData {
+	return events.AttendeesData{
+		Name:    data.User.Name,
+		Email:   data.User.Email,
+		City:    data.User.City,
+		Present: "",
+	}
+}
+
+func ToAttendeeCoreList(data []Participant) []events.AttendeesData {
+	result := []events.AttendeesData{}
+	for key := range data {
+		result = append(result, data[key].toAttendeeCore())
 	}
 	return result
 }

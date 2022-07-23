@@ -51,9 +51,15 @@ func (h *CommentHandler) Add(c echo.Context) error {
 }
 
 func (h *CommentHandler) Get(c echo.Context) error {
-	eventId, _ := strconv.Atoi(c.Param("id"))
+	eventId, errID := strconv.Atoi(c.Param("id"))
+	if errID != nil {
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
+	}
 	limit := 5
-	offset, _ := strconv.Atoi(c.QueryParam("page"))
+	offset, errOffset := strconv.Atoi(c.QueryParam("page"))
+	if errOffset != nil {
+		return c.JSON(helper.ResponseBadRequest("failed parameter"))
+	}
 
 	result, total, err := h.commentBusiness.GetCommentByIdEvent(limit, offset, eventId)
 	if err != nil {

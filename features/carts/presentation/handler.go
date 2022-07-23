@@ -7,7 +7,6 @@ import (
 
 	"lami/app/helper"
 	"lami/app/middlewares"
-	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -27,13 +26,13 @@ func (h *CartHandler) PostCart(c echo.Context) error {
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to extract token"))
+		return c.JSON(helper.ResponseForbidden("user not found"))
 	}
 
 	cart := request.Cart{}
 	err_bind := c.Bind(&cart)
 	if err_bind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to bind data cart"))
+		return c.JSON(helper.ResponseBadRequest("failed to bind data cart"))
 	}
 
 	cartCore := request.ToCore(cart)
@@ -41,27 +40,27 @@ func (h *CartHandler) PostCart(c echo.Context) error {
 	cartCore.Qty = 1
 
 	row, err := h.cartBusiness.AddCart(cartCore)
-	if err != nil || row != 1 {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed to insert cart"))
+	if err != nil || row != 0 {
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to insert cart"))
+	return c.JSON(helper.ResponseCreateSuccess("Success to insert cart"))
 
 }
 
 func (h *CartHandler) GetCart(c echo.Context) error {
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed extract data token"))
+		return c.JSON(helper.ResponseForbidden("user not found"))
 	}
 
 	res, err := h.cartBusiness.SelectCart(userID_token)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed get all your carts"))
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 
 	resp := response.FromCoreList(res)
-	return c.JSON(http.StatusOK, helper.ResponseSuccessWithData("Success get all your carts", resp))
+	return c.JSON(helper.ResponseStatusOkWithData("Success get all your carts", resp))
 }
 
 func (h *CartHandler) PutCart(c echo.Context) error {
@@ -70,35 +69,35 @@ func (h *CartHandler) PutCart(c echo.Context) error {
 	cart := request.Cart{}
 	err_bind := c.Bind(&cart)
 	if err_bind != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to bind data update cart"))
+		return c.JSON(helper.ResponseBadRequest("failed to bind data update cart"))
 	}
 
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get id user"))
+		return c.JSON(helper.ResponseForbidden("user not found"))
 	}
 
 	cartCore := request.ToCoreUpdate(cart)
 	err := h.cartBusiness.UpdateCart(cartCore, idCart)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed to update data cart"))
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to update data cart"))
+	return c.JSON(helper.ResponseStatusOkNoData("Success to update data cart"))
 }
 
 func (h *CartHandler) DeletedCart(c echo.Context) error {
 	idCart, _ := strconv.Atoi(c.Param("cartID"))
 	userID_token, _, errToken := middlewares.ExtractToken(c)
 	if userID_token == 0 || errToken != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed to get id user"))
+		return c.JSON(helper.ResponseForbidden("user not found"))
 	}
 
 	err := h.cartBusiness.DeleteCart(idCart, userID_token)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("Failed to delete data cart"))
+		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, helper.ResponseSuccessNoData("Success to delete data cart"))
+	return c.JSON(helper.ResponseNoContent("Success to delete data cart"))
 
 }
