@@ -108,12 +108,6 @@
 
 <body style="background-color: #e9ecef;">
 
-    <!-- start preheader -->
-    <div class="preheader"
-        style="display: none; max-width: 0; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-        A preheader is the short summary text that follows the subject line when an email is viewed in the inbox.
-    </div>
-    <!-- end preheader -->
 
     <!-- start body -->
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -140,6 +134,31 @@
         <tr>
             <td align="center" bgcolor="#e9ecef">
                 <!--[if (gte mso 9)|(IE)]>
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
+        <tr>
+        <td align="center" valign="top" width="600">
+        <![endif]-->
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+                    <tr>
+
+                        <td align="left" bgcolor="#ffffff"
+                            style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
+                            <a href=https://lamiapp.netlify.app> <img
+                                src="https://lamiapp.s3.amazonaws.com/logo.png"></img>
+                            </a>
+                            <!-- style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600;font-size: 32px;
+                            ">Lami
+                            App </a> -->
+                            <h1
+                                style="margin: 0; font-size: 23px; font-weight: 700; letter-spacing: -1px; line-height: 48px; padding-top: 10px;">
+                                Thanks for Using Lami app</h1>
+                        </td>
+                    </tr>
+                </table>
+                <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+        </table>
         <![endif]-->
             </td>
         </tr>
@@ -159,42 +178,27 @@
                     <tr>
                         <td align="left" bgcolor="#ffffff"
                             style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                            <p style="margin: 0;">Tap the button below to confirm your email address. If you didn't
-                                create an account with Lami App {{ .SUBJECT }}, you can safely
-                                delete
-                                this email.</p>
+                            <p style="margin: 0; text-align: center;">Dulur Lami app, Terimakasih telah menggunakan
+                                layanan budaya dari Lami app. Berikut adalah rincian aktivitas dulur dalam layanan Lami
+                                app: </p>
+                        </td>
+                    </tr> <!-- end copy -->
+                    <tr align="center" bgcolor="#ffffff">
+                        <td>
+                            <p style="margin: 0; font-weight: 600;">Melakukan {{.ACT}}
+                            </p>
+                            <p style="margin: 0; font-weight: 600">{{.DETAIL}}
+                            </p>
                         </td>
                     </tr>
-                    <!-- end copy -->
-
-                    <!-- start button -->
-                    <tr>
-                        <td align="left" bgcolor="#ffffff">
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td align="center" bgcolor="#ffffff" style="padding: 12px;">
-                                        <table border="0" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td align="center" bgcolor="#1a82e2" style="border-radius: 6px;">
-                                                    <a href="{{.URL}}" target="_blank"
-                                                        style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">Confirm</a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <!-- end button -->
-
                     <!-- start copy -->
                     <tr>
-                        <td align="left" bgcolor="#ffffff"
+                        <td align="center" bgcolor="#ffffff"
                             style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                            <p style="margin: 0;">If that doesn't work, copy and paste the following link in your
-                                browser:</p>
-                            <p style="margin: 0;"><a href="{{.URL}}" target="_blank">{{.URL}}</a></p>
+                            <p style="margin: 0;">Yuk kenali budayamu di Lami app dan peroleh keuntungan di Lami app.
+                            </p>
+                            <p style="margin: 0;font-style: italic;">"Zaman boleh maju tapi budaya jangan ditinggalkan"
+                            </p>
                         </td>
                     </tr>
                     <!-- end copy -->
@@ -203,7 +207,7 @@
                     <tr>
                         <td align="left" bgcolor="#ffffff"
                             style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-bottom: 3px solid #d4dadf">
-                            <p style="margin: 0;">Cheers,<br> Lami App</p>
+                            <p style="margin: 0;">Cheers,<br> Lami app</p>
                         </td>
                     </tr>
                     <!-- end copy -->

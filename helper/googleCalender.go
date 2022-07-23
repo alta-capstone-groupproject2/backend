@@ -24,13 +24,10 @@ func InsertEvent(eventCore events.Core, email string) (eventId string, err error
 			TimeZone: "Asia/Jakarta",
 		},
 		Attendees: []*calendar.EventAttendee{
-			{
-				Email: email,
-			},
+			{Email: email},
 		},
 	}
 	calendarID := "primary"
-
 	event, err = srv.Events.Insert(calendarID, event).SendNotifications(true).Do()
 	if err != nil {
 		return "", err
@@ -65,22 +62,4 @@ func UpdateEvent(srv *calendar.Service, eventID string) {
 	}
 	fmt.Printf("Event updated: %s %s\n", event.HtmlLink, event.Id)
 
-}
-
-func eventList(srv *calendar.Service) {
-	calendarID := "primary"
-	events, err := srv.Events.List(calendarID).OrderBy("startTime").Do()
-	fmt.Println(err)
-	if len(events.Items) == 0 {
-		fmt.Println("No upcoming events found.")
-	} else {
-		for _, item := range events.Items {
-			date := item.Start.DateTime
-			eventID := item.Id
-			if date == "" {
-				date = item.Start.Date
-			}
-			fmt.Printf("%s %v (%v)\n", eventID, item.Summary, date)
-		}
-	}
 }
