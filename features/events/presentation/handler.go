@@ -30,12 +30,15 @@ func NewEventHandler(business events.Business) *EventHandler {
 func (h *EventHandler) GetAll(c echo.Context) error {
 	name := c.QueryParam("name")
 	city := c.QueryParam("city")
-	page, _ := strconv.Atoi(c.QueryParam("page"))
-	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	page, errPage := strconv.Atoi(c.QueryParam("page"))
+	limit, errLimit := strconv.Atoi(c.QueryParam("limit"))
+	if errLimit != nil || limit == 0 || errPage != nil || page == 0 {
+		return c.JSON(helper.ResponseBadRequest("invalid query"))
+	}
 
 	result, total, err := h.eventBusiness.GetAllEvent(limit, page, name, city)
 	if err != nil {
-		return c.JSON(helper.ResponseInternalServerError("failed get all data"))
+		return c.JSON(helper.ResponseBadRequest("failed get all data"))
 	}
 	respons := _response_event.FromCoreList(result)
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success get all events", total, respons))
@@ -254,4 +257,21 @@ func (h *EventHandler) GetSubmissionByID(c echo.Context) error {
 		return c.JSON(helper.ResponseStatusOkWithData("success to get apply event", data))
 	}
 	return c.JSON(helper.ResponseBadRequest("only is admin"))
+}
+
+func (h *EventHandler) GetEventAttendeesData(c echo.Context) error {
+	userID, _, errToken := middlewares.ExtractToken(c)
+	if errToken != nil {
+		return c.JSON(helper.ResponseInternalServerError("invalid token"))
+	}
+	id, errID := strconv.Atoi(c.Param("id"))
+	if errID != nil {
+		return c.JSON(helper.ResponseBadRequest("parameter invalid"))
+	}
+	result, err := h.eventBusiness.GetEventAttendee(id, userID)
+	if err != nil {
+		return c.JSON(helper.ResponseInternalServerError("failed get pdf"))
+	}
+
+	return c.JSON(helper.ResponseStatusOkWithData("success get event", result))
 }

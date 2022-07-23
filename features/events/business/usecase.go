@@ -3,6 +3,7 @@ package business
 import (
 	"errors"
 	"lami/app/features/events"
+	"lami/app/helper"
 )
 
 type eventUseCase struct {
@@ -79,4 +80,25 @@ func (uc *eventUseCase) GetEventSubmissionByID(id int) (data events.Core, err er
 		return events.Core{}, err
 	}
 	return result, err
+}
+
+func (uc *eventUseCase) GetEventAttendee(id int, userID int) (urlPDF string, err error) {
+	response, err := uc.eventData.SelectDataByID(id)
+	if err != nil {
+		return "", err
+	}
+	checkUserID, errCheck := uc.eventData.CheckUserID(id)
+	if errCheck != nil {
+		return "", err
+	}
+	if checkUserID != userID {
+		return "", errors.New("not found")
+	}
+	responseAttendee, errAttendee := uc.eventData.SelectAttendeeData(response.ID)
+	if errAttendee != nil {
+		return "", errAttendee
+	}
+	response.AttendeesData = responseAttendee
+	urlPDF = helper.ExportPDF(response)
+	return urlPDF, err
 }

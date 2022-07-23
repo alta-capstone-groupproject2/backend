@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"io"
 	_config "lami/app/config"
 	"log"
 	"mime/multipart"
@@ -69,4 +70,27 @@ func CheckFileSize(size int64, contentType string) error {
 		}
 	}
 	return nil
+}
+
+func UploadPDFToS3(directory string, fileName string, contentType string, data io.Reader) (string, error) {
+
+	// The session the S3 Uploader will use
+	sess := _config.GetSession()
+
+	// Create an uploader with the session and default options
+	uploader := s3manager.NewUploader(sess)
+
+	// Upload the file to S3.
+	result, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket:      aws.String(os.Getenv("AWS_BUCKET")),
+		Key:         aws.String("/" + directory + "/" + fileName),
+		Body:        data,
+		ContentType: aws.String(contentType),
+	})
+
+	if err != nil {
+		log.Print(err.Error())
+		return "", fmt.Errorf("failed to upload file")
+	}
+	return result.Location, nil
 }

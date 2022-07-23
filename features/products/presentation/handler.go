@@ -134,7 +134,6 @@ func (h *ProductHandler) PutProduct(c echo.Context) error {
 		if errUploadImg != nil {
 			return c.JSON(helper.ResponseBadRequest("failed to upload file"))
 		}
-
 		productCore.URL = url
 	}
 

@@ -63,6 +63,7 @@ func (data *Product) toCorebyProductID() product.Core {
 		Price:     data.Price,
 		City:      data.User.City,
 		Detail:    data.Detail,
+		Stock:     data.Stock,
 	}
 }
 
@@ -78,6 +79,7 @@ func (data *Product) toCoreProductList() product.Core {
 		URL:   data.URL,
 		Price: data.Price,
 		City:  data.User.City,
+		Stock: data.Stock,
 	}
 }
 

@@ -11,6 +11,7 @@ type Product struct {
 	StoreName  string  `json:"storeName"`
 	Price      uint    `json:"price"`
 	City       string  `json:"city"`
+	Stock      int     `json:"stock"`
 	MeanRating float64 `json:"meanRating"`
 	Detail     string  `json:"details"`
 }
@@ -21,6 +22,7 @@ type MyProduct struct {
 	Name  string `json:"productName"`
 	Price uint   `json:"price"`
 	City  string `json:"city"`
+	Stock int    `json:"stock"`
 }
 
 type ProductRating struct {
@@ -67,6 +69,7 @@ func FromCorebyIDProduct(core product.Core) Product {
 		StoreName:  core.StoreName,
 		Price:      core.Price,
 		City:       core.City,
+		Stock:      int(core.Stock),
 		MeanRating: core.MeanRating,
 		Detail:     core.Detail,
 	}
@@ -99,6 +102,7 @@ func FromCoreMyProduct(core product.Core) MyProduct {
 		Name:  core.Name,
 		Price: core.Price,
 		City:  core.City,
+		Stock: int(core.Stock),
 	}
 }
 
