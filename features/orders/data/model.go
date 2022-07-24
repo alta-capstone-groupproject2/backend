@@ -22,6 +22,8 @@ type OrderDetail struct {
 	gorm.Model
 	OrderID   int          `json:"order_id" form:"order_id"`
 	ProductID int          `json:"product_id" form:"product_id"`
+	Name      string       `json:"name" form:"name"`
+	URL       string       `json:"url" form:"url"`
 	Qty       uint         `json:"qty" form:"qty"`
 	Product   data.Product `json:"product" form:"product"`
 }
@@ -47,15 +49,15 @@ func fromCoreDetail(core orders.CoreDetail) OrderDetail {
 
 func (data *Order) toCore() orders.Core {
 	return orders.Core{
-		Receiver:    data.Receiver,
-		Address:     data.Address,
-		TotalPrice:  data.TotalPrice,
-		Status:      data.Status,
-		OrderDetail: ToCoreDetail(data.OrderDetail),
+		Receiver:   data.Receiver,
+		TotalPrice: data.TotalPrice,
+		Address:    data.Address,
+		Status:     data.Status,
+		Product:    ToCoreDetailList(data.OrderDetail),
 	}
 }
 
-func ToCore(data []Order) []orders.Core {
+func ToCoreList(data []Order) []orders.Core {
 	res := []orders.Core{}
 	for v := range data {
 		res = append(res, data[v].toCore())
@@ -74,7 +76,7 @@ func (data *OrderDetail) toCoreDetail() orders.CoreDetail {
 	}
 }
 
-func ToCoreDetail(data []OrderDetail) []orders.CoreDetail {
+func ToCoreDetailList(data []OrderDetail) []orders.CoreDetail {
 	res := []orders.CoreDetail{}
 	for v := range data {
 		res = append(res, data[v].toCoreDetail())

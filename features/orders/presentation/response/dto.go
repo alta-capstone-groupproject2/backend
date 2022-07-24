@@ -7,18 +7,18 @@ import (
 )
 
 type Order struct {
-	Receiver   string    `json:"receiver" form:"receiver"`
-	Address    string    `json:"address" form:"address"`
-	TotalPrice uint      `json:"totalprice" form:"totalprice"`
-	Status     string    `json:"status" form:"status"`
-	Product    []Product `json:"product" form:"product"`
+	Receiver   string        `json:"receiver"`
+	Address    string        `json:"address"`
+	TotalPrice uint          `json:"totalprice"`
+	Status     string        `json:"status"`
+	Product    []OrderDetail `json:"product"`
 }
 
-type Product struct {
-	ID   int    `json:"id" form:"id"`
-	Name string `json:"name" form:"name"`
-	Url  string `json:"url" form:"url"`
-	Qty  uint   `json:"qty" form:"qty"`
+type OrderDetail struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Url  string `json:"url"`
+	Qty  uint   `json:"qty"`
 }
 
 func FromCore(core orders.Core) Order {
@@ -27,7 +27,7 @@ func FromCore(core orders.Core) Order {
 		Address:    core.Address,
 		TotalPrice: core.TotalPrice,
 		Status:     core.Status,
-		Product:    FromCoreDetailList(core.OrderDetail),
+		Product:    FromCoreDetailList(core.Product),
 	}
 }
 
@@ -39,8 +39,8 @@ func FromCoreList(core []orders.Core) []Order {
 	return res
 }
 
-func FromCoreDetail(core orders.CoreDetail) Product {
-	return Product{
+func FromCoreDetail(core orders.CoreDetail) OrderDetail {
+	return OrderDetail{
 		ID:   core.Product.ID,
 		Name: core.Product.Name,
 		Url:  core.Product.Url,
@@ -48,8 +48,8 @@ func FromCoreDetail(core orders.CoreDetail) Product {
 	}
 }
 
-func FromCoreDetailList(core []orders.CoreDetail) []Product {
-	res := []Product{}
+func FromCoreDetailList(core []orders.CoreDetail) []OrderDetail {
+	res := []OrderDetail{}
 	for v := range core {
 		res = append(res, FromCoreDetail(core[v]))
 	}

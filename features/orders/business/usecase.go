@@ -16,7 +16,7 @@ func (uc *orderUseCase) SelectHistoryOrder(idUser int) ([]orders.Core, error) {
 }
 
 // AddOrder implements orders.Business
-func (uc *orderUseCase) Order(dataReq orders.Core, idUser int) (int64, error) {
+func (uc *orderUseCase) Order(dataReq orders.Core, idUser int) (int, error) {
 
 	//	Check length []cartID
 	if len(dataReq.CartID) == 0 {
@@ -24,20 +24,20 @@ func (uc *orderUseCase) Order(dataReq orders.Core, idUser int) (int64, error) {
 	}
 
 	//	Update stock on product plus count total price
-	total, err2 := uc.orderData.UpdateStockOnProductPlusCountTotalPrice(dataReq, idUser)
-	if err2 != nil {
+	total, err := uc.orderData.UpdateStockOnProductPlusCountTotalPrice(dataReq, idUser)
+	if err != nil {
 		return -1, errors.New("failed")
 	}
 
 	//	Add data order plus count rows
-	rows, err5 := uc.orderData.AddDataOrder(dataReq, idUser, total)
-	if err5 != nil {
+	rows, err2 := uc.orderData.AddDataOrder(dataReq, idUser, total)
+	if err2 != nil {
 		return -1, errors.New("failed")
 	}
 
 	//	Add data order detail
-	err6 := uc.orderData.AddDataOrderDetail(dataReq, rows, idUser)
-	if err6 != nil {
+	err3 := uc.orderData.AddDataOrderDetail(dataReq, rows, idUser)
+	if err3 != nil {
 		return -1, errors.New("failed")
 	}
 
