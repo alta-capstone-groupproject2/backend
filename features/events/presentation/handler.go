@@ -96,7 +96,7 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 	}
 	event.StartDateTime = StartDateTime
 
-	EndDateTime, errEndDate := time.Parse(layout_time, event.StartDate)
+	EndDateTime, errEndDate := time.Parse(layout_time, event.EndDate)
 	if errEndDate != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed format date"))
 	}
