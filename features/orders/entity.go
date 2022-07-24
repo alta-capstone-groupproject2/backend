@@ -1,7 +1,5 @@
 package orders
 
-// import "lami/app/features/products/data"
-
 type Core struct {
 	ID          int
 	CartID      []int
@@ -20,14 +18,6 @@ type CoreDetail struct {
 	ProductID int
 	Qty       uint
 	Product   Product
-}
-
-type CoreResponse struct {
-	Receiver   string
-	Address    string
-	TotalPrice uint
-	Status     string
-	Product    []Product
 }
 
 type Product struct {

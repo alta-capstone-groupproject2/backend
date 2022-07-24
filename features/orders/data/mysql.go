@@ -2,7 +2,6 @@ package data
 
 import (
 	"errors"
-	"fmt"
 	_datacart "lami/app/features/carts/data"
 	"lami/app/features/orders"
 	"lami/app/features/products/data"
@@ -24,36 +23,45 @@ func (repo *mysqlOrderRepository) SelectDataHistoryOrder(idUser int) ([]orders.C
 	if res.Error != nil {
 		return []orders.Core{}, res.Error
 	}
-	result := ToCoreList(dataOrder)
+	length := ToCoreList(dataOrder)
 
-	for i := 0; i < len(result); i++ {
+	for i := 0; i < len(length); i++ {
 
-		dataOrderDetail := []OrderDetail{}
-
-		// idProduct := []data.Product{}
 		for j := 0; j < len(dataOrder[i].OrderDetail); j++ {
-			fmt.Println("dataOrder[i].OrderDetail[j].ProductID", dataOrder[i].OrderDetail[j].ProductID)
-			res3 := repo.db.Find(&dataProduct).Where("id = ?", dataOrder[i].OrderDetail[j].ProductID)
-			if res3.Error != nil {
-				return []orders.Core{}, res3.Error
-			}
-			dataOrderDetail2 := OrderDetail{
-				ProductID: int(dataProduct.ID),
-				Name:      dataProduct.Name,
-				URL:       dataProduct.URL,
-			}
-			// idProduct = append(idProduct, dataProduct)
-			dataOrderDetail = append(dataOrderDetail, dataOrderDetail2)
 
-			fmt.Println("dataOrderDetail ", i, " : ", dataOrderDetail)
+			rowsproduct, errproduct := repo.db.Model(&dataProduct).Where("id = ?", dataOrder[i].OrderDetail[j].ProductID).Select("id, name, url").Rows()
+			if errproduct != nil {
+				return []orders.Core{}, errors.New(errproduct.Error())
+			}
 
-			result[i].Product = ToCoreDetailList(dataOrderDetail)
+			for rowsproduct.Next() {
+				var dataID int
+				var dataName, dataURL string
+				if errrowsproduct := rowsproduct.Scan(&dataID, &dataName, &dataURL); errrowsproduct != nil {
+					panic(errrowsproduct)
+				}
+				dataOrder[i].OrderDetail[j].Product.ID = uint(dataID)
+				dataOrder[i].OrderDetail[j].Product.Name = dataName
+				dataOrder[i].OrderDetail[j].Product.URL = dataURL
+			}
+
+			rowsqty, errrowsqty := repo.db.Model(&OrderDetail{}).Where("product_id = ?", dataOrder[i].OrderDetail[j].ProductID).Select("qty").Rows()
+			if errrowsqty != nil {
+				return []orders.Core{}, errors.New(errrowsqty.Error())
+			}
+
+			for rowsqty.Next() {
+				var dataQty int
+				if errqty := rowsqty.Scan(&dataQty); errqty != nil {
+					panic(errqty)
+				}
+				dataOrder[i].OrderDetail[j].Qty = uint(dataQty)
+			}
+
 		}
 
-		fmt.Println("result[", i, "]", " : ", result[i].Product)
 	}
-
-	return result, nil
+	return ToCoreList(dataOrder), nil
 }
 
 // UpdateStockOnProductPlusCountTotalPrice implements orders.Data

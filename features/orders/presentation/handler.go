@@ -1,12 +1,12 @@
 package presentation
 
 import (
-	"fmt"
 	"lami/app/features/orders"
 	"lami/app/features/orders/presentation/request"
 	"lami/app/features/orders/presentation/response"
 	"lami/app/helper"
 	"lami/app/middlewares"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -74,7 +74,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	case typeName == "bca":
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + "bcatemp8",
+				OrderID:  strconv.Itoa(idOrder) + "bcatemp9",
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{

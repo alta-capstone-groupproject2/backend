@@ -44,7 +44,7 @@ func FromCoreDetail(core orders.CoreDetail) OrderDetail {
 		ID:   core.Product.ID,
 		Name: core.Product.Name,
 		Url:  core.Product.Url,
-		Qty:  core.Qty,
+		Qty:  core.Product.Qty,
 	}
 }
 
