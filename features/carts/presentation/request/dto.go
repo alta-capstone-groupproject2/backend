@@ -1,14 +1,14 @@
 package request
 
 import (
-	"lami/app/features/carts"
+	cart "lami/app/features/carts"
 	_dataProduct "lami/app/features/products/data"
 	_dataUser "lami/app/features/users/data"
 )
 
 type Cart struct {
-	UserID    int `json:"user_id" form:"user_id"`
-	ProductID int `json:"product_id" form:"product_id"`
+	UserID    int
+	ProductID int `json:"productID" form:"productID"`
 	Qty       int `json:"qty" form:"qty"`
 	Product   _dataProduct.Product
 	User      _dataUser.User
@@ -29,4 +29,3 @@ func ToCoreUpdate(cartReq Cart) cart.Core {
 		Qty: cartReq.Qty,
 	}
 }
-

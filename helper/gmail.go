@@ -20,14 +20,11 @@ type BodylinkEmail struct {
 	URL     string
 }
 
-func SendGmailNotify(email, subject string) {
-	template, errPath := filepath.Abs("./helper/templates/emailNotif.html")
-	fmt.Print(errPath)
-	//template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailNotif.html"
-	var detail string
-
+func SendGmailNotify(email, act, detail string) {
+	template, _ := filepath.Abs("./helper/templates/emailNotif.html")
+	subject := "Activity Information"
 	templateData := BodylinkEmail{
-		ACT:    subject,
+		ACT:    act,
 		DETAIL: detail,
 	}
 	result, errParse := ParseTemplate(template, templateData)
@@ -64,10 +61,8 @@ func SendEmail(to string, subject string, result string) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", CONFIG_SENDER_NAME)
 	m.SetHeader("To", to)
-	// m.SetAddressHeader("Cc", "<RECIPIENT CC>", "<RECIPIENT CC NAME>")
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", result)
-	// m.Attach(templateFile) // attach whatever you want
 
 	d := gomail.NewDialer(
 		CONFIG_SMTP_HOST, CONFIG_SMTP_PORT, CONFIG_AUTH_EMAIL, CONFIG_AUTH_PASSWORD)
