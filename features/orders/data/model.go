@@ -22,8 +22,6 @@ type OrderDetail struct {
 	gorm.Model
 	OrderID   int          `json:"order_id" form:"order_id"`
 	ProductID int          `json:"product_id" form:"product_id"`
-	Name      string       `json:"name" form:"name"`
-	URL       string       `json:"url" form:"url"`
 	Qty       uint         `json:"qty" form:"qty"`
 	Product   data.Product `json:"product" form:"product"`
 }
