@@ -74,7 +74,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	case typeName == "bca":
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder),
+				OrderID:  strconv.Itoa(idOrder) + "bcatemp8",
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{

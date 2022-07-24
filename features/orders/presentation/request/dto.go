@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	_dataorder "lami/app/features/orders/data"
+	"lami/app/features/orders/data"
 
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
@@ -44,7 +44,7 @@ type ChargeRequest struct {
 	TransactionDetails midtrans.TransactionDetails
 	BankTransfer       *coreapi.BankTransferDetails
 	EChannelDetails    coreapi.EChannelDetail
-	Order              _dataorder.Order
+	Order              data.Order
 }
 
 func ToCoreMidtransBank(dataReq ChargeRequest) coreapi.ChargeReq {

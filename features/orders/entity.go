@@ -1,15 +1,17 @@
 package orders
 
+// import "lami/app/features/products/data"
+
 type Core struct {
 	ID          int
 	CartID      []int
 	UserID      int
 	Receiver    string
 	PhoneNumber string
-	Address     string
 	TotalPrice  uint
+	Address     string
 	Status      string
-	OrderDetail []CoreDetail
+	Product     []CoreDetail
 }
 
 type CoreDetail struct {
@@ -25,7 +27,7 @@ type CoreResponse struct {
 	Address    string
 	TotalPrice uint
 	Status     string
-	Product    []CoreDetail
+	Product    []Product
 }
 
 type Product struct {
@@ -36,7 +38,7 @@ type Product struct {
 }
 
 type Business interface {
-	Order(dataReq Core, idUser int) (int64, error)
+	Order(dataReq Core, idUser int) (int, error)
 	SelectHistoryOrder(idUser int) ([]Core, error)
 
 	PaymentsOrderID(idUser int) (int, error)
@@ -48,7 +50,7 @@ type Data interface {
 
 	UpdateStockOnProductPlusCountTotalPrice(dataReq Core, idUser int) (int, error)
 	DeleteDataCart(dataReq Core, idUser int) error
-	AddDataOrder(dataReq Core, idUser, totalprice int) (int64, error)
+	AddDataOrder(dataReq Core, idUser int, total int) (int64, error)
 	AddDataOrderDetail(dataReq Core, row int64, idUser int) error
 
 	DataPaymentsOrderID(idUser int) (int, error)
