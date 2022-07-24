@@ -69,7 +69,7 @@ func Decrypt(encryptedString string, keyString string) (decryptedString string) 
 		panic(err.Error())
 	}
 
-	return fmt.Sprintf("%s", plaintext)
+	return string(plaintext)
 }
 
 func RandomString(length int) string {
