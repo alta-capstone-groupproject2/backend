@@ -4,7 +4,7 @@ import (
 	"errors"
 	_datacart "lami/app/features/carts/data"
 	"lami/app/features/orders"
-	_dataproduct "lami/app/features/products/data"
+	"lami/app/features/products/data"
 
 	"gorm.io/gorm"
 )
@@ -17,25 +17,64 @@ type mysqlOrderRepository struct {
 func (repo *mysqlOrderRepository) SelectDataHistoryOrder(idUser int) ([]orders.Core, error) {
 
 	dataOrder := []Order{}
-	res1 := repo.db.Preload("OrderDetail").Where("user_id = ?", idUser).Find(&dataOrder)
-	if res1.Error != nil {
-		return []orders.Core{}, res1.Error
-	}
+	dataProduct := data.Product{}
 
-	return ToCore(dataOrder), nil
+	res := repo.db.Preload("OrderDetail").Where("user_id = ?", idUser).Find(&dataOrder)
+	if res.Error != nil {
+		return []orders.Core{}, res.Error
+	}
+	length := ToCoreList(dataOrder)
+
+	for i := 0; i < len(length); i++ {
+
+		for j := 0; j < len(dataOrder[i].OrderDetail); j++ {
+
+			rowsproduct, errproduct := repo.db.Model(&dataProduct).Where("id = ?", dataOrder[i].OrderDetail[j].ProductID).Select("id, name, url").Rows()
+			if errproduct != nil {
+				return []orders.Core{}, errors.New(errproduct.Error())
+			}
+
+			for rowsproduct.Next() {
+				var dataID int
+				var dataName, dataURL string
+				if errrowsproduct := rowsproduct.Scan(&dataID, &dataName, &dataURL); errrowsproduct != nil {
+					panic(errrowsproduct)
+				}
+				dataOrder[i].OrderDetail[j].Product.ID = uint(dataID)
+				dataOrder[i].OrderDetail[j].Product.Name = dataName
+				dataOrder[i].OrderDetail[j].Product.URL = dataURL
+			}
+
+			rowsqty, errrowsqty := repo.db.Model(&OrderDetail{}).Where("product_id = ?", dataOrder[i].OrderDetail[j].ProductID).Select("qty").Rows()
+			if errrowsqty != nil {
+				return []orders.Core{}, errors.New(errrowsqty.Error())
+			}
+
+			for rowsqty.Next() {
+				var dataQty int
+				if errqty := rowsqty.Scan(&dataQty); errqty != nil {
+					panic(errqty)
+				}
+				dataOrder[i].OrderDetail[j].Qty = uint(dataQty)
+			}
+
+		}
+
+	}
+	return ToCoreList(dataOrder), nil
 }
 
 // UpdateStockOnProductPlusCountTotalPrice implements orders.Data
 func (repo *mysqlOrderRepository) UpdateStockOnProductPlusCountTotalPrice(dataReq orders.Core, idUser int) (int, error) {
 	var totalprice int
 	dataCart := []_datacart.Cart{}
-	dataProduct := _dataproduct.Product{}
+	dataProduct := data.Product{}
 
-	chechQty := repo.db.Preload("Product").Where("user_id = ?", idUser).Find(&dataCart)
-	if chechQty.RowsAffected >= 1 {
-		for i := 0; i < int(chechQty.RowsAffected); i++ {
+	checkQty := repo.db.Preload("Product").Where("user_id = ?", idUser).Find(&dataCart)
+	if checkQty.RowsAffected >= 1 {
+		for i := 0; i < int(checkQty.RowsAffected); i++ {
 			if dataCart[i].Product.Stock < uint(dataCart[i].Qty) {
-				return 0, errors.New("there is one product with a quantity that exceeds stock")
+				return totalprice, errors.New("there is one product with a quantity that exceeds stock")
 			}
 		}
 	}
@@ -44,10 +83,10 @@ func (repo *mysqlOrderRepository) UpdateStockOnProductPlusCountTotalPrice(dataRe
 		dataProduct.Stock = dataCart[i].Product.Stock - uint(dataCart[i].Qty)
 		errUpdateStock := repo.db.Model(dataProduct).Where("id = ?", dataCart[i].Product.ID).Updates(dataProduct)
 		if errUpdateStock.Error != nil {
-			return 0, errUpdateStock.Error
+			return totalprice, errUpdateStock.Error
 		}
 
-		totalprice = totalprice + (int(dataCart[i].Product.Price) * dataCart[i].Qty)
+		totalprice += (int(dataCart[i].Product.Price) * dataCart[i].Qty)
 
 	}
 	return totalprice, nil
@@ -57,9 +96,9 @@ func (repo *mysqlOrderRepository) UpdateStockOnProductPlusCountTotalPrice(dataRe
 func (repo *mysqlOrderRepository) DeleteDataCart(dataReq orders.Core, idUser int) error {
 	dataCart := []_datacart.Cart{}
 
-	chechQty := repo.db.Preload("Product").Where("user_id = ?", idUser).Find(&dataCart)
-	if chechQty.RowsAffected >= 1 {
-		for i := 0; i < int(chechQty.RowsAffected); i++ {
+	checkQty := repo.db.Preload("Product").Where("user_id = ?", idUser).Find(&dataCart)
+	if checkQty.RowsAffected >= 1 {
+		for i := 0; i < int(checkQty.RowsAffected); i++ {
 			if dataCart[i].Product.Stock < uint(dataCart[i].Qty) {
 				return errors.New("there is one product with a quantity that exceeds stock")
 			}
@@ -76,9 +115,20 @@ func (repo *mysqlOrderRepository) DeleteDataCart(dataReq orders.Core, idUser int
 }
 
 // AddDataOrderPlusCountRows implements orders.Data
-func (repo *mysqlOrderRepository) AddDataOrder(dataReq orders.Core, idUser, totalprice int) (int64, error) {
-	dataReq.TotalPrice = uint(totalprice)
+func (repo *mysqlOrderRepository) AddDataOrder(dataReq orders.Core, idUser int, total int) (int64, error) {
+	dataCart := []_datacart.Cart{}
+
+	checkQty := repo.db.Preload("Product").Where("user_id = ?", idUser).Find(&dataCart)
+	if checkQty.RowsAffected >= 1 {
+		for i := 0; i < int(checkQty.RowsAffected); i++ {
+			if dataCart[i].Product.Stock < uint(dataCart[i].Qty) {
+				return 0, errors.New("there is one product with a quantity that exceeds stock")
+			}
+		}
+	}
+
 	dataReq.Status = "Pending"
+	dataReq.TotalPrice = uint(total)
 
 	dataOrder := fromCore(dataReq)
 	res := repo.db.Create(&dataOrder)
@@ -100,9 +150,9 @@ func (repo *mysqlOrderRepository) AddDataOrderDetail(dataReq orders.Core, row in
 	dataCart := []_datacart.Cart{}
 	dataReqOrderDetail := orders.CoreDetail{}
 
-	chechQty := repo.db.Preload("Product").Where("user_id = ?", idUser).Find(&dataCart)
-	if chechQty.RowsAffected >= 1 {
-		for i := 0; i < int(chechQty.RowsAffected); i++ {
+	checkQty := repo.db.Preload("Product").Where("user_id = ?", idUser).Find(&dataCart)
+	if checkQty.RowsAffected >= 1 {
+		for i := 0; i < int(checkQty.RowsAffected); i++ {
 			if dataCart[i].Product.Stock < uint(dataCart[i].Qty) {
 				return errors.New("there is one product with a quantity that exceeds stock")
 			}
@@ -113,7 +163,7 @@ func (repo *mysqlOrderRepository) AddDataOrderDetail(dataReq orders.Core, row in
 
 		dataReqOrderDetail.OrderID = int(row)
 
-		dataReqOrderDetail.ProductID = int(dataCart[i].ID)
+		dataReqOrderDetail.ProductID = int(dataCart[i].Product.ID)
 		dataReqOrderDetail.Qty = uint(dataCart[i].Qty)
 
 		dataOrderDetail := fromCoreDetail(dataReqOrderDetail)

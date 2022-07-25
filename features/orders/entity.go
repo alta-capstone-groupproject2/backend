@@ -6,10 +6,10 @@ type Core struct {
 	UserID      int
 	Receiver    string
 	PhoneNumber string
-	Address     string
 	TotalPrice  uint
+	Address     string
 	Status      string
-	OrderDetail []CoreDetail
+	Product     []CoreDetail
 }
 
 type CoreDetail struct {
@@ -20,14 +20,6 @@ type CoreDetail struct {
 	Product   Product
 }
 
-type CoreResponse struct {
-	Receiver   string
-	Address    string
-	TotalPrice uint
-	Status     string
-	Product    []CoreDetail
-}
-
 type Product struct {
 	ID   int
 	Name string
@@ -36,7 +28,7 @@ type Product struct {
 }
 
 type Business interface {
-	Order(dataReq Core, idUser int) (int64, error)
+	Order(dataReq Core, idUser int) (int, error)
 	SelectHistoryOrder(idUser int) ([]Core, error)
 
 	PaymentsOrderID(idUser int) (int, error)
@@ -48,7 +40,7 @@ type Data interface {
 
 	UpdateStockOnProductPlusCountTotalPrice(dataReq Core, idUser int) (int, error)
 	DeleteDataCart(dataReq Core, idUser int) error
-	AddDataOrder(dataReq Core, idUser, totalprice int) (int64, error)
+	AddDataOrder(dataReq Core, idUser int, total int) (int64, error)
 	AddDataOrderDetail(dataReq Core, row int64, idUser int) error
 
 	DataPaymentsOrderID(idUser int) (int, error)
