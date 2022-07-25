@@ -128,6 +128,7 @@ func (repo *mysqlOrderRepository) AddDataOrder(dataReq orders.Core, idUser int, 
 		}
 	}
 
+	dataReq.Status = "pending"
 	dataReq.TotalPrice = uint(total)
 
 	dataOrder := fromCore(dataReq)
@@ -197,12 +198,34 @@ func (repo *mysqlOrderRepository) DataPaymentsOrderID(idUser int) (int, error) {
 	return idOrder, nil
 }
 
-// UpdateDataStatusPayments implements orders.Data
-func (repo *mysqlOrderRepository) UpdateDataStatus(idOrder int) error {
+// SelectDataPaymentID implements orders.Data
+func (repo *mysqlOrderRepository) SelectDataPaymentID(idOrder int, idUser int) (string, error) {
+	var orderID string
+	errpayment := repo.db.Raw("SELECT payment_id FROM payments WHERE id = ?  AND user_id = ?", idOrder, idUser).Scan(&orderID)
+	if errpayment.Error != nil {
+		return "", errpayment.Error
+	}
 
-	errorder := repo.db.Model(&Order{}).Where("id = ? AND status = Pending", idOrder).Update("status", "Settelement")
+	return orderID, nil
+}
+
+// UpdateDataStatusPayments implements orders.Data
+func (repo *mysqlOrderRepository) UpdateDataStatus(idOrder, idUser int) error {
+
+	errorder := repo.db.Model(&Order{}).Where("id = ? AND user_id = ?", idOrder, idUser).Update("status", "settlement")
 	if errorder.Error != nil {
 		return errorder.Error
+	}
+
+	return nil
+}
+
+// InsertDataPayment implements orders.Data
+func (repo *mysqlOrderRepository) InsertDataPayment(dataReq orders.CorePayment) error {
+	dataPayment := fromCorePayment(dataReq)
+	res := repo.db.Create(&dataPayment)
+	if res.Error != nil {
+		return res.Error
 	}
 
 	return nil

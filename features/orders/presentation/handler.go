@@ -9,6 +9,7 @@ import (
 	"lami/app/features/orders/presentation/response"
 	"lami/app/helper"
 	"lami/app/middlewares"
+	"sync"
 
 	"io/ioutil"
 	"os"
@@ -41,22 +42,24 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		return c.JSON(helper.ResponseForbidden("user not found"))
 	}
 
+	//	Bind data input request order
 	order := request.Order{}
 	err_bind := c.Bind(&order)
 	if err_bind != nil {
 		return c.JSON(helper.ResponseBadRequest("failed to bind data order"))
 	}
 
+	//	Create data in database orders
 	orderCore := request.ToCore(order)
 	orderCore.UserID = userID_token
-	orderCore.Status = "Pending"
+	// orderCore.PaymentID = paymentsID
 
 	res, err := h.orderBusiness.Order(orderCore, userID_token)
 	if err != nil && res == -1 {
 		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 
-	//	Payments Order
+	//	Request payments order
 	idOrder, errorderid := h.orderBusiness.PaymentsOrderID(userID_token)
 	if errorderid != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get order_id for payments"))
@@ -81,6 +84,17 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	resp, errcharge := coreapi.ChargeTransaction(&transferCore)
 	if errcharge != nil {
 		fmt.Println("Error coreapi api, with global config", errcharge.GetMessage())
+	}
+
+	//	Create data in database payment
+	paymentCore := request.ToCorePayment(request.Payment{})
+	paymentCore.OrderID = idOrder
+	paymentCore.UserID = userID_token
+	paymentCore.PaymentID = paymentsID
+
+	errpayment := h.orderBusiness.InsertPayment(paymentCore)
+	if errpayment != nil {
+		return c.JSON(helper.ResponseInternalServerError("failed get order_id for payments"))
 	}
 
 	if typeName == "permata" {
@@ -120,7 +134,27 @@ func (h *OrderHandler) PostUpdatedStatusPayments(c echo.Context) error {
 		return c.JSON(helper.ResponseForbidden("user not found"))
 	}
 
-	url := fmt.Sprintf("https://api.sandbox.midtrans.com/v2/"+"%s"+"/status", idOrderParam)
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+
+	c1 := make(chan string)
+
+	go func() {
+
+		defer wg.Done()
+		//	Get payment id from database
+		paymentID, errpayments := h.orderBusiness.SelectPaymentID(idOrder, userID_token)
+		if errpayments != nil || paymentID == "" {
+			panic(errpayments)
+		}
+		c1 <- paymentID
+	}()
+
+	paymentID := <-c1
+	fmt.Println("paymentID:", paymentID)
+
+	url := fmt.Sprintf("https://api.sandbox.midtrans.com/v2/"+"%s"+"/status", paymentID)
 
 	payload := strings.NewReader("\n\n")
 
@@ -142,11 +176,6 @@ func (h *OrderHandler) PostUpdatedStatusPayments(c echo.Context) error {
 		c.JSON(http.StatusInternalServerError, "failed get api status")
 	}
 
-	errstatus := h.orderBusiness.UpdateStatus(idOrder)
-	if errstatus != nil {
-		c.JSON(helper.ResponseBadRequest("fauled update status in database"))
-	}
-
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "failed res.Body")
@@ -154,7 +183,23 @@ func (h *OrderHandler) PostUpdatedStatusPayments(c echo.Context) error {
 	defer res.Body.Close()
 
 	resp := coreapi.TransactionStatusResponse{}
+	fmt.Println("resp.TransactionStatus", resp.TransactionStatus)
 	json.Unmarshal(body, &resp)
 
-	return c.JSON(http.StatusOK, "Success confirm")
+	wg.Add(1)
+
+	go func() error {
+
+		defer wg.Done()
+		//	Update status on database orders
+		errstatus := h.orderBusiness.UpdateStatus(idOrder, userID_token)
+		if errstatus != nil {
+			return c.JSON(helper.ResponseBadRequest("failed update status in database"))
+		}
+		return nil
+	}()
+
+	wg.Wait()
+
+	return c.JSON(helper.ResponseStatusOkNoData("Success confirm your order"))
 }
