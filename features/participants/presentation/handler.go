@@ -157,7 +157,7 @@ func (h *ParticipantHandler) CheckStatusPayment(c echo.Context) error {
 	midtrans.ServerKey = config.MidtransServerKey()
 	event.New(midtrans.ServerKey, midtrans.Sandbox)
 
-	OrderID := c.Param("orderID")
+	OrderID := c.Param("id")
 
 	response, err := h.participantBusiness.CheckStatusPayment(OrderID)
 	if err != nil {
