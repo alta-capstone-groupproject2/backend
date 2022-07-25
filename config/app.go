@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -50,4 +52,9 @@ func MidtransOrderServerKey() string {
 	}
 	MIDTRANS_ORDER_SERVER_KEY := os.Getenv("MIDTRANS_ORDER_SERVER_KEY")
 	return MIDTRANS_ORDER_SERVER_KEY
+}
+
+func Random() string {
+	time.Sleep(500 * time.Millisecond)
+	return strconv.FormatInt(time.Now().Unix(), 10)
 }
