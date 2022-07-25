@@ -15,17 +15,17 @@ import (
 
 type BodylinkEmail struct {
 	SUBJECT string
-	Name    string
+	ACT     string
+	DETAIL  string
 	URL     string
 }
 
-func SendGmailNotify(email, subject string) {
-	template, errPath := filepath.Abs("./helper/templates/emailNotif.html")
-	fmt.Print(errPath)
-	//template := "/home/alfin/ALTA/tugas/capstone/backend/helper/templates/emailNotif.html"
-
+func SendGmailNotify(email, act, detail string) {
+	template, _ := filepath.Abs("./helper/templates/emailNotif.html")
+	subject := "Activity Information"
 	templateData := BodylinkEmail{
-		SUBJECT: subject,
+		ACT:    act,
+		DETAIL: detail,
 	}
 	result, errParse := ParseTemplate(template, templateData)
 	fmt.Println(errParse)
@@ -43,9 +43,7 @@ func SendEmailVerification(userData users.Core, encrypt string) {
 	url := "https://lamiapp.site/users/confirm/" + encrypt
 
 	templateData := BodylinkEmail{
-		Name:    userData.Name,
-		SUBJECT: subject,
-		URL:     url,
+		URL: url,
 	}
 	result, errParse := ParseTemplate(template, templateData)
 	fmt.Println(errParse)
@@ -63,10 +61,8 @@ func SendEmail(to string, subject string, result string) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", CONFIG_SENDER_NAME)
 	m.SetHeader("To", to)
-	// m.SetAddressHeader("Cc", "<RECIPIENT CC>", "<RECIPIENT CC NAME>")
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", result)
-	// m.Attach(templateFile) // attach whatever you want
 
 	d := gomail.NewDialer(
 		CONFIG_SMTP_HOST, CONFIG_SMTP_PORT, CONFIG_AUTH_EMAIL, CONFIG_AUTH_PASSWORD)

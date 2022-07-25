@@ -1,7 +1,7 @@
 package data
 
 import (
-	"lami/app/features/carts"
+	cart "lami/app/features/carts"
 	_dataProduct "lami/app/features/products/data"
 	_dataUser "lami/app/features/users/data"
 
@@ -28,7 +28,8 @@ func fromCore(core cart.Core) Cart {
 // For Get Cart
 func (data *Cart) toCore() cart.Core {
 	return cart.Core{
-		ID: int(data.ID),
+		ID:        int(data.ID),
+		ProductID: data.ProductID,
 		Product: _dataProduct.Product{
 			Name:  data.Product.Name,
 			URL:   data.Product.URL,

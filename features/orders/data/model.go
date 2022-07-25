@@ -1,39 +1,29 @@
 package data
 
 import (
-	_dataCart "lami/app/features/carts/data"
 	"lami/app/features/orders"
-	_dataProduct "lami/app/features/products/data"
+	"lami/app/features/products/data"
 
 	"gorm.io/gorm"
 )
 
 type Order struct {
 	gorm.Model
-	UserID      int                  `json:"user_id" form:"user_id"`
-	Receiver    string               `json:"receiver" form:"receiver"`
-	PhoneNumber string               `json:"phone" form:"phone"`
-	Address     string               `json:"address" form:"address"`
-	TotalPrice  uint                 `json:"totalprice" form:"totalprice"`
-	Status      string               `json:"status" form:"status"`
-	Cart        _dataCart.Cart       `gorm:"foreignKey:UserID"`
-	Product     _dataProduct.Product `gorm:"foreignKey:ID"`
-	// Payment     string  `json:"payment" form:"payment"`
+	UserID      int    `json:"user_id" form:"user_id"`
+	Receiver    string `json:"receiver" form:"receiver"`
+	PhoneNumber string `json:"phone" form:"phone"`
+	Address     string `json:"address" form:"address"`
+	TotalPrice  uint   `json:"totalprice" form:"totalprice"`
+	Status      string `json:"status" form:"status"`
+	OrderDetail []OrderDetail
 }
 
 type OrderDetail struct {
 	gorm.Model
-	OrderID   int   `json:"order_id" form:"order_id"`
-	ProductID int   `json:"product_id" form:"product_id"`
-	Qty       uint  `json:"qty" form:"qty"`
-	Order     Order `gorm:"foreignKey:ID"`
-}
-
-type Product struct {
-	ID   int    `json:"id" form:"id"`
-	Name string `json:"name" form:"name"`
-	Url  string `json:"url" form:"url"`
-	Qty  uint   `json:"qty" form:"qty"`
+	OrderID   int          `json:"order_id" form:"order_id"`
+	ProductID int          `json:"product_id" form:"product_id"`
+	Qty       uint         `json:"qty" form:"qty"`
+	Product   data.Product `json:"product" form:"product"`
 }
 
 func fromCore(core orders.Core) Order {
@@ -49,37 +39,45 @@ func fromCore(core orders.Core) Order {
 
 func fromCoreDetail(core orders.CoreDetail) OrderDetail {
 	return OrderDetail{
-		OrderID:    core.OrderID,
-		ProductID:  core.ProductID,
-		Qty:        core.Qty,
+		OrderID:   core.OrderID,
+		ProductID: core.ProductID,
+		Qty:       core.Qty,
 	}
 }
 
-func (data *OrderDetail) toCore() orders.CoreDetail {
+func (data *Order) toCore() orders.Core {
+	return orders.Core{
+		Receiver:   data.Receiver,
+		TotalPrice: data.TotalPrice,
+		Address:    data.Address,
+		Status:     data.Status,
+		Product:    ToCoreDetailList(data.OrderDetail),
+	}
+}
+
+func ToCoreList(data []Order) []orders.Core {
+	res := []orders.Core{}
+	for v := range data {
+		res = append(res, data[v].toCore())
+	}
+	return res
+}
+
+func (data *OrderDetail) toCoreDetail() orders.CoreDetail {
 	return orders.CoreDetail{
-		Receiver:   data.Order.Receiver,
-		Address:    data.Order.Address,
-		Status:     data.Order.Status,
+		Product: orders.Product{
+			ID:   int(data.Product.ID),
+			Name: data.Product.Name,
+			Url:  data.Product.URL,
+			Qty:  data.Qty,
+		},
 	}
 }
 
-func toCore(data OrderDetail) orders.CoreDetail {
-	return data.toCore()
-}
-
-func (data *Product) toProductCore() orders.Product {
-	return orders.Product{
-		ID:   data.ID,
-		Name: data.Name,
-		Url:  data.Url,
-		Qty:  data.Qty,
+func ToCoreDetailList(data []OrderDetail) []orders.CoreDetail {
+	res := []orders.CoreDetail{}
+	for v := range data {
+		res = append(res, data[v].toCoreDetail())
 	}
-}
-
-func ToProductCoreList(data []Product) []orders.Product {
-	result := []orders.Product{}
-	for key := range data {
-		result = append(result, data[key].toProductCore())
-	}
-	return result
+	return res
 }

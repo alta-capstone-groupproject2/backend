@@ -21,9 +21,8 @@ func ExportPDF(data events.Core) string {
 
 	buildHeading(m, data)
 	buildFruitList(m, data.AttendeesData)
-	buf, _ := m.Output()
+	buf, err := m.Output()
 
-	err := m.OutputFileAndClose("./helper/temp.pdf")
 	if err != nil {
 		fmt.Println("⚠️  Could not get PDF:", err)
 		os.Exit(1)
@@ -58,7 +57,7 @@ func buildHeading(m pdf.Maroto, data events.Core) {
 
 	m.Row(10, func() {
 		m.Col(12, func() {
-			m.Text(fmt.Sprintf("%s", data.Name), props.Text{
+			m.Text(data.Name, props.Text{
 				Size:  20,
 				Style: consts.Bold,
 				Align: consts.Left,
