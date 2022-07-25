@@ -1,6 +1,7 @@
 package orders
 
 import "github.com/midtrans/midtrans-go/coreapi"
+import "lami/app/features/users/data"
 
 type Core struct {
 	ID          int
@@ -49,6 +50,7 @@ type Data interface {
 
 	DataPaymentsOrderID(idUser int) (int, error)
 	DataPaymentsGrossAmount(idUser int) (int, error)
+	SelectUser(id int) (response data.User, err error)
 }
 
 //	Payments

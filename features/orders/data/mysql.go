@@ -5,6 +5,7 @@ import (
 	_datacart "lami/app/features/carts/data"
 	"lami/app/features/orders"
 	"lami/app/features/products/data"
+	_mUser "lami/app/features/users/data"
 
 	"gorm.io/gorm"
 )
@@ -201,4 +202,16 @@ func NewOrderRepository(conn *gorm.DB) orders.Data {
 	return &mysqlOrderRepository{
 		db: conn,
 	}
+}
+
+func (repo *mysqlOrderRepository) SelectUser(id int) (response _mUser.User, err error) {
+	datauser := _mUser.User{}
+	result := repo.db.Preload("Role").Find(&datauser, id)
+	if result.Error != nil {
+		return _mUser.User{}, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return _mUser.User{}, errors.New("user not found")
+	}
+	return datauser, nil
 }

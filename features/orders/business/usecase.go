@@ -1,11 +1,13 @@
 package business
 
 import (
+	"fmt"
 	"errors"
+	"strconv"
+	"lami/app/helper"
 	"lami/app/config"
 	"lami/app/features/orders"
 	"lami/app/features/orders/presentation/request"
-	"strconv"
 
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
@@ -52,6 +54,12 @@ func (uc *orderUseCase) Order(dataReq orders.Core, idUser int) (int, error) {
 	if err4 != nil {
 		return -1, errors.New("failed")
 	}
+
+	userData, _ := uc.orderData.SelectUser(dataReq.UserID)
+
+	detailMal := fmt.Sprintf("Total Order : Rp. %d", total)
+
+	helper.SendGmailNotify(userData.Email, "Order Merchandise", detailMal)
 
 	return 0, nil
 
