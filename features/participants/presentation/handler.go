@@ -157,13 +157,9 @@ func (h *ParticipantHandler) CheckStatusPayment(c echo.Context) error {
 	midtrans.ServerKey = config.MidtransServerKey()
 	event.New(midtrans.ServerKey, midtrans.Sandbox)
 
-	reqPay := _request_participant.Participant{}
-	err_bind := c.Bind(&reqPay)
-	if err_bind != nil {
-		return c.JSON(helper.ResponseBadRequest("error bind data"))
-	}
+	OrderID := c.Param("orderID")
 
-	response, err := h.participantBusiness.CheckStatusPayment(reqPay.OrderID)
+	response, err := h.participantBusiness.CheckStatusPayment(OrderID)
 	if err != nil {
 		return c.JSON(helper.ResponseBadRequest("failed to get status payment"))
 	}
