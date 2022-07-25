@@ -1,5 +1,6 @@
 package orders
 
+import "github.com/midtrans/midtrans-go/coreapi"
 import "lami/app/features/users/data"
 
 type Core struct {
@@ -33,6 +34,8 @@ type Business interface {
 	Order(dataReq Core, idUser int) (int, error)
 	SelectHistoryOrder(idUser int) ([]Core, error)
 
+	TypeBank(grossamount int64, typename string, idOrder int) (coreapi.ChargeReq, error)
+	RequestChargeBank(dataCore coreapi.ChargeReq, typename string) (coreapi.ChargeReq, error)
 	PaymentsOrderID(idUser int) (int, error)
 	PaymentGrossAmount(idUser int) (int, error)
 }

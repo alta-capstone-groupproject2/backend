@@ -1,18 +1,15 @@
 package presentation
 
 import (
-	"fmt"
 	"lami/app/features/orders"
 	"lami/app/features/orders/presentation/request"
 	"lami/app/features/orders/presentation/response"
 	"lami/app/helper"
 	"lami/app/middlewares"
+	"fmt"
 	"net/http"
-	"strconv"
-	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 )
 
@@ -49,7 +46,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}
 
-	//	Payments
+	//	Payments Order
 	idOrder, errorderid := h.orderBusiness.PaymentsOrderID(userID_token)
 	if errorderid != nil {
 		return c.JSON(helper.ResponseInternalServerError("failed get order_id for payments"))
@@ -60,76 +57,17 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 		return c.JSON(helper.ResponseInternalServerError("failed get gross amount for payments"))
 	}
 
-	var Transfer request.ChargeRequest
-	switch {
-	case typeName == "bni":
-		Transfer = request.ChargeRequest{
-			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - BNI" + Random(),
-				GrossAmt: int64(grossamount),
-			},
-			BankTransfer: &coreapi.BankTransferDetails{
-				Bank: midtrans.BankBni,
-			},
-		}
-	case typeName == "bca":
-		Transfer = request.ChargeRequest{
-			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - BCA" + Random(),
-				GrossAmt: int64(grossamount),
-			},
-			BankTransfer: &coreapi.BankTransferDetails{
-				Bank: midtrans.BankBca,
-			},
-		}
-	case typeName == "bri":
-		Transfer = request.ChargeRequest{
-			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - BRI" + Random(),
-				GrossAmt: int64(grossamount),
-			},
-			BankTransfer: &coreapi.BankTransferDetails{
-				Bank: midtrans.BankBri,
-			},
-		}
-	case typeName == "permata":
-		Transfer = request.ChargeRequest{
-			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - PERMATA" + Random(),
-				GrossAmt: int64(grossamount),
-			},
-			BankTransfer: &coreapi.BankTransferDetails{
-				Bank: midtrans.BankPermata,
-				Permata: &coreapi.PermataBankTransferDetail{
-					RecipientName: "lamiapp",
-				},
-			},
-		}
-	case typeName == "mandiri":
-		Transfer = request.ChargeRequest{
-			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - MANDIRI" + Random(),
-				GrossAmt: int64(grossamount),
-			},
-			EChannelDetails: coreapi.EChannelDetail{
-				BillInfo1: "BillInfo1",
-				BillInfo2: "BillInfo2",
-			},
-		}
-	default:
-		return c.JSON(http.StatusInternalServerError, "failed param")
+	transfer, errtransfer := h.orderBusiness.TypeBank(int64(grossamount), typeName, idOrder)
+	if errtransfer != nil {
+		return c.JSON(helper.ResponseBadRequest("Failed param for type bank"))
 	}
 
-	var TransferCore coreapi.ChargeReq
-	if typeName == "permata" {
-		TransferCore = request.ToCoreMidtransPermata(Transfer)
-	} else if typeName == "mandiri" {
-		TransferCore = request.ToCoreMidtransMandiri(Transfer)
-	} else {
-		TransferCore = request.ToCoreMidtransBank(Transfer)
+	transferCore, errcore := h.orderBusiness.RequestChargeBank(transfer, typeName)
+	if errcore != nil {
+		return c.JSON(helper.ResponseInternalServerError("Failed data bank transfer"))
 	}
 
-	resp, errcharge := coreapi.ChargeTransaction(&TransferCore)
+	resp, errcharge := coreapi.ChargeTransaction(&transferCore)
 	if errcharge != nil {
 		fmt.Println("Error coreapi api, with global config", errcharge.GetMessage())
 	}
@@ -157,9 +95,4 @@ func (h *OrderHandler) GetHistoryOrder(c echo.Context) error {
 
 	response := response.FromCoreList(resp)
 	return c.JSON(helper.ResponseStatusOkWithData("success get history order", response))
-}
-
-func Random() string {
-	time.Sleep(500 * time.Millisecond)
-	return strconv.FormatInt(time.Now().Unix(), 10)
 }

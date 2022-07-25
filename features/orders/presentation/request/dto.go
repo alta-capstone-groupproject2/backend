@@ -2,10 +2,6 @@ package request
 
 import (
 	"lami/app/features/orders"
-	"strconv"
-	"time"
-
-	"lami/app/features/orders/data"
 
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
@@ -37,17 +33,7 @@ func ToCore(orderReq Order) orders.Core {
 
 }
 
-//	Payment
-
-type ChargeRequest struct {
-	PaymentType        coreapi.CoreapiPaymentType
-	TransactionDetails midtrans.TransactionDetails
-	BankTransfer       *coreapi.BankTransferDetails
-	EChannelDetails    coreapi.EChannelDetail
-	Order              data.Order
-}
-
-func ToCoreMidtransBank(dataReq ChargeRequest) coreapi.ChargeReq {
+func ToCoreMidtransBank(dataReq coreapi.ChargeReq) coreapi.ChargeReq {
 
 	return coreapi.ChargeReq{
 		PaymentType: "bank_transfer",
@@ -61,7 +47,7 @@ func ToCoreMidtransBank(dataReq ChargeRequest) coreapi.ChargeReq {
 	}
 }
 
-func ToCoreMidtransPermata(dataReq ChargeRequest) coreapi.ChargeReq {
+func ToCoreMidtransPermata(dataReq coreapi.ChargeReq) coreapi.ChargeReq {
 
 	return coreapi.ChargeReq{
 		PaymentType: "bank_transfer",
@@ -78,7 +64,7 @@ func ToCoreMidtransPermata(dataReq ChargeRequest) coreapi.ChargeReq {
 	}
 }
 
-func ToCoreMidtransMandiri(dataReq ChargeRequest) coreapi.ChargeReq {
+func ToCoreMidtransMandiri(dataReq coreapi.ChargeReq) coreapi.ChargeReq {
 	return coreapi.ChargeReq{
 		PaymentType: "echannel",
 		TransactionDetails: midtrans.TransactionDetails{
@@ -86,17 +72,9 @@ func ToCoreMidtransMandiri(dataReq ChargeRequest) coreapi.ChargeReq {
 			GrossAmt: dataReq.TransactionDetails.GrossAmt,
 		},
 		EChannel: &coreapi.EChannelDetail{
-			BillInfo1: dataReq.EChannelDetails.BillInfo1,
-			BillInfo2: dataReq.EChannelDetails.BillInfo2,
+			BillInfo1: dataReq.EChannel.BillInfo1,
+			BillInfo2: dataReq.EChannel.BillInfo2,
 		},
 	}
 }
 
-func ToCoreMidtransEMoney(dataReq ChargeRequest) coreapi.ChargeReq {
-	return coreapi.ChargeReq{}
-}
-
-func Random() string {
-	time.Sleep(1000000 * time.Microsecond)
-	return strconv.FormatInt(time.Now().Unix(), 10)
-}
