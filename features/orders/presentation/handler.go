@@ -1,14 +1,15 @@
 package presentation
 
 import (
+	"fmt"
 	"lami/app/features/orders"
 	"lami/app/features/orders/presentation/request"
 	"lami/app/features/orders/presentation/response"
 	"lami/app/helper"
 	"lami/app/middlewares"
-	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/midtrans/midtrans-go"
@@ -64,7 +65,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	case typeName == "bni":
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder),
+				OrderID:  strconv.Itoa(idOrder) + " - BNI" + Random(),
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
@@ -74,7 +75,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	case typeName == "bca":
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + "bcatemp9",
+				OrderID:  strconv.Itoa(idOrder) + " - BCA" + Random(),
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
@@ -84,7 +85,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	case typeName == "bri":
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + "bri",
+				OrderID:  strconv.Itoa(idOrder) + " - BRI" + Random(),
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
@@ -94,7 +95,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	case typeName == "permata":
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + "permata1",
+				OrderID:  strconv.Itoa(idOrder) + " - PERMATA" + Random(),
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
@@ -107,7 +108,7 @@ func (h *OrderHandler) PostOrder(c echo.Context) error {
 	case typeName == "mandiri":
 		Transfer = request.ChargeRequest{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder),
+				OrderID:  strconv.Itoa(idOrder) + " - MANDIRI" + Random(),
 				GrossAmt: int64(grossamount),
 			},
 			EChannelDetails: coreapi.EChannelDetail{
@@ -156,4 +157,9 @@ func (h *OrderHandler) GetHistoryOrder(c echo.Context) error {
 
 	response := response.FromCoreList(resp)
 	return c.JSON(helper.ResponseStatusOkWithData("success get history order", response))
+}
+
+func Random() string {
+	time.Sleep(500 * time.Millisecond)
+	return strconv.FormatInt(time.Now().Unix(), 10)
 }
