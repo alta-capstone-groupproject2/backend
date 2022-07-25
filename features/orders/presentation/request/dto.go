@@ -77,4 +77,3 @@ func ToCoreMidtransMandiri(dataReq coreapi.ChargeReq) coreapi.ChargeReq {
 		},
 	}
 }
-
