@@ -7,9 +7,10 @@ import (
 )
 
 type Core struct {
-	ID          int
-	CartID      []int
-	UserID      int
+	ID     int
+	CartID []int
+	UserID int
+	// PaymentID   string
 	Receiver    string
 	PhoneNumber string
 	TotalPrice  uint
@@ -33,6 +34,12 @@ type Product struct {
 	Qty  uint
 }
 
+type CorePayment struct {
+	OrderID   int
+	UserID    int
+	PaymentID string
+}
+
 type Business interface {
 	Order(dataReq Core, idUser int) (int, error)
 	SelectHistoryOrder(idUser int) ([]Core, error)
@@ -41,7 +48,9 @@ type Business interface {
 	RequestChargeBank(dataCore coreapi.ChargeReq, typename string) (coreapi.ChargeReq, error)
 	PaymentsOrderID(idUser int) (int, error)
 	PaymentGrossAmount(idUser int) (int, error)
-	UpdateStatus(idOrder int) error
+	InsertPayment(dataReq CorePayment) error
+	SelectPaymentID(idOrder, idUser int) (string, error)
+	UpdateStatus(idOrder, idUser int) error
 }
 
 type Data interface {
@@ -54,7 +63,9 @@ type Data interface {
 
 	DataPaymentsOrderID(idUser int) (int, error)
 	DataPaymentsGrossAmount(idUser int) (int, error)
-	UpdateDataStatus(idOrder int) error
+	InsertDataPayment(dataReq CorePayment) error
+	SelectDataPaymentID(idOrder, idUser int) (string, error)
+	UpdateDataStatus(idOrder, idUser int) error
 
 	SelectUser(id int) (response data.User, err error)
 }

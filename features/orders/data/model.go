@@ -9,7 +9,8 @@ import (
 
 type Order struct {
 	gorm.Model
-	UserID      int    `json:"user_id" form:"user_id"`
+	UserID int `json:"user_id" form:"user_id"`
+	// PaymentID   string `json:"payment_id" form:"payment_id"`
 	Receiver    string `json:"receiver" form:"receiver"`
 	PhoneNumber string `json:"phone" form:"phone"`
 	Address     string `json:"address" form:"address"`
@@ -26,9 +27,25 @@ type OrderDetail struct {
 	Product   data.Product `json:"product" form:"product"`
 }
 
+type Payment struct {
+	gorm.Model
+	OrderID   int    `json:"user_id" form:"user_id"`
+	UserID    int    `json:"order_id" form:"order_id"`
+	PaymentID string `json:"payment_id" form:"payment_id"`
+}
+
+func fromCorePayment(core orders.CorePayment) Payment {
+	return Payment{
+		OrderID:   core.OrderID,
+		UserID:    core.UserID,
+		PaymentID: core.PaymentID,
+	}
+}
+
 func fromCore(core orders.Core) Order {
 	return Order{
-		UserID:      core.UserID,
+		UserID: core.UserID,
+		// PaymentID:   core.PaymentID,
 		Receiver:    core.Receiver,
 		PhoneNumber: core.PhoneNumber,
 		Address:     core.Address,

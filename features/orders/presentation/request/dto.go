@@ -8,13 +8,20 @@ import (
 )
 
 type Order struct {
-	CartID      []int   `json:"cart_id" form:"cart_id"`
-	UserID      int     `json:"user_id" form:"user_id"`
+	CartID []int `json:"cart_id" form:"cart_id"`
+	UserID int   `json:"user_id" form:"user_id"`
+	// PaymentID   string  `json:"payment_id" form:"payment_id"`
 	Receiver    string  `json:"receiver" form:"receiver"`
 	PhoneNumber string  `json:"phone" form:"phone"`
 	Address     string  `json:"address" form:"address"`
 	TotalPrice  float32 `json:"totalprice" form:"totalprice"`
 	Status      string  `json:"status" form:"status"`
+}
+
+type Payment struct {
+	OrderID   int    `json:"user_id" form:"user_id"`
+	UserID    int    `json:"order_id" form:"order_id"`
+	PaymentID string `json:"payment_id" form:"payment_id"`
 }
 
 func ToCore(orderReq Order) orders.Core {
@@ -31,6 +38,14 @@ func ToCore(orderReq Order) orders.Core {
 		Address:     orderReq.Address,
 	}
 
+}
+
+func ToCorePayment(paymentReq Payment) orders.CorePayment {
+	return orders.CorePayment{
+		OrderID:   paymentReq.OrderID,
+		UserID:    paymentReq.UserID,
+		PaymentID: paymentReq.PaymentID,
+	}
 }
 
 func ToCoreMidtransBank(dataReq coreapi.ChargeReq) coreapi.ChargeReq {
