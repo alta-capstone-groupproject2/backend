@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"lami/app/config"
 	"lami/app/features/cultures"
+	"lami/app/helper"
 	"mime/multipart"
 )
 
@@ -106,9 +107,12 @@ func (uc *cultureUseCase) AddCultureReport(dataReq cultures.CoreReport) error {
 	if err != nil {
 		return errors.New("failed to insert data report culture")
 	}
-	// userData, _ := uc.cultureData.SelectUser(dataReq.UserID)
+	cultureData, _ := uc.cultureData.SelectDataCultureByCultureID(dataReq.CultureID)
+	userData, _ := uc.cultureData.SelectUser(dataReq.UserID)
 
-	// helper.SendGmailNotify(userData.Email, "Success Add Report")
+	detailMal := fmt.Sprintf("Culture : %s, \nReport : %s", cultureData.Name, dataReq.Message)
+
+	helper.SendGmailNotify(userData.Email, "Report Culture", detailMal)
 	return nil
 }
 

@@ -2,7 +2,9 @@ package business
 
 import (
 	"errors"
+	"fmt"
 	"lami/app/features/orders"
+	"lami/app/helper"
 )
 
 type orderUseCase struct {
@@ -46,6 +48,12 @@ func (uc *orderUseCase) Order(dataReq orders.Core, idUser int) (int, error) {
 	if err4 != nil {
 		return -1, errors.New("failed")
 	}
+
+	userData, _ := uc.orderData.SelectUser(dataReq.UserID)
+
+	detailMal := fmt.Sprintf("Total Order : Rp. %d", total)
+
+	helper.SendGmailNotify(userData.Email, "Order Merchandise", detailMal)
 
 	return 0, nil
 
