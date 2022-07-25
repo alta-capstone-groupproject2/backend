@@ -2,6 +2,7 @@ package participants
 
 import (
 	"lami/app/features/events/data"
+	_mUser "lami/app/features/users/data"
 	"time"
 
 	"github.com/midtrans/midtrans-go/coreapi"
@@ -78,4 +79,5 @@ type Data interface {
 	CreateDataPayment(coreapi.ChargeReq) (*coreapi.ChargeResponse, error)
 	CheckDataStatusPayment(orderID string) (*coreapi.TransactionStatusResponse, error)
 	PaymentDataWebHook(data Core) error
+	SelectUser(id int) (response _mUser.User, err error)
 }

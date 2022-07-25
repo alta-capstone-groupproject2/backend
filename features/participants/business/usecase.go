@@ -2,7 +2,9 @@ package business
 
 import (
 	"errors"
+	"fmt"
 	"lami/app/features/participants"
+	"lami/app/helper"
 
 	"github.com/midtrans/midtrans-go/coreapi"
 )
@@ -65,6 +67,14 @@ func (uc *participantUseCase) AddParticipant(partRequest participants.Core) (err
 		return errors.New("user have a join")
 	}
 	err = uc.participantData.AddData(partRequest)
+	if err == nil {
+		eventData, _ := uc.participantData.SelectDataByID(partRequest.EventID)
+		userData, _ := uc.participantData.SelectUser(partRequest.UserID)
+		detailMal := fmt.Sprintf("Event : %s, \nDate : %s", eventData.Name, eventData.StartDate)
+
+		helper.SendGmailNotify(userData.Email, "Join Event", detailMal)
+	}
+
 	return err
 }
 
