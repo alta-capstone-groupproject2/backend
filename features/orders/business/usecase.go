@@ -1,13 +1,13 @@
 package business
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"strconv"
-	"lami/app/helper"
-	"lami/app/config"
+
 	"lami/app/features/orders"
 	"lami/app/features/orders/presentation/request"
+	"lami/app/helper"
 
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
@@ -72,22 +72,22 @@ func (uc *orderUseCase) RequestChargeBank(transfer coreapi.ChargeReq, typename s
 	case typename == "permata":
 		transferCore = request.ToCoreMidtransPermata(transfer)
 	case typename == "mandiri":
-		transferCore = request.ToCoreMidtransPermata(transfer)
+		transferCore = request.ToCoreMidtransMandiri(transfer)
 	default:
-		transferCore = request.ToCoreMidtransPermata(transfer)
+		transferCore = request.ToCoreMidtransBank(transfer)
 	}
 
 	return transferCore, nil
 }
 
 // TypeBank implements orders.Business
-func (uc *orderUseCase) TypeBank(grossamount int64, typename string, idOrder int) (coreapi.ChargeReq, error) {
+func (uc *orderUseCase) TypeBank(grossamount int64, typename string, idOrder int) (coreapi.ChargeReq, string, error) {
 	var Transfer coreapi.ChargeReq
 	switch {
 	case typename == "bni":
 		Transfer = coreapi.ChargeReq{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - BNI" + config.Random(),
+				OrderID:  strconv.Itoa(idOrder),
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
@@ -97,7 +97,7 @@ func (uc *orderUseCase) TypeBank(grossamount int64, typename string, idOrder int
 	case typename == "bca":
 		Transfer = coreapi.ChargeReq{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - BCA" + config.Random(),
+				OrderID:  strconv.Itoa(idOrder),
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
@@ -107,7 +107,7 @@ func (uc *orderUseCase) TypeBank(grossamount int64, typename string, idOrder int
 	case typename == "bri":
 		Transfer = coreapi.ChargeReq{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - BRI" + config.Random(),
+				OrderID:  strconv.Itoa(idOrder),
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
@@ -117,7 +117,7 @@ func (uc *orderUseCase) TypeBank(grossamount int64, typename string, idOrder int
 	case typename == "permata":
 		Transfer = coreapi.ChargeReq{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - PERMATA" + config.Random(),
+				OrderID:  strconv.Itoa(idOrder),
 				GrossAmt: int64(grossamount),
 			},
 			BankTransfer: &coreapi.BankTransferDetails{
@@ -130,7 +130,7 @@ func (uc *orderUseCase) TypeBank(grossamount int64, typename string, idOrder int
 	case typename == "mandiri":
 		Transfer = coreapi.ChargeReq{
 			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  strconv.Itoa(idOrder) + " - MANDIRI" + config.Random(),
+				OrderID:  strconv.Itoa(idOrder),
 				GrossAmt: int64(grossamount),
 			},
 			EChannel: &coreapi.EChannelDetail{
@@ -139,10 +139,10 @@ func (uc *orderUseCase) TypeBank(grossamount int64, typename string, idOrder int
 			},
 		}
 	default:
-		return Transfer, errors.New("failed")
+		return Transfer, "", errors.New("failed")
 	}
 
-	return Transfer, nil
+	return Transfer, Transfer.TransactionDetails.OrderID, nil
 }
 
 // PaymentGrossAmount implements paymentsorder.Business
@@ -171,6 +171,20 @@ func (uc *orderUseCase) PaymentsOrderID(idUser int) (int, error) {
 	}
 
 	return grossamount, nil
+}
+
+// UpdateStatusPayments implements orders.Business
+func (uc *orderUseCase) UpdateStatus(idOrder, idUser int) error {
+	if idOrder == 0 || idUser == 0 {
+		return errors.New("failed")
+	}
+
+	err := uc.orderData.UpdateDataStatus(idOrder, idUser)
+	if err != nil {
+		return errors.New("failed")
+	}
+
+	return nil
 }
 
 func NewOrderBusiness(odrData orders.Data) orders.Business {

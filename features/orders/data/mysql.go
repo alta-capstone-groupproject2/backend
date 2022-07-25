@@ -128,7 +128,6 @@ func (repo *mysqlOrderRepository) AddDataOrder(dataReq orders.Core, idUser int, 
 		}
 	}
 
-	dataReq.Status = "Pending"
 	dataReq.TotalPrice = uint(total)
 
 	dataOrder := fromCore(dataReq)
@@ -196,6 +195,17 @@ func (repo *mysqlOrderRepository) DataPaymentsOrderID(idUser int) (int, error) {
 	}
 
 	return idOrder, nil
+}
+
+// UpdateDataStatusPayments implements orders.Data
+func (repo *mysqlOrderRepository) UpdateDataStatus(idOrder, idUser int) error {
+
+	errorder := repo.db.Model(&Order{}).Where("id = ? AND user_id = ?", idOrder, idUser).Update("status", "Settelement")
+	if errorder.Error != nil {
+		return errorder.Error
+	}
+
+	return nil
 }
 
 func NewOrderRepository(conn *gorm.DB) orders.Data {
