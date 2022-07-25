@@ -198,9 +198,9 @@ func (repo *mysqlOrderRepository) DataPaymentsOrderID(idUser int) (int, error) {
 }
 
 // UpdateDataStatusPayments implements orders.Data
-func (repo *mysqlOrderRepository) UpdateDataStatus(idOrder, idUser int) error {
+func (repo *mysqlOrderRepository) UpdateDataStatus(idOrder int) error {
 
-	errorder := repo.db.Model(&Order{}).Where("id = ? AND user_id = ?", idOrder, idUser).Update("status", "Settelement")
+	errorder := repo.db.Model(&Order{}).Where("id = ? AND status = Pending", idOrder).Update("status", "Settelement")
 	if errorder.Error != nil {
 		return errorder.Error
 	}

@@ -142,7 +142,7 @@ func (h *OrderHandler) PostUpdatedStatusPayments(c echo.Context) error {
 		c.JSON(http.StatusInternalServerError, "failed get api status")
 	}
 
-	errstatus := h.orderBusiness.UpdateStatus(idOrder, userID_token)
+	errstatus := h.orderBusiness.UpdateStatus(idOrder)
 	if errstatus != nil {
 		c.JSON(helper.ResponseBadRequest("fauled update status in database"))
 	}

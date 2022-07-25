@@ -174,12 +174,12 @@ func (uc *orderUseCase) PaymentsOrderID(idUser int) (int, error) {
 }
 
 // UpdateStatusPayments implements orders.Business
-func (uc *orderUseCase) UpdateStatus(idOrder, idUser int) error {
-	if idOrder == 0 || idUser == 0 {
+func (uc *orderUseCase) UpdateStatus(idOrder int) error {
+	if idOrder == 0 {
 		return errors.New("failed")
 	}
 
-	err := uc.orderData.UpdateDataStatus(idOrder, idUser)
+	err := uc.orderData.UpdateDataStatus(idOrder)
 	if err != nil {
 		return errors.New("failed")
 	}
