@@ -86,6 +86,8 @@ func New(presenter factory.Presenter) *echo.Echo {
 
 	// Order
 	e.POST("/orders/:type", presenter.OrderPresenter.PostOrder, middlewares.JWTMiddleware())
+	e.GET("/orders", presenter.OrderPresenter.PostOrder, middlewares.JWTMiddleware())
+
 
 	// PaymentOrder
 	e.POST("/payments/confirm", presenter.PaymentPresenter.PutPayment, middlewares.JWTMiddleware())
