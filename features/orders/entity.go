@@ -41,7 +41,7 @@ type Business interface {
 	RequestChargeBank(dataCore coreapi.ChargeReq, typename string) (coreapi.ChargeReq, error)
 	PaymentsOrderID(idUser int) (int, error)
 	PaymentGrossAmount(idUser int) (int, error)
-	UpdateStatus(idOrder, idUser int) error
+	UpdateStatus(idOrder int) error
 }
 
 type Data interface {
@@ -54,7 +54,7 @@ type Data interface {
 
 	DataPaymentsOrderID(idUser int) (int, error)
 	DataPaymentsGrossAmount(idUser int) (int, error)
-	UpdateDataStatus(idOrder, idUser int) error
+	UpdateDataStatus(idOrder int) error
 
 	SelectUser(id int) (response data.User, err error)
 }
