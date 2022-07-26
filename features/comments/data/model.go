@@ -23,8 +23,8 @@ func (data *Comment) toCore() comments.Core {
 		EventID: data.EventID,
 		UserID:  data.UserID,
 		User: comments.User{
-			Name:   data.User.Name,
-			Avatar: data.User.Image,
+			Name:  data.User.Name,
+			Image: data.User.Image,
 		},
 		Comment:   data.Comment,
 		CreatedAt: data.CreatedAt,
