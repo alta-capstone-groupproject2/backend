@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>business: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">lami/app/features/users/business/usecase.go (100.0%)</option>
+				
+				<option value="file1">lami/app/features/users/business/validation.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package business
+
+import (
+        "errors"
+        "lami/app/config"
+        "lami/app/features/users"
+        "lami/app/helper"
+        "mime/multipart"
+        "strings"
+
+        "golang.org/x/crypto/bcrypt"
+)
+
+type userUseCase struct {
+        userData users.Data
+}
+
+func NewUserBusiness(usrData users.Data) users.Business <span class="cov8" title="1">{
+        return &amp;userUseCase{
+                userData: usrData,
+        }
+}</span>
+
+func (uc *userUseCase) GetDataById(id int) (response users.Core, err error) <span class="cov8" title="1">{
+        resp, errData := uc.userData.SelectDataById(id)
+        return resp, errData
+}</span>
+
+func (uc *userUseCase) InsertData(userRequest users.Core) (err error) <span class="cov8" title="1">{
+
+        if userRequest.Name == "" || userRequest.Email == "" || userRequest.Password == "" || userRequest.Name == " " || userRequest.Password == " " </span><span class="cov8" title="1">{
+                return errors.New("all data must be filled")
+        }</span>
+
+        <span class="cov8" title="1">errEmailFormat := emailFormatValidation(userRequest.Email)
+        if errEmailFormat != nil </span><span class="cov8" title="1">{
+                return errors.New(errEmailFormat.Error())
+        }</span>
+
+        <span class="cov8" title="1">errNameFormat := nameFormatValidation(userRequest.Name)
+        if errNameFormat != nil </span><span class="cov8" title="1">{
+                return errors.New(errNameFormat.Error())
+        }</span>
+
+        <span class="cov8" title="1">passWillBcrypt := []byte(userRequest.Password)
+        hash, _ := bcrypt.GenerateFromPassword(passWillBcrypt, bcrypt.DefaultCost)
+        
+        userRequest.Password = string(hash)
+
+        //default role user
+        userRequest.RoleID = 2
+        userRequest.Image = "https://lamiapp.s3.amazonaws.com/userimages/default_user.png"
+        err = uc.userData.InsertData(userRequest)
+        if err != nil </span><span class="cov8" title="1">{
+                return errors.New(err.Error())
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (uc *userUseCase) DeleteData(id int) (err error) <span class="cov8" title="1">{
+        err = uc.userData.DeleteData(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (uc *userUseCase) UpdateData(userReq users.Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) (err error) <span class="cov8" title="1">{
+        updateMap := make(map[string]interface{})
+
+        if userReq.Name != "" || userReq.Name == " " </span><span class="cov8" title="1">{
+                errNameFormat := nameFormatValidation(userReq.Name)
+                if errNameFormat != nil </span><span class="cov8" title="1">{
+                        return errors.New(errNameFormat.Error())
+                }</span>
+                <span class="cov8" title="1">updateMap["name"] = &amp;userReq.Name</span>
+        }
+        <span class="cov8" title="1">if userReq.Email != "" </span><span class="cov8" title="1">{
+                errEmailFormat := emailFormatValidation(userReq.Email)
+                if errEmailFormat != nil </span><span class="cov8" title="1">{
+                        return errors.New(errEmailFormat.Error())
+                }</span>
+                <span class="cov8" title="1">updateMap["email"] = &amp;userReq.Email</span>
+        }
+        <span class="cov8" title="1">if userReq.Password != "" </span><span class="cov8" title="1">{
+                hash, _ := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
+                
+                updateMap["password"] = &amp;hash
+        }</span>
+
+        <span class="cov8" title="1">if fileInfo != nil </span><span class="cov8" title="1">{
+                urlImage, errFile := uploadFileValidation(userReq.Name, id, config.UserImages, config.ContentImage, fileInfo, fileData)
+                if errFile != nil </span><span class="cov8" title="1">{
+                        return errors.New(errFile.Error())
+                }</span>
+
+                <span class="cov8" title="1">updateMap["image"] = urlImage</span>
+        }
+
+        <span class="cov8" title="1">err = uc.userData.UpdateData(updateMap, id)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (uc *userUseCase) UpgradeAccount(dataReq users.Core, id int, fileInfo *multipart.FileHeader, fileData multipart.File) error <span class="cov8" title="1">{
+        if dataReq.StoreName == "" || dataReq.Phone == "" || dataReq.Owner == "" || dataReq.City == "" || dataReq.Address == "" || fileInfo == nil </span><span class="cov8" title="1">{
+                return errors.New("all data must be filled")
+        }</span>
+
+        <span class="cov8" title="1">errOwner := nameFormatValidation(dataReq.Owner)
+        if errOwner != nil </span><span class="cov8" title="1">{
+                return errors.New(errOwner.Error())
+        }</span>
+
+        <span class="cov8" title="1">errCity := cityFormatValidation(dataReq.City)
+        if errCity != nil </span><span class="cov8" title="1">{
+                return errors.New(errCity.Error())
+        }</span>
+
+        <span class="cov8" title="1">errPhone := phoneFormatValidation(dataReq.Phone)
+        if errPhone != nil </span><span class="cov8" title="1">{
+                return errors.New(errPhone.Error())
+        }</span>
+
+        <span class="cov8" title="1">urlDoc, errFile := uploadFileValidation(dataReq.StoreName, id, config.UserDocuments, config.ContentDocuments, fileInfo, fileData)
+        if errFile != nil </span><span class="cov8" title="1">{
+                return errors.New(errFile.Error())
+        }</span>
+        <span class="cov8" title="1">dataReq.Document = urlDoc
+        dataReq.StoreStatus = "waiting"
+
+        err := uc.userData.InsertStoreData(dataReq, id)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        //helper.SendGmailNotify(dataReq.Email, "upgrade account to umkm")
+        <span class="cov8" title="1">return nil</span>
+}
+func (uc *userUseCase) UpdateStatusUser(status string, id int) error <span class="cov8" title="1">{
+        roleId := 0
+        if status == "approve" </span><span class="cov8" title="1">{
+                roleId = 3
+        }</span> else<span class="cov8" title="1"> {
+                roleId = 2
+        }</span>
+        <span class="cov8" title="1">err := uc.userData.UpdateAccountRole(status, roleId, id)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (uc *userUseCase) GetDataSubmissionStore(limit, page int) (response []users.Core, total int64, err error) <span class="cov8" title="1">{
+        offset := limit * (page - 1)
+        resp, total, errData := uc.userData.SelectDataSubmissionStore(limit, offset)
+        total = total/int64(limit) + 1
+        return resp, total, errData
+}</span>
+
+func (uc *userUseCase) VerifyEmail(userData users.Core) error <span class="cov8" title="1">{
+        //random string for sparator
+        key := helper.RandomString(3)
+
+        //combine data and sparator
+        if userData.Name == "" || userData.Email == "" || userData.Password == "" || userData.Name == " " || userData.Password == " " </span><span class="cov8" title="1">{
+                return errors.New("all data must be filled")
+        }</span>
+
+        <span class="cov8" title="1">errEmailFormat := emailFormatValidation(userData.Email)
+        if errEmailFormat != nil </span><span class="cov8" title="1">{
+                return errors.New(errEmailFormat.Error())
+        }</span>
+
+        <span class="cov8" title="1">errNameFormat := nameFormatValidation(userData.Name)
+        if errNameFormat != nil </span><span class="cov8" title="1">{
+                return errors.New(errNameFormat.Error())
+        }</span>
+
+        <span class="cov8" title="1">plain := key + key + userData.Name + key + userData.Email + key + userData.Password
+
+        encrypted := helper.Encrypt(plain, "57a45acad2047e9731ed4bd06c4f2af2f556d60da076606dea4d55463fdff03f")
+
+        helper.SendEmailVerification(userData, encrypted)
+        return nil</span>
+}
+
+func (uc *userUseCase) ConfirmEmail(encryptData string) error <span class="cov8" title="1">{
+        var userData users.Core
+        Decrypted := helper.Decrypt(encryptData, "57a45acad2047e9731ed4bd06c4f2af2f556d60da076606dea4d55463fdff03f")
+
+        // get sparator
+        sparator := Decrypted[:6]
+        dataRaw := strings.Split(Decrypted, sparator)
+        userData.Name = dataRaw[2]
+        userData.Email = dataRaw[3]
+        userData.Password = dataRaw[4]
+
+        userData.RoleID = 2
+        userData.Image = "https://lamiapp.s3.amazonaws.com/userimages/default_user.png"
+        err := uc.userData.InsertData(userData)
+        if err != nil </span><span class="cov8" title="1">{
+                return errors.New(err.Error())
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package business
+
+import (
+        "errors"
+        "lami/app/helper"
+        "mime/multipart"
+        "regexp"
+)
+
+func emailFormatValidation(email string) error <span class="cov8" title="1">{
+        //        Check syntax email address
+        pattern := `^\w+@\w+\.\w+$`
+        matched, _ := regexp.Match(pattern, []byte(email))
+        if !matched </span><span class="cov8" title="1">{
+                return errors.New("failed syntax email address")
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func phoneFormatValidation(email string) error <span class="cov8" title="1">{
+        //        Check syntax email address
+        pattern := `^[0-9]+$`
+        matched, _ := regexp.Match(pattern, []byte(email))
+        if !matched </span><span class="cov8" title="1">{
+                return errors.New("failed syntax phone ")
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func nameFormatValidation(name string) error <span class="cov8" title="1">{
+        //        Check syntax email address
+        pattern := `^[a-zA-Z ]+$`
+        matched, _ := regexp.Match(pattern, []byte(name))
+        if !matched </span><span class="cov8" title="1">{
+                return errors.New("failed syntax name")
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func cityFormatValidation(name string) error <span class="cov8" title="1">{
+        //        Check syntax email address
+        pattern := `^[a-zA-Z ]+$`
+        matched, _ := regexp.Match(pattern, []byte(name))
+        if !matched </span><span class="cov8" title="1">{
+                return errors.New("failed syntax city")
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func uploadFileValidation(name string, id int, directory string, contentType string, fileInfo *multipart.FileHeader, fileData multipart.File) (string, error) <span class="cov8" title="1">{
+        //        Check file extension
+        _, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, contentType)
+        if err_check_extension != nil </span><span class="cov8" title="1">{
+                return "", errors.New("file extension error")
+        }</span>
+
+        //        Check file size
+        <span class="cov8" title="1">err_check_size := helper.CheckFileSize(fileInfo.Size, contentType)
+        if err_check_size != nil </span><span class="cov8" title="1">{
+                return "", errors.New("file size error")
+        }</span>
+
+        //        Memberikan nama file
+        // fileName := strconv.Itoa(id) + "_" + name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
+
+        // // Upload file
+        // urlImage, errUploadImg := helper.UploadFileToS3(directory, fileName, contentType, fileData)
+
+        // if errUploadImg != nil {
+        //         return "", errors.New("failed to upload file")
+        // }
+        <span class="cov8" title="1">return "urlImage", nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
