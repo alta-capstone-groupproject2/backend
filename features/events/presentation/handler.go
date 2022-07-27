@@ -122,7 +122,7 @@ func (h *EventHandler) InsertData(c echo.Context) error {
 	// memberikan nama file
 	imageName := strconv.Itoa(userID_token) + "_" + event.Name + time.Now().Format("2006-01-02 15:04:05") + "." + imageExtension
 
-	image, errUploadImg := helper.UploadFileToS3(config.EventImages, config.ContentImage, imageName, imageData)
+	image, errUploadImg := helper.UploadFileToS3(config.EventImages, imageName, config.ContentImage, imageData)
 
 	if errUploadImg != nil {
 		fmt.Println(errUploadImg)
