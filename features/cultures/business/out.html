@@ -55,9 +55,9 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">lami/app/features/cultures/business/usecase.go (20.4%)</option>
+				<option value="file0">lami/app/features/cultures/business/usecase.go (100.0%)</option>
 				
-				<option value="file1">lami/app/features/cultures/business/validation.go (0.0%)</option>
+				<option value="file1">lami/app/features/cultures/business/validation.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -93,32 +93,32 @@ func NewCultureBusiness(prdData cultures.Data) cultures.Business <span class="co
 }</span>
 
 // AddCulture implements culture.Business
-func (uc *cultureUseCase) AddCulture(dataReq cultures.Core, fileInfo *multipart.FileHeader, fileData multipart.File) error <span class="cov0" title="0">{
-        if dataReq.Name == "" || dataReq.City == "" || dataReq.Details == "" </span><span class="cov0" title="0">{
+func (uc *cultureUseCase) AddCulture(dataReq cultures.Core, fileInfo *multipart.FileHeader, fileData multipart.File) error <span class="cov8" title="1">{
+        if dataReq.Name == "" || dataReq.City == "" || dataReq.Details == "" </span><span class="cov8" title="1">{
                 return errors.New("all data must be filled")
         }</span>
 
-        <span class="cov0" title="0">if fileInfo != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if fileInfo != nil </span><span class="cov8" title="1">{
                 urlImage, errFile := uploadFileValidation(dataReq.Name, 0, config.CultureImages, config.ContentImage, fileInfo, fileData)
-                if errFile != nil </span><span class="cov0" title="0">{
+                if errFile != nil </span><span class="cov8" title="1">{
                         return errors.New(errFile.Error())
                 }</span>
 
-                <span class="cov0" title="0">dataReq.Image = urlImage</span>
+                <span class="cov8" title="1">dataReq.Image = urlImage</span>
         }
 
-        <span class="cov0" title="0">err := uc.cultureData.AddDataCulture(dataReq)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">err := uc.cultureData.AddDataCulture(dataReq)
+        if err != nil </span><span class="cov8" title="1">{
                 return errors.New("failed to insert data culture")
         }</span>
 
-        <span class="cov0" title="0">return nil</span>
+        <span class="cov8" title="1">return nil</span>
 }
 
 // SelectMyculture implements culture.Business
-func (uc *cultureUseCase) SelectCulture(limit, page int) ([]cultures.Core, int64, error) <span class="cov8" title="1">{
+func (uc *cultureUseCase) SelectCulture(limit, page int, name, city string) ([]cultures.Core, int64, error) <span class="cov8" title="1">{
         offset := limit * (page - 1)
-        resp, total, err := uc.cultureData.SelectDataCulture(limit, offset)
+        resp, total, err := uc.cultureData.SelectDataCulture(limit, offset, name, city)
         total = total/int64(limit) + 1
         return resp, total, err
 }</span>
@@ -136,51 +136,51 @@ func (uc *cultureUseCase) DeleteCulture(cultureID int) error <span class="cov8" 
 }</span>
 
 // UpdateCulture implements culture.Business
-func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fileInfo *multipart.FileHeader, fileData multipart.File) error <span class="cov0" title="0">{
+func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fileInfo *multipart.FileHeader, fileData multipart.File) error <span class="cov8" title="1">{
         updateMap := make(map[string]interface{})
 
-        if dataReq.Name != "" || dataReq.Name == " " </span><span class="cov0" title="0">{
+        if dataReq.Name != "" || dataReq.Name == " " </span><span class="cov8" title="1">{
                 errNameFormat := nameFormatValidation(dataReq.Name)
-                if errNameFormat != nil </span><span class="cov0" title="0">{
+                if errNameFormat != nil </span><span class="cov8" title="1">{
                         return errors.New(errNameFormat.Error())
                 }</span>
-                <span class="cov0" title="0">updateMap["name"] = &amp;dataReq.Name</span>
+                <span class="cov8" title="1">updateMap["name"] = &amp;dataReq.Name</span>
         }
-        <span class="cov0" title="0">if dataReq.City != "" || dataReq.City == " " </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if dataReq.City != "" || dataReq.City == " " </span><span class="cov8" title="1">{
                 errEmailFormat := cityFormatValidation(dataReq.City)
-                if errEmailFormat != nil </span><span class="cov0" title="0">{
+                if errEmailFormat != nil </span><span class="cov8" title="1">{
                         return errors.New(errEmailFormat.Error())
                 }</span>
-                <span class="cov0" title="0">updateMap["city"] = &amp;dataReq.City</span>
+                <span class="cov8" title="1">updateMap["city"] = &amp;dataReq.City</span>
         }
-        <span class="cov0" title="0">if dataReq.Details != "" || dataReq.Details == " " </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if dataReq.Details != "" || dataReq.Details == " " </span><span class="cov8" title="1">{
                 updateMap["details"] = &amp;dataReq.Details
         }</span>
-        <span class="cov0" title="0">if fileInfo != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">if fileInfo != nil </span><span class="cov8" title="1">{
                 urlImage, errFile := uploadFileValidation("", 0, config.CultureImages, config.ContentImage, fileInfo, fileData)
-                if errFile != nil </span><span class="cov0" title="0">{
+                if errFile != nil </span><span class="cov8" title="1">{
                         return errors.New(errFile.Error())
                 }</span>
 
-                <span class="cov0" title="0">updateMap["image"] = urlImage</span>
+                <span class="cov8" title="1">updateMap["image"] = urlImage</span>
         }
-        <span class="cov0" title="0">fmt.Println(updateMap["image"])
+        <span class="cov8" title="1">fmt.Println(updateMap["image"])
         err := uc.cultureData.UpdateDataCulture(updateMap, cultureID)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov8" title="1">{
                 fmt.Println(err)
                 return errors.New("failed to update data culture")
         }</span>
 
-        <span class="cov0" title="0">return nil</span>
+        <span class="cov8" title="1">return nil</span>
 }
 
 // AddCultureReport implements culture.Business
-func (uc *cultureUseCase) AddCultureReport(dataReq cultures.CoreReport) error <span class="cov0" title="0">{
+func (uc *cultureUseCase) AddCultureReport(dataReq cultures.CoreReport) error <span class="cov8" title="1">{
         err := uc.cultureData.AddCultureDataReport(dataReq)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov8" title="1">{
                 return errors.New("failed to insert data report culture")
         }</span>
-        <span class="cov0" title="0">cultureData, _ := uc.cultureData.SelectDataCultureByCultureID(dataReq.CultureID)
+        <span class="cov8" title="1">cultureData, _ := uc.cultureData.SelectDataCultureByCultureID(dataReq.CultureID)
         userData, _ := uc.cultureData.SelectUser(dataReq.UserID)
 
         detailMal := fmt.Sprintf("Culture : %s, \nReport : %s", cultureData.Name, dataReq.Message)
@@ -200,68 +200,55 @@ func (uc *cultureUseCase) SelectReport(cultureID int) ([]cultures.CoreReport, er
 
 import (
         "errors"
-        "fmt"
         "lami/app/helper"
         "mime/multipart"
         "regexp"
-        "strconv"
-        "time"
 )
 
-func phoneFormatValidation(email string) error <span class="cov0" title="0">{
-        //        Check syntax email address
-        pattern := `^[0-9]+$`
-        matched, _ := regexp.Match(pattern, []byte(email))
-        if !matched </span><span class="cov0" title="0">{
-                return errors.New("failed syntax phone ")
-        }</span>
-        <span class="cov0" title="0">return nil</span>
-}
-
-func nameFormatValidation(name string) error <span class="cov0" title="0">{
+func nameFormatValidation(name string) error <span class="cov8" title="1">{
         //        Check syntax email address
         pattern := `^[a-zA-Z ]+$`
         matched, _ := regexp.Match(pattern, []byte(name))
-        if !matched </span><span class="cov0" title="0">{
+        if !matched </span><span class="cov8" title="1">{
                 return errors.New("failed syntax name")
         }</span>
-        <span class="cov0" title="0">return nil</span>
+        <span class="cov8" title="1">return nil</span>
 }
 
-func cityFormatValidation(name string) error <span class="cov0" title="0">{
+func cityFormatValidation(name string) error <span class="cov8" title="1">{
         //        Check syntax email address
         pattern := `^[a-zA-Z ]+$`
         matched, _ := regexp.Match(pattern, []byte(name))
-        if !matched </span><span class="cov0" title="0">{
+        if !matched </span><span class="cov8" title="1">{
                 return errors.New("failed syntax city")
         }</span>
-        <span class="cov0" title="0">return nil</span>
+        <span class="cov8" title="1">return nil</span>
 }
 
-func uploadFileValidation(name string, id int, directory string, contentType string, fileInfo *multipart.FileHeader, fileData multipart.File) (string, error) <span class="cov0" title="0">{
+func uploadFileValidation(name string, id int, directory string, contentType string, fileInfo *multipart.FileHeader, fileData multipart.File) (string, error) <span class="cov8" title="1">{
         //        Check file extension
-        extension, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, contentType)
-        if err_check_extension != nil </span><span class="cov0" title="0">{
+        _, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, contentType)
+        if err_check_extension != nil </span><span class="cov8" title="1">{
                 return "", errors.New("file extension error")
         }</span>
 
         //        Check file size
-        <span class="cov0" title="0">err_check_size := helper.CheckFileSize(fileInfo.Size, contentType)
-        if err_check_size != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">err_check_size := helper.CheckFileSize(fileInfo.Size, contentType)
+        if err_check_size != nil </span><span class="cov8" title="1">{
                 return "", errors.New("file size error")
         }</span>
 
         //        Memberikan nama file
-        <span class="cov0" title="0">fileName := strconv.Itoa(id) + "_" + name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
-        fmt.Println(fileName)
-        // Upload file
-        urlImage, errUploadImg := helper.UploadFileToS3(directory, fileName, contentType, fileData)
+        // fileName := strconv.Itoa(id) + "_" + name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
+        // fmt.Println(fileName)
+        // // Upload file
+        // urlImage, errUploadImg := helper.UploadFileToS3(directory, fileName, contentType, fileData)
 
-        if errUploadImg != nil </span><span class="cov0" title="0">{
-                return "", errors.New("failed to upload file")
-        }</span>
-        <span class="cov0" title="0">fmt.Println(urlImage)
-        return urlImage, nil</span>
+        // if errUploadImg != nil {
+        //         return "", errors.New("failed to upload file")
+        // }
+
+        <span class="cov8" title="1">return "urlImage", nil</span>
 }
 </pre>
 		
