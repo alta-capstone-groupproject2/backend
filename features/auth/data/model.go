@@ -41,10 +41,3 @@ func (data *User) toCore() auth.Core {
 		UpdatedAt: data.UpdatedAt,
 	}
 }
-
-func authCore(core auth.Core) User {
-	return User{
-		Email:    core.Email,
-		Password: core.Password,
-	}
-}
