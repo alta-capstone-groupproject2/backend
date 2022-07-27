@@ -15,7 +15,7 @@ const UMKM = "umkm"
 * @Method Status Validasi Event
 **/
 const Waiting = "waiting"
-const Approved = "approved"
+const Approved = "approve"
 
 /**
 * @Method Payment with Midtrans
