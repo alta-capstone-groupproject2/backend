@@ -43,9 +43,9 @@ func (uc *cultureUseCase) AddCulture(dataReq cultures.Core, fileInfo *multipart.
 }
 
 // SelectMyculture implements culture.Business
-func (uc *cultureUseCase) SelectCulture(limit, page int) ([]cultures.Core, int64, error) {
+func (uc *cultureUseCase) SelectCulture(limit, page int, name, city string) ([]cultures.Core, int64, error) {
 	offset := limit * (page - 1)
-	resp, total, err := uc.cultureData.SelectDataCulture(limit, offset)
+	resp, total, err := uc.cultureData.SelectDataCulture(limit, offset, name, city)
 	total = total/int64(limit) + 1
 	return resp, total, err
 }

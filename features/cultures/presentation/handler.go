@@ -58,6 +58,8 @@ func (h *CultureHandler) PostCulture(c echo.Context) error {
 func (h *CultureHandler) GetCulture(c echo.Context) error {
 	limit := c.QueryParam("limit")
 	page := c.QueryParam("page")
+	name := c.QueryParam("name")
+	city := c.QueryParam("city")
 	limitint, errLimit := strconv.Atoi(limit)
 	pageint, errPage := strconv.Atoi(page)
 
@@ -65,7 +67,7 @@ func (h *CultureHandler) GetCulture(c echo.Context) error {
 		return c.JSON(helper.ResponseBadRequest("wrong query param"))
 	}
 
-	res, total, err := h.cultureBusiness.SelectCulture(limitint, pageint)
+	res, total, err := h.cultureBusiness.SelectCulture(limitint, pageint, name, city)
 	if err != nil {
 		return c.JSON(helper.ResponseBadRequest(err.Error()))
 	}

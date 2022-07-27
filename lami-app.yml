@@ -8,7 +8,7 @@ servers:
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/Alfin7007/lamiApp/1.0
   - description: Base URL
-    url: https://lamiapp.site
+    url: https://lamiapp.website
 tags:
   - name: Login
     description: Authentication
