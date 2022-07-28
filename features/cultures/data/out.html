@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>data: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">lami/app/features/cultures/data/model.go (92.3%)</option>
+				
+				<option value="file1">lami/app/features/cultures/data/mysql.go (92.5%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package data
+
+import (
+        "lami/app/features/cultures"
+
+        "gorm.io/gorm"
+)
+
+type Culture struct {
+        gorm.Model
+        Name    string `json:"name"`
+        Details string `json:"details"`
+        Image   string `json:"image"`
+        City    string `json:"city"`
+}
+
+type Report struct {
+        gorm.Model
+        CultureID int    `json:"culture_id"`
+        Message   string `json:"message"`
+        Culture   Culture
+}
+
+func fromCore(core cultures.Core) Culture <span class="cov8" title="1">{
+        return Culture{
+                Name:    core.Name,
+                Details: core.Details,
+                Image:   core.Image,
+                City:    core.City,
+        }
+}</span>
+
+func fromCoreReport(core cultures.CoreReport) Report <span class="cov8" title="1">{
+        return Report{
+                CultureID: core.CultureID,
+                Message:   core.Message,
+        }
+}</span>
+
+func (data *Culture) toCore() cultures.Core <span class="cov8" title="1">{
+        return cultures.Core{
+                ID:      int(data.ID),
+                Name:    data.Name,
+                Image:   data.Image,
+                City:    data.City,
+                Details: data.Details,
+        }
+}</span>
+
+func ToCore(data Culture) cultures.Core <span class="cov8" title="1">{
+        return data.toCore()
+}</span>
+
+func ToCoreList(data []Culture) []cultures.Core <span class="cov8" title="1">{
+        res := []cultures.Core{}
+        for key := range data </span><span class="cov0" title="0">{
+                res = append(res, data[key].toCore())
+        }</span>
+        <span class="cov8" title="1">return res</span>
+}
+
+func (data *Report) toCoreReport() cultures.CoreReport <span class="cov8" title="1">{
+        return cultures.CoreReport{
+                ID:        int(data.ID),
+                Message:   data.Message,
+                CreatedAt: data.CreatedAt,
+        }
+}</span>
+
+func ToCoreReportList(data []Report) []cultures.CoreReport <span class="cov8" title="1">{
+        res := []cultures.CoreReport{}
+        for key := range data </span><span class="cov8" title="1">{
+                res = append(res, data[key].toCoreReport())
+        }</span>
+        <span class="cov8" title="1">return res</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package data
+
+import (
+        "errors"
+        "lami/app/features/cultures"
+        "lami/app/features/users/data"
+
+        "gorm.io/gorm"
+)
+
+type mysqlCultureRepository struct {
+        db *gorm.DB
+}
+
+func NewCultureRepository(conn *gorm.DB) cultures.Data <span class="cov8" title="1">{
+        return &amp;mysqlCultureRepository{
+                db: conn,
+        }
+}</span>
+
+// AddDataCulture implements culture.Data
+func (repo *mysqlCultureRepository) AddDataCulture(dataReq cultures.Core) error <span class="cov8" title="1">{
+
+        model := fromCore(dataReq)
+
+        res := repo.db.Create(&amp;model)
+        if res.Error != nil </span><span class="cov8" title="1">{
+                return res.Error
+        }</span>
+        <span class="cov8" title="1">if res.RowsAffected == 0 </span><span class="cov0" title="0">{
+                return errors.New("failed insert data")
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+
+}
+
+// SelectDataMyCulture implements culture.Data
+func (repo *mysqlCultureRepository) SelectDataCulture(limit, offset int, name, city string) ([]cultures.Core, int64, error) <span class="cov8" title="1">{
+        dataCulture := []Culture{}
+        var count int64
+        res := repo.db.Order("updated_at desc").Where("city LIKE ? and name LIKE ?", "%"+city+"%", "%"+name+"%").Limit(limit).Offset(offset).Find(&amp;dataCulture).Count(&amp;count)
+        if res.Error != nil </span><span class="cov8" title="1">{
+                return []cultures.Core{}, 0, errors.New("failed get data culture")
+        }</span>
+
+        <span class="cov8" title="1">return ToCoreList(dataCulture), count, nil</span>
+}
+
+// SelectDataCulturebyIDCulture implements culture.Data
+func (repo *mysqlCultureRepository) SelectDataCultureByCultureID(idCulture int) (cultures.Core, error) <span class="cov8" title="1">{
+        dataCulture := Culture{}
+
+        res := repo.db.Where("id = ?", idCulture).Find(&amp;dataCulture)
+        if res.Error != nil </span><span class="cov8" title="1">{
+                return cultures.Core{}, res.Error
+        }</span>
+
+        <span class="cov8" title="1">return ToCore(dataCulture), res.Error</span>
+}
+
+// DeleteDataCulture implements culture.Data
+func (repo *mysqlCultureRepository) DeleteDataCulture(idCulture int) error <span class="cov8" title="1">{
+        dataCulture := Culture{}
+
+        res := repo.db.Delete(&amp;dataCulture, idCulture)
+        if res.RowsAffected == 0 </span><span class="cov8" title="1">{
+                return errors.New("dailed delete culture")
+        }</span>
+
+        <span class="cov8" title="1">if res.Error != nil </span><span class="cov0" title="0">{
+                return res.Error
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// UpdateDataCulture implements culture.Data
+func (repo *mysqlCultureRepository) UpdateDataCulture(dataReq map[string]interface{}, idCulture int) error <span class="cov8" title="1">{
+
+        model := Culture{}
+        model.ID = uint(idCulture)
+        err := repo.db.Model(model).Updates(dataReq)
+        if err.RowsAffected == 0 </span><span class="cov8" title="1">{
+                return errors.New("no rows affected")
+        }</span>
+
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return err.Error
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// AddCultureDataReport implements culture.Data
+func (repo *mysqlCultureRepository) AddCultureDataReport(dataReq cultures.CoreReport) error <span class="cov8" title="1">{
+
+        model := fromCoreReport(dataReq)
+
+        res := repo.db.Create(&amp;model)
+        if res.Error != nil </span><span class="cov8" title="1">{
+                return res.Error
+        }</span>
+        <span class="cov8" title="1">if res.RowsAffected == 0 </span><span class="cov0" title="0">{
+                return errors.New("failed insert report")
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// SelectDataReport implements culture.Data
+func (repo *mysqlCultureRepository) SelectDataReport(idCulture int) ([]cultures.CoreReport, error) <span class="cov8" title="1">{
+        dataReport := []Report{}
+
+        res := repo.db.Preload("Culture").Where("culture_id = ?", idCulture).Find(&amp;dataReport)
+        if res.Error != nil </span><span class="cov8" title="1">{
+                return []cultures.CoreReport{}, res.Error
+        }</span>
+
+        <span class="cov8" title="1">return ToCoreReportList(dataReport), nil</span>
+}
+
+func (repo *mysqlCultureRepository) SelectUser(id int) (response data.User, err error) <span class="cov8" title="1">{
+        datauser := data.User{}
+        result := repo.db.Preload("Role").Find(&amp;datauser, id)
+        if result.Error != nil </span><span class="cov8" title="1">{
+                return data.User{}, result.Error
+        }</span>
+        <span class="cov8" title="1">if result.RowsAffected == 0 </span><span class="cov8" title="1">{
+                return data.User{}, errors.New("user not found")
+        }</span>
+        <span class="cov8" title="1">return datauser, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

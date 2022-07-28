@@ -59,7 +59,7 @@ func (repo *mysqlEventRepository) DeleteDataByID(id int, userId int) error {
 	return result.Error
 }
 
-func (repo *mysqlEventRepository) CheckUserID(id int) (respon int, err error) {
+func (repo *mysqlEventRepository) CheckValidateUserID(id int) (respon int, err error) {
 	var data Event
 	result := repo.db.First(&data, id)
 	if result.Error != nil {

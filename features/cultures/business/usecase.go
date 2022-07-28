@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"lami/app/config"
 	"lami/app/features/cultures"
+	"lami/app/helper"
 	"mime/multipart"
 )
 
@@ -42,9 +43,9 @@ func (uc *cultureUseCase) AddCulture(dataReq cultures.Core, fileInfo *multipart.
 }
 
 // SelectMyculture implements culture.Business
-func (uc *cultureUseCase) SelectCulture(limit, page int) ([]cultures.Core, int64, error) {
+func (uc *cultureUseCase) SelectCulture(limit, page int, name, city string) ([]cultures.Core, int64, error) {
 	offset := limit * (page - 1)
-	resp, total, err := uc.cultureData.SelectDataCulture(limit, offset)
+	resp, total, err := uc.cultureData.SelectDataCulture(limit, offset, name, city)
 	total = total/int64(limit) + 1
 	return resp, total, err
 }
@@ -106,9 +107,12 @@ func (uc *cultureUseCase) AddCultureReport(dataReq cultures.CoreReport) error {
 	if err != nil {
 		return errors.New("failed to insert data report culture")
 	}
-	// userData, _ := uc.cultureData.SelectUser(dataReq.UserID)
+	cultureData, _ := uc.cultureData.SelectDataCultureByCultureID(dataReq.CultureID)
+	userData, _ := uc.cultureData.SelectUser(dataReq.UserID)
 
-	// helper.SendGmailNotify(userData.Email, "Success Add Report")
+	detailMal := fmt.Sprintf("Culture : %s, \nReport : %s", cultureData.Name, dataReq.Message)
+
+	helper.SendGmailNotify(userData.Email, "Report Culture", detailMal)
 	return nil
 }
 

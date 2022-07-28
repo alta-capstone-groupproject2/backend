@@ -43,10 +43,8 @@ func (uc *userUseCase) InsertData(userRequest users.Core) (err error) {
 	}
 
 	passWillBcrypt := []byte(userRequest.Password)
-	hash, err_hash := bcrypt.GenerateFromPassword(passWillBcrypt, bcrypt.DefaultCost)
-	if err_hash != nil {
-		return errors.New("hashing password failed")
-	}
+	hash, _ := bcrypt.GenerateFromPassword(passWillBcrypt, bcrypt.DefaultCost)
+	
 	userRequest.Password = string(hash)
 
 	//default role user
@@ -85,10 +83,8 @@ func (uc *userUseCase) UpdateData(userReq users.Core, id int, fileInfo *multipar
 		updateMap["email"] = &userReq.Email
 	}
 	if userReq.Password != "" {
-		hash, errHash := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
-		if errHash != nil {
-			return errors.New("hasing password failed")
-		}
+		hash, _ := bcrypt.GenerateFromPassword([]byte(userReq.Password), bcrypt.DefaultCost)
+		
 		updateMap["password"] = &hash
 	}
 
@@ -167,6 +163,7 @@ func (uc *userUseCase) GetDataSubmissionStore(limit, page int) (response []users
 func (uc *userUseCase) VerifyEmail(userData users.Core) error {
 	//random string for sparator
 	key := helper.RandomString(3)
+
 	//combine data and sparator
 	if userData.Name == "" || userData.Email == "" || userData.Password == "" || userData.Name == " " || userData.Password == " " {
 		return errors.New("all data must be filled")
@@ -184,7 +181,7 @@ func (uc *userUseCase) VerifyEmail(userData users.Core) error {
 
 	plain := key + key + userData.Name + key + userData.Email + key + userData.Password
 
-	encrypted := helper.Encrypt(plain, config.EncryptKey())
+	encrypted := helper.Encrypt(plain, "57a45acad2047e9731ed4bd06c4f2af2f556d60da076606dea4d55463fdff03f")
 
 	helper.SendEmailVerification(userData, encrypted)
 	return nil
@@ -192,7 +189,7 @@ func (uc *userUseCase) VerifyEmail(userData users.Core) error {
 
 func (uc *userUseCase) ConfirmEmail(encryptData string) error {
 	var userData users.Core
-	Decrypted := helper.Decrypt(encryptData, config.EncryptKey())
+	Decrypted := helper.Decrypt(encryptData, "57a45acad2047e9731ed4bd06c4f2af2f556d60da076606dea4d55463fdff03f")
 
 	// get sparator
 	sparator := Decrypted[:6]

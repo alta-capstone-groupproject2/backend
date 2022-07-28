@@ -5,6 +5,7 @@ import (
 	_datacart "lami/app/features/carts/data"
 	"lami/app/features/orders"
 	"lami/app/features/products/data"
+	_mUser "lami/app/features/users/data"
 
 	"gorm.io/gorm"
 )
@@ -127,7 +128,7 @@ func (repo *mysqlOrderRepository) AddDataOrder(dataReq orders.Core, idUser int, 
 		}
 	}
 
-	dataReq.Status = "Pending"
+	dataReq.Status = "pending"
 	dataReq.TotalPrice = uint(total)
 
 	dataOrder := fromCore(dataReq)
@@ -197,8 +198,53 @@ func (repo *mysqlOrderRepository) DataPaymentsOrderID(idUser int) (int, error) {
 	return idOrder, nil
 }
 
+// SelectDataPaymentID implements orders.Data
+func (repo *mysqlOrderRepository) SelectDataPaymentID(idOrder int, idUser int) (string, error) {
+	var orderID string
+	errpayment := repo.db.Raw("SELECT payment_id FROM payments WHERE id = ?  AND user_id = ?", idOrder, idUser).Scan(&orderID)
+	if errpayment.Error != nil {
+		return "", errpayment.Error
+	}
+
+	return orderID, nil
+}
+
+// UpdateDataStatusPayments implements orders.Data
+func (repo *mysqlOrderRepository) UpdateDataStatus(idOrder, idUser int) error {
+
+	errorder := repo.db.Model(&Order{}).Where("id = ? AND user_id = ?", idOrder, idUser).Update("status", "settlement")
+	if errorder.Error != nil {
+		return errorder.Error
+	}
+
+	return nil
+}
+
+// InsertDataPayment implements orders.Data
+func (repo *mysqlOrderRepository) InsertDataPayment(dataReq orders.CorePayment) error {
+	dataPayment := fromCorePayment(dataReq)
+	res := repo.db.Create(&dataPayment)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
 func NewOrderRepository(conn *gorm.DB) orders.Data {
 	return &mysqlOrderRepository{
 		db: conn,
 	}
+}
+
+func (repo *mysqlOrderRepository) SelectUser(id int) (response _mUser.User, err error) {
+	datauser := _mUser.User{}
+	result := repo.db.Preload("Role").Find(&datauser, id)
+	if result.Error != nil {
+		return _mUser.User{}, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return _mUser.User{}, errors.New("user not found")
+	}
+	return datauser, nil
 }

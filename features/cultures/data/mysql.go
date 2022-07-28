@@ -36,10 +36,10 @@ func (repo *mysqlCultureRepository) AddDataCulture(dataReq cultures.Core) error 
 }
 
 // SelectDataMyCulture implements culture.Data
-func (repo *mysqlCultureRepository) SelectDataCulture(limit, offset int) ([]cultures.Core, int64, error) {
+func (repo *mysqlCultureRepository) SelectDataCulture(limit, offset int, name, city string) ([]cultures.Core, int64, error) {
 	dataCulture := []Culture{}
 	var count int64
-	res := repo.db.Order("updated_at desc").Limit(limit).Offset(offset).Find(&dataCulture).Count(&count)
+	res := repo.db.Order("updated_at desc").Where("city LIKE ? and name LIKE ?", "%"+city+"%", "%"+name+"%").Limit(limit).Offset(offset).Find(&dataCulture).Count(&count)
 	if res.Error != nil {
 		return []cultures.Core{}, 0, errors.New("failed get data culture")
 	}

@@ -26,4 +26,5 @@ func Migration(db *gorm.DB) {
 	db.AutoMigrate(_mCart.Cart{})
 	db.AutoMigrate(_mOrder.Order{})
 	db.AutoMigrate(_mOrder.OrderDetail{})
+	db.AutoMigrate(_mOrder.Payment{})
 }

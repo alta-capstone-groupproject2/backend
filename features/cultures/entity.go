@@ -26,7 +26,7 @@ type CoreReport struct {
 
 type Business interface {
 	AddCulture(dataReq Core, fileInfo *multipart.FileHeader, fileData multipart.File) error
-	SelectCulture(limit, page int) ([]Core, int64, error)
+	SelectCulture(limit, page int, name, city string) ([]Core, int64, error)
 	SelectCulturebyCultureID(cultureID int) (Core, error)
 	UpdateCulture(dataReq Core, cultureID int, fileInfo *multipart.FileHeader, fileData multipart.File) error
 	DeleteCulture(cultureID int) error
@@ -37,7 +37,7 @@ type Business interface {
 
 type Data interface {
 	AddDataCulture(dataReq Core) error
-	SelectDataCulture(limit, offset int) ([]Core, int64, error)
+	SelectDataCulture(limit, offset int, name, city string) ([]Core, int64, error)
 	SelectDataCultureByCultureID(cultureID int) (Core, error)
 	UpdateDataCulture(dataReq map[string]interface{}, cultureID int) error
 	DeleteDataCulture(cultureID int) error

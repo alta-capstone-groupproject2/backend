@@ -48,9 +48,6 @@ func (repo *mysqlUserRepository) InsertData(userData users.Core) (err error) {
 
 		return errors.New("failed insert data")
 	}
-	if result.RowsAffected == 0 {
-		return errors.New("failed insert data")
-	}
 	return nil
 }
 

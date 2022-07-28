@@ -5,6 +5,7 @@ import (
 	"lami/app/config"
 	_eventData "lami/app/features/events/data"
 	"lami/app/features/participants"
+	"lami/app/features/users/data"
 
 	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
@@ -149,4 +150,16 @@ func (repo *mysqlParticipantRepository) PaymentDataWebHook(data participants.Cor
 		}
 		return nil
 	}
+}
+
+func (repo *mysqlParticipantRepository) SelectUser(id int) (response data.User, err error) {
+	datauser := data.User{}
+	result := repo.db.Preload("Role").Find(&datauser, id)
+	if result.Error != nil {
+		return data.User{}, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return data.User{}, errors.New("user not found")
+	}
+	return datauser, nil
 }

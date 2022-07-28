@@ -2,7 +2,16 @@ package business
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"time"
+
 	"lami/app/features/orders"
+	"lami/app/features/orders/presentation/request"
+	"lami/app/helper"
+
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
 )
 
 type orderUseCase struct {
@@ -47,8 +56,94 @@ func (uc *orderUseCase) Order(dataReq orders.Core, idUser int) (int, error) {
 		return -1, errors.New("failed")
 	}
 
+	userData, _ := uc.orderData.SelectUser(dataReq.UserID)
+
+	detailMal := fmt.Sprintf("Total Order : Rp. %d", total)
+
+	helper.SendGmailNotify(userData.Email, "Order Merchandise", detailMal)
+
 	return 0, nil
 
+}
+
+// BankCore implements orders.Business
+func (uc *orderUseCase) RequestChargeBank(transfer coreapi.ChargeReq, typename string) (coreapi.ChargeReq, error) {
+	var transferCore coreapi.ChargeReq
+	switch {
+	case typename == "permata":
+		transferCore = request.ToCoreMidtransPermata(transfer)
+	case typename == "mandiri":
+		transferCore = request.ToCoreMidtransMandiri(transfer)
+	default:
+		transferCore = request.ToCoreMidtransBank(transfer)
+	}
+
+	return transferCore, nil
+}
+
+// TypeBank implements orders.Business
+func (uc *orderUseCase) TypeBank(grossamount int64, typename string, idOrder int) (coreapi.ChargeReq, string, error) {
+	var Transfer coreapi.ChargeReq
+	switch {
+	case typename == "bni":
+		Transfer = coreapi.ChargeReq{
+			TransactionDetails: midtrans.TransactionDetails{
+				OrderID:  strconv.Itoa(idOrder) + "#BNI" + time.Now().Format("2006-01-02 15:04:05"),
+				GrossAmt: int64(grossamount),
+			},
+			BankTransfer: &coreapi.BankTransferDetails{
+				Bank: midtrans.BankBni,
+			},
+		}
+	case typename == "bca":
+		Transfer = coreapi.ChargeReq{
+			TransactionDetails: midtrans.TransactionDetails{
+				OrderID:  strconv.Itoa(idOrder) + "#BCA" + time.Now().Format("2006-01-02 15:04:05"),
+				GrossAmt: int64(grossamount),
+			},
+			BankTransfer: &coreapi.BankTransferDetails{
+				Bank: midtrans.BankBca,
+			},
+		}
+	case typename == "bri":
+		Transfer = coreapi.ChargeReq{
+			TransactionDetails: midtrans.TransactionDetails{
+				OrderID:  strconv.Itoa(idOrder) + "#BRI" + time.Now().Format("2006-01-02 15:04:05"),
+				GrossAmt: int64(grossamount),
+			},
+			BankTransfer: &coreapi.BankTransferDetails{
+				Bank: midtrans.BankBri,
+			},
+		}
+	case typename == "permata":
+		Transfer = coreapi.ChargeReq{
+			TransactionDetails: midtrans.TransactionDetails{
+				OrderID:  strconv.Itoa(idOrder) + "#PERMATA" + time.Now().Format("2006-01-02 15:04:05"),
+				GrossAmt: int64(grossamount),
+			},
+			BankTransfer: &coreapi.BankTransferDetails{
+				Bank: midtrans.BankPermata,
+				Permata: &coreapi.PermataBankTransferDetail{
+					RecipientName: "lamiapp",
+				},
+			},
+		}
+	case typename == "mandiri":
+		Transfer = coreapi.ChargeReq{
+			TransactionDetails: midtrans.TransactionDetails{
+				OrderID:  strconv.Itoa(idOrder) + "#MANDIRI" + time.Now().Format("2006-01-02 15:04:05"),
+				GrossAmt: int64(grossamount),
+			},
+			EChannel: &coreapi.EChannelDetail{
+				BillInfo1: "BillInfo1",
+				BillInfo2: "BillInfo2",
+			},
+		}
+	default:
+		return Transfer, "", errors.New("failed")
+	}
+
+	return Transfer, Transfer.TransactionDetails.OrderID, nil
 }
 
 // PaymentGrossAmount implements paymentsorder.Business
@@ -77,6 +172,44 @@ func (uc *orderUseCase) PaymentsOrderID(idUser int) (int, error) {
 	}
 
 	return grossamount, nil
+}
+
+// SelectPaymentID implements orders.Business
+func (uc *orderUseCase) SelectPaymentID(idOrder int, idUser int) (string, error) {
+	if idOrder == 0 || idUser == 0 {
+		return "", errors.New("failed")
+	}
+
+	rows, err := uc.orderData.SelectDataPaymentID(idOrder, idUser)
+	if err != nil || rows == "" {
+		return "", errors.New("failed")
+	}
+
+	return rows, nil
+}
+
+// UpdateStatusPayments implements orders.Business
+func (uc *orderUseCase) UpdateStatus(idOrder int, idUser int) error {
+	if idOrder == 0 || idUser == 0 {
+		return errors.New("failed")
+	}
+
+	err := uc.orderData.UpdateDataStatus(idOrder, idUser)
+	if err != nil {
+		return errors.New("failed")
+	}
+
+	return nil
+}
+
+// InsertPayment implements orders.Business
+func (uc *orderUseCase) InsertPayment(dataReq orders.CorePayment) error {
+	res := uc.orderData.InsertDataPayment(dataReq)
+	if res != nil {
+		return errors.New("failed")
+	}
+
+	return nil
 }
 
 func NewOrderBusiness(odrData orders.Data) orders.Business {

@@ -54,7 +54,7 @@ func (uc *eventUseCase) DeleteEventByID(id int, userId int) (err error) {
 }
 
 func (uc *eventUseCase) UpdateEventByID(status string, id int) (err error) {
-	checkUserID, errCheck := uc.eventData.CheckUserID(id)
+	checkUserID, errCheck := uc.eventData.CheckValidateUserID(id)
 	if errCheck != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (uc *eventUseCase) GetEventAttendee(id int, userID int) (urlPDF string, err
 	if err != nil {
 		return "", err
 	}
-	checkUserID, errCheck := uc.eventData.CheckUserID(id)
+	checkUserID, errCheck := uc.eventData.CheckValidateUserID(id)
 	if errCheck != nil {
 		return "", err
 	}

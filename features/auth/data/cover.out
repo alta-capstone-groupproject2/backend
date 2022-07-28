@@ -1,0 +1,6 @@
+mode: set
+lami/app/features/auth/data/mysql.go:16.49,20.2 1 1
+lami/app/features/auth/data/mysql.go:22.89,25.45 3 1
+lami/app/features/auth/data/mysql.go:29.2,29.31 1 1
+lami/app/features/auth/data/mysql.go:25.45,27.3 1 1
+lami/app/features/auth/data/model.go:33.38,43.2 1 1

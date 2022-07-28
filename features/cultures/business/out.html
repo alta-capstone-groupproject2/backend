@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>business: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">lami/app/features/cultures/business/usecase.go (100.0%)</option>
+				
+				<option value="file1">lami/app/features/cultures/business/validation.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package business
+
+import (
+        "errors"
+        "fmt"
+        "lami/app/config"
+        "lami/app/features/cultures"
+        "lami/app/helper"
+        "mime/multipart"
+)
+
+type cultureUseCase struct {
+        cultureData cultures.Data
+}
+
+func NewCultureBusiness(prdData cultures.Data) cultures.Business <span class="cov8" title="1">{
+        return &amp;cultureUseCase{
+                cultureData: prdData,
+        }
+}</span>
+
+// AddCulture implements culture.Business
+func (uc *cultureUseCase) AddCulture(dataReq cultures.Core, fileInfo *multipart.FileHeader, fileData multipart.File) error <span class="cov8" title="1">{
+        if dataReq.Name == "" || dataReq.City == "" || dataReq.Details == "" </span><span class="cov8" title="1">{
+                return errors.New("all data must be filled")
+        }</span>
+
+        <span class="cov8" title="1">if fileInfo != nil </span><span class="cov8" title="1">{
+                urlImage, errFile := uploadFileValidation(dataReq.Name, 0, config.CultureImages, config.ContentImage, fileInfo, fileData)
+                if errFile != nil </span><span class="cov8" title="1">{
+                        return errors.New(errFile.Error())
+                }</span>
+
+                <span class="cov8" title="1">dataReq.Image = urlImage</span>
+        }
+
+        <span class="cov8" title="1">err := uc.cultureData.AddDataCulture(dataReq)
+        if err != nil </span><span class="cov8" title="1">{
+                return errors.New("failed to insert data culture")
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// SelectMyculture implements culture.Business
+func (uc *cultureUseCase) SelectCulture(limit, page int, name, city string) ([]cultures.Core, int64, error) <span class="cov8" title="1">{
+        offset := limit * (page - 1)
+        resp, total, err := uc.cultureData.SelectDataCulture(limit, offset, name, city)
+        total = total/int64(limit) + 1
+        return resp, total, err
+}</span>
+
+// SelectculturebyCultureID implements culture.Business
+func (uc *cultureUseCase) SelectCulturebyCultureID(cultureID int) (cultures.Core, error) <span class="cov8" title="1">{
+        resp, err := uc.cultureData.SelectDataCultureByCultureID(cultureID)
+        return resp, err
+}</span>
+
+// DeleteCulture implements culture.Business
+func (uc *cultureUseCase) DeleteCulture(cultureID int) error <span class="cov8" title="1">{
+        err := uc.cultureData.DeleteDataCulture(cultureID)
+        return err
+}</span>
+
+// UpdateCulture implements culture.Business
+func (uc *cultureUseCase) UpdateCulture(dataReq cultures.Core, cultureID int, fileInfo *multipart.FileHeader, fileData multipart.File) error <span class="cov8" title="1">{
+        updateMap := make(map[string]interface{})
+
+        if dataReq.Name != "" || dataReq.Name == " " </span><span class="cov8" title="1">{
+                errNameFormat := nameFormatValidation(dataReq.Name)
+                if errNameFormat != nil </span><span class="cov8" title="1">{
+                        return errors.New(errNameFormat.Error())
+                }</span>
+                <span class="cov8" title="1">updateMap["name"] = &amp;dataReq.Name</span>
+        }
+        <span class="cov8" title="1">if dataReq.City != "" || dataReq.City == " " </span><span class="cov8" title="1">{
+                errEmailFormat := cityFormatValidation(dataReq.City)
+                if errEmailFormat != nil </span><span class="cov8" title="1">{
+                        return errors.New(errEmailFormat.Error())
+                }</span>
+                <span class="cov8" title="1">updateMap["city"] = &amp;dataReq.City</span>
+        }
+        <span class="cov8" title="1">if dataReq.Details != "" || dataReq.Details == " " </span><span class="cov8" title="1">{
+                updateMap["details"] = &amp;dataReq.Details
+        }</span>
+        <span class="cov8" title="1">if fileInfo != nil </span><span class="cov8" title="1">{
+                urlImage, errFile := uploadFileValidation("", 0, config.CultureImages, config.ContentImage, fileInfo, fileData)
+                if errFile != nil </span><span class="cov8" title="1">{
+                        return errors.New(errFile.Error())
+                }</span>
+
+                <span class="cov8" title="1">updateMap["image"] = urlImage</span>
+        }
+        <span class="cov8" title="1">fmt.Println(updateMap["image"])
+        err := uc.cultureData.UpdateDataCulture(updateMap, cultureID)
+        if err != nil </span><span class="cov8" title="1">{
+                fmt.Println(err)
+                return errors.New("failed to update data culture")
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// AddCultureReport implements culture.Business
+func (uc *cultureUseCase) AddCultureReport(dataReq cultures.CoreReport) error <span class="cov8" title="1">{
+        err := uc.cultureData.AddCultureDataReport(dataReq)
+        if err != nil </span><span class="cov8" title="1">{
+                return errors.New("failed to insert data report culture")
+        }</span>
+        <span class="cov8" title="1">cultureData, _ := uc.cultureData.SelectDataCultureByCultureID(dataReq.CultureID)
+        userData, _ := uc.cultureData.SelectUser(dataReq.UserID)
+
+        detailMal := fmt.Sprintf("Culture : %s, \nReport : %s", cultureData.Name, dataReq.Message)
+
+        helper.SendGmailNotify(userData.Email, "Report Culture", detailMal)
+        return nil</span>
+}
+
+// SelectReport implements culture.Business
+func (uc *cultureUseCase) SelectReport(cultureID int) ([]cultures.CoreReport, error) <span class="cov8" title="1">{
+        resp, err := uc.cultureData.SelectDataReport(cultureID)
+        return resp, err
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package business
+
+import (
+        "errors"
+        "lami/app/helper"
+        "mime/multipart"
+        "regexp"
+)
+
+func nameFormatValidation(name string) error <span class="cov8" title="1">{
+        //        Check syntax email address
+        pattern := `^[a-zA-Z ]+$`
+        matched, _ := regexp.Match(pattern, []byte(name))
+        if !matched </span><span class="cov8" title="1">{
+                return errors.New("failed syntax name")
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func cityFormatValidation(name string) error <span class="cov8" title="1">{
+        //        Check syntax email address
+        pattern := `^[a-zA-Z ]+$`
+        matched, _ := regexp.Match(pattern, []byte(name))
+        if !matched </span><span class="cov8" title="1">{
+                return errors.New("failed syntax city")
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func uploadFileValidation(name string, id int, directory string, contentType string, fileInfo *multipart.FileHeader, fileData multipart.File) (string, error) <span class="cov8" title="1">{
+        //        Check file extension
+        _, err_check_extension := helper.CheckFileExtension(fileInfo.Filename, contentType)
+        if err_check_extension != nil </span><span class="cov8" title="1">{
+                return "", errors.New("file extension error")
+        }</span>
+
+        //        Check file size
+        <span class="cov8" title="1">err_check_size := helper.CheckFileSize(fileInfo.Size, contentType)
+        if err_check_size != nil </span><span class="cov8" title="1">{
+                return "", errors.New("file size error")
+        }</span>
+
+        //        Memberikan nama file
+        // fileName := strconv.Itoa(id) + "_" + name + time.Now().Format("2006-01-02 15:04:05") + "." + extension
+        // fmt.Println(fileName)
+        // // Upload file
+        // urlImage, errUploadImg := helper.UploadFileToS3(directory, fileName, contentType, fileData)
+
+        // if errUploadImg != nil {
+        //         return "", errors.New("failed to upload file")
+        // }
+
+        <span class="cov8" title="1">return "urlImage", nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
