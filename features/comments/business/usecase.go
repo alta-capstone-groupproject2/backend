@@ -4,24 +4,27 @@ import (
 	"lami/app/features/comments"
 )
 
-type commentUseCase struct {
+type CommentUseCase struct {
 	commentData comments.Data
 }
 
 func NewCommentBusiness(cmnData comments.Data) comments.Business {
-	return &commentUseCase{
+	return &CommentUseCase{
 		commentData: cmnData,
 	}
 }
 
-func (uc *commentUseCase) AddComment(data comments.Core) (row int, err error) {
-	row, err = uc.commentData.Insert(data)
-	return row, err
+func (uc *CommentUseCase) AddComment(dataReq comments.Core) (err error) {
+	result := uc.commentData.Insert(dataReq)
+	if result != nil {
+		return result
+	}
+	return nil
 }
 
-func (uc *commentUseCase) GetCommentByIdEvent(limit, offset, eventId int) (response []comments.Core, total int64, err error) {
+func (uc *CommentUseCase) GetCommentByIdEvent(limit, offset, eventID int) (response []comments.Core, total int64, err error) {
 	page := limit * (offset - 1)
-	response, total, err = uc.commentData.GetComment(limit, page, eventId)
+	response, total, err = uc.commentData.GetComment(limit, page, eventID)
 	if err != nil {
 		return []comments.Core{}, 0, err
 	}

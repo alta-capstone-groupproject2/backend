@@ -52,11 +52,11 @@ type User struct {
 }
 
 type Business interface {
-	AddComment(data Core) (row int, err error)
+	AddComment(dataEvent Core) (err error)
 	GetCommentByIdEvent(limit, offset, event_id int) (data []Core, count int64, err error)
 }
 
 type Data interface {
-	Insert(data Core) (row int, err error)
+	Insert(dataEvent Core) (err error)
 	GetComment(limit, offset, event_id int) (data []Core, count int64, err error)
 }

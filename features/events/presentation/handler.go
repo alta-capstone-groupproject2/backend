@@ -28,18 +28,18 @@ func NewEventHandler(business events.Business) *EventHandler {
 }
 
 func (h *EventHandler) GetAll(c echo.Context) error {
-	name := ""
 	nameParam := c.QueryParam("name")
 	nameIsInt, _ := strconv.Atoi(nameParam)
+	name := ""
 	if nameIsInt != 0 {
 		return c.JSON(helper.ResponseBadRequest("failed parameter"))
 	} else {
 		name = nameParam
 	}
 
-	city := ""
 	cityParam := c.QueryParam("city")
 	cityIsInt, _ := strconv.Atoi(cityParam)
+	city := ""
 	if cityIsInt != 0 {
 		return c.JSON(helper.ResponseBadRequest("failed parameter"))
 	} else {
@@ -59,6 +59,7 @@ func (h *EventHandler) GetAll(c echo.Context) error {
 	if result == nil {
 		return c.JSON(helper.ResponseBadRequest("failed get all events"))
 	}
+
 	respons := _response_event.FromCoreList(result)
 	return c.JSON(helper.ResponseStatusOkWithDataPage("success get all events", total, respons))
 }

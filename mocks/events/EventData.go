@@ -241,3 +241,18 @@ func (_m *EventData) SelectAttendeeData(eventID int) (dataEvent []events.Attende
 
 	return r0, r1
 }
+
+type mockConstructorTestingTNewEventData interface {
+	mock.TestingT
+	Cleanup(func())
+}
+
+// NewCultureData creates a new instance of CultureData. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
+func NewEventData(t mockConstructorTestingTNewEventData) *EventData {
+	mock := &EventData{}
+	mock.Mock.Test(t)
+
+	t.Cleanup(func() { mock.AssertExpectations(t) })
+
+	return mock
+}
