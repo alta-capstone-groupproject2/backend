@@ -25,12 +25,12 @@ func (repo *mysqlEventRepository) SelectData(limit int, offset int, name string,
 	if result.Error != nil {
 		return []events.Core{}, 0, result.Error
 	}
-	return ToCoreList(dataEvent), count, result.Error
+	return ToCoreList(dataEvent), count, nil
 }
 
-func (repo *mysqlEventRepository) SelectDataByID(id int) (response events.Core, err error) {
+func (repo *mysqlEventRepository) SelectDataByID(eventID int) (response events.Core, err error) {
 	dataEvent := Event{}
-	result := repo.db.Where("status = ?", config.Approved).Find(&dataEvent, id)
+	result := repo.db.Where("status = ?", config.Approved).Find(&dataEvent, eventID)
 	if result.Error != nil {
 		return events.Core{}, result.Error
 	}
@@ -59,7 +59,7 @@ func (repo *mysqlEventRepository) DeleteDataByID(id int, userId int) error {
 	return result.Error
 }
 
-func (repo *mysqlEventRepository) CheckUserID(id int) (respon int, err error) {
+func (repo *mysqlEventRepository) CheckValidateUserID(id int) (respon int, err error) {
 	var data Event
 	result := repo.db.First(&data, id)
 	if result.Error != nil {

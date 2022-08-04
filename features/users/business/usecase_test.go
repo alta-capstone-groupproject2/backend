@@ -18,7 +18,7 @@ func (mock mockUserData) SelectDataById(id int) (data users.Core, err error) {
 }
 
 func (mock mockUserData) SelectDataSubmissionStore(limit int, offset int) (data []users.Core, total int64, err error) {
-	return []users.Core{{ID: 1, Name: "alta", Email: "alta@mail.id", Password: "qwerty"}}, 1,nil
+	return []users.Core{{ID: 1, Name: "alta", Email: "alta@mail.id", Password: "qwerty"}}, 1, nil
 }
 
 func (mock mockUserData) InsertData(data users.Core) (err error) {
@@ -98,7 +98,7 @@ func TestInsertData(t *testing.T) {
 		}
 		err := userBusiness.InsertData(newUser)
 		assert.Nil(t, err)
-		
+
 	})
 
 	t.Run("Success Test Insert Data", func(t *testing.T) {
@@ -110,14 +110,14 @@ func TestInsertData(t *testing.T) {
 		}
 		err := userBusiness.InsertData(newUser)
 		assert.NotNil(t, err)
-		
+
 	})
 
 	t.Run("Failed Test Insert Data When Email Invalid", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newUser := users.Core{
 			Name:     "alta",
-			Email: "alta",
+			Email:    "alta",
 			Password: "qwerty",
 		}
 		err := userBusiness.InsertData(newUser)
@@ -128,7 +128,7 @@ func TestInsertData(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newUser := users.Core{
 			Name:     "alta1",
-			Email: "alta@mail.com",
+			Email:    "alta@mail.com",
 			Password: "qwerty",
 		}
 		err := userBusiness.InsertData(newUser)
@@ -152,42 +152,40 @@ func TestDeleteData(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserData{})
 		err := userBusiness.DeleteData(id)
 		assert.Nil(t, err)
-		
+
 	})
 	t.Run("Failed Test Delete Data", func(t *testing.T) {
 		id := 1
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		err := userBusiness.DeleteData(id)
 		assert.NotNil(t, err)
-		
+
 	})
 }
 
 func TestUpdateData(t *testing.T) {
-	file , _ := os.Open("./../../../helper/testFile/imageSuccess.png")
+	file, _ := os.Open("./../../../helper/testFile/imageSuccess.png")
 	fileStat, _ := file.Stat()
 	fileInfo := &multipart.FileHeader{
 		Filename: fileStat.Name(),
-		Size: fileStat.Size(),
-		
+		Size:     fileStat.Size(),
 	}
 	fileData, _ := fileInfo.Open()
-	
-	fileSize , _ := os.Open("./../../../helper/testFile/imageSizeInvalid.png")
+
+	fileSize, _ := os.Open("./../../../helper/testFile/imageSizeInvalid.png")
 	fileStatSize, _ := fileSize.Stat()
 	fileInfoSize := &multipart.FileHeader{
 		Filename: fileStatSize.Name(),
-		Size: fileStatSize.Size(),
-		
+		Size:     fileStatSize.Size(),
 	}
 
 	fileDataSize, _ := fileInfoSize.Open()
 	fileFail, _ := os.Open("./../../../helper/testFile/fileTest.txt")
-		fileStatFail,_ :=fileFail.Stat()
-		fileInfoFail := &multipart.FileHeader{
-			Filename: fileStatFail.Name(),
-			Size: fileStatFail.Size(),			
-		}	
+	fileStatFail, _ := fileFail.Stat()
+	fileInfoFail := &multipart.FileHeader{
+		Filename: fileStatFail.Name(),
+		Size:     fileStatFail.Size(),
+	}
 	fileDataFail, _ := fileInfoFail.Open()
 
 	t.Run("Success Test Update Data", func(t *testing.T) {
@@ -198,11 +196,11 @@ func TestUpdateData(t *testing.T) {
 			Email:    "alfin@mail.id",
 			Password: "123",
 		}
-		
+
 		userBusiness := NewUserBusiness(mockUserData{})
 		err := userBusiness.UpdateData(data, id, fileInfo, fileData)
 		assert.Nil(t, err)
-		
+
 	})
 	t.Run("Failed Test Update Name Invalid", func(t *testing.T) {
 		id := 3
@@ -215,7 +213,7 @@ func TestUpdateData(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		err := userBusiness.UpdateData(data, id, fileInfo, fileData)
 		assert.NotNil(t, err)
-		
+
 	})
 	t.Run("Failed Test Update Email Invalid", func(t *testing.T) {
 		id := 3
@@ -228,7 +226,7 @@ func TestUpdateData(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		err := userBusiness.UpdateData(data, id, fileInfo, fileData)
 		assert.NotNil(t, err)
-		
+
 	})
 	t.Run("Failed Test Update Data", func(t *testing.T) {
 		id := 3
@@ -240,7 +238,7 @@ func TestUpdateData(t *testing.T) {
 		}
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		err := userBusiness.UpdateData(data, id, fileInfo, fileData)
-		assert.NotNil(t, err)	
+		assert.NotNil(t, err)
 	})
 	t.Run("Failed Test Update Data invalid extension", func(t *testing.T) {
 		id := 1
@@ -250,11 +248,11 @@ func TestUpdateData(t *testing.T) {
 			Email:    "alfin@mail.id",
 			Password: "123",
 		}
-		
+
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		err := userBusiness.UpdateData(data, id, fileInfoFail, fileDataFail)
 		assert.NotNil(t, err)
-		
+
 	})
 	t.Run("Failed Test Update Data invalid size", func(t *testing.T) {
 		id := 1
@@ -264,78 +262,74 @@ func TestUpdateData(t *testing.T) {
 			Email:    "alfin@mail.id",
 			Password: "123",
 		}
-		
+
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		err := userBusiness.UpdateData(data, id, fileInfoSize, fileDataSize)
 		assert.NotNil(t, err)
-		
+
 	})
-	
-	
+
 }
 
 func TestUpgradeAccount(t *testing.T) {
-	file , _ := os.Open("./../../../helper/testFile/docSuccess.pdf")
+	file, _ := os.Open("./../../../helper/testFile/docSuccess.pdf")
 	fileStat, _ := file.Stat()
 	fileInfo := &multipart.FileHeader{
 		Filename: fileStat.Name(),
-		Size: fileStat.Size(),
-		
+		Size:     fileStat.Size(),
 	}
 	fileData, _ := fileInfo.Open()
-	
-	fileSize , _ := os.Open("./../../../helper/testFile/docInvalidSize.pdf")
+
+	fileSize, _ := os.Open("./../../../helper/testFile/docInvalidSize.pdf")
 	fileStatSize, _ := fileSize.Stat()
 	fileInfoSize := &multipart.FileHeader{
 		Filename: fileStatSize.Name(),
-		Size: fileStatSize.Size(),
-		
+		Size:     fileStatSize.Size(),
 	}
 	fileFail, _ := os.Open("./../../../helper/testFile/imageSuccess.png")
-		fileStatFail,_ :=fileFail.Stat()
-		fileInfoFail := &multipart.FileHeader{
-			Filename: fileStatFail.Name(),
-			Size: fileStatFail.Size(),			
-		}	
+	fileStatFail, _ := fileFail.Stat()
+	fileInfoFail := &multipart.FileHeader{
+		Filename: fileStatFail.Name(),
+		Size:     fileStatFail.Size(),
+	}
 	fileDataFail, _ := fileInfoFail.Open()
 
-	
 	t.Run("Success Test Upgrade Account", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserData{})
 		newStoreUser := users.Core{
-			StoreName:   "store A",
-			Phone:       "8218198212",
-			Owner:       "aku",
-			City:        "malang",
-			Address:     "jln. simpang remujung",
+			StoreName: "store A",
+			Phone:     "8218198212",
+			Owner:     "aku",
+			City:      "malang",
+			Address:   "jln. simpang remujung",
 		}
 		err := userBusiness.UpgradeAccount(newStoreUser, 1, fileInfo, fileData)
 		assert.Nil(t, err)
-		
+
 	})
 
 	t.Run("Failed Test Upgrade Account Not All Data Filled", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newStoreUser := users.Core{
-			StoreName:   "store A",
-			Phone:       "8218198212",
-			Owner:       "aku",
-			City:        "malang",
-			Address:     "",
+			StoreName: "store A",
+			Phone:     "8218198212",
+			Owner:     "aku",
+			City:      "malang",
+			Address:   "",
 		}
 		err := userBusiness.UpgradeAccount(newStoreUser, 1, fileInfo, fileData)
 		assert.NotNil(t, err)
-		
+
 	})
 
 	t.Run("Failed Test Upgrade Account When Name Invalid", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newStoreUser := users.Core{
-			StoreName:   "store A",
-			Phone:       "8218198212",
-			Owner:       "aku1",
-			City:        "malang",
-			Address:     "jln. simpang remujung",
+			StoreName: "store A",
+			Phone:     "8218198212",
+			Owner:     "aku1",
+			City:      "malang",
+			Address:   "jln. simpang remujung",
 		}
 		err := userBusiness.UpgradeAccount(newStoreUser, 1, fileInfo, fileData)
 		assert.NotNil(t, err)
@@ -344,11 +338,11 @@ func TestUpgradeAccount(t *testing.T) {
 	t.Run("Failed Test Upgrade Account When City Invalid", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newStoreUser := users.Core{
-			StoreName:   "store A",
-			Phone:       "8218198212",
-			Owner:       "aku",
-			City:        "malang1",
-			Address:     "jln. simpang remujung",
+			StoreName: "store A",
+			Phone:     "8218198212",
+			Owner:     "aku",
+			City:      "malang1",
+			Address:   "jln. simpang remujung",
 		}
 		err := userBusiness.UpgradeAccount(newStoreUser, 1, fileInfo, fileData)
 		assert.NotNil(t, err)
@@ -356,12 +350,12 @@ func TestUpgradeAccount(t *testing.T) {
 	t.Run("Failed Test Upgrade Account When All Data Not Filled ", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newStoreUser := users.Core{
-		StoreName:   "store A",
-		Phone:       "8218198212qq",
-		Owner:       "aku",
-		City:        "malang",
-		Address:     "jln. simpang remujung",
-	}
+			StoreName: "store A",
+			Phone:     "8218198212qq",
+			Owner:     "aku",
+			City:      "malang",
+			Address:   "jln. simpang remujung",
+		}
 		err := userBusiness.UpgradeAccount(newStoreUser, 1, fileInfo, fileData)
 		assert.NotNil(t, err)
 	})
@@ -369,11 +363,11 @@ func TestUpgradeAccount(t *testing.T) {
 	t.Run("Failed Test Upgrade Account When extension invalid", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newStoreUser := users.Core{
-			StoreName:   "store A",
-			Phone:       "8218198212",
-			Owner:       "aku",
-			City:        "malang",
-			Address:     "jln. simpang remujung",
+			StoreName: "store A",
+			Phone:     "8218198212",
+			Owner:     "aku",
+			City:      "malang",
+			Address:   "jln. simpang remujung",
 		}
 		err := userBusiness.UpgradeAccount(newStoreUser, 1, fileInfoFail, fileDataFail)
 		assert.NotNil(t, err)
@@ -381,11 +375,11 @@ func TestUpgradeAccount(t *testing.T) {
 	t.Run("Failed Test Upgrade Account When size invalid", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newStoreUser := users.Core{
-			StoreName:   "store A",
-			Phone:       "8218198212",
-			Owner:       "aku",
-			City:        "malang",
-			Address:     "jln. simpang remujung",
+			StoreName: "store A",
+			Phone:     "8218198212",
+			Owner:     "aku",
+			City:      "malang",
+			Address:   "jln. simpang remujung",
 		}
 		err := userBusiness.UpgradeAccount(newStoreUser, 1, fileInfoSize, fileData)
 		assert.NotNil(t, err)
@@ -397,25 +391,25 @@ func TestUpdateStatusUser(t *testing.T) {
 		id := 1
 		status := "approve"
 		userBusiness := NewUserBusiness(mockUserData{})
-		err := userBusiness.UpdateStatusUser(status,id)
+		err := userBusiness.UpdateStatusUser(status, id)
 		assert.Nil(t, err)
-		
+
 	})
 	t.Run("Success Test Update Status Approve Data", func(t *testing.T) {
 		id := 1
 		status := "decline"
 		userBusiness := NewUserBusiness(mockUserData{})
-		err := userBusiness.UpdateStatusUser(status,id)
+		err := userBusiness.UpdateStatusUser(status, id)
 		assert.Nil(t, err)
-		
+
 	})
 	t.Run("Failed Test Delete Data", func(t *testing.T) {
 		id := 0
 		status := "decline"
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
-		err := userBusiness.UpdateStatusUser(status,id)
+		err := userBusiness.UpdateStatusUser(status, id)
 		assert.NotNil(t, err)
-		
+
 	})
 }
 func TestGetDataSubmissionStore(t *testing.T) {
@@ -432,7 +426,7 @@ func TestGetDataSubmissionStore(t *testing.T) {
 		limit := 1
 		offset := 1
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
-		result,_, err := userBusiness.GetDataSubmissionStore(limit, offset)
+		result, _, err := userBusiness.GetDataSubmissionStore(limit, offset)
 		assert.NotNil(t, err)
 		// assert.Equal(t, total, int64(0))
 		assert.Equal(t, []users.Core(nil), result)
@@ -449,15 +443,14 @@ func TestVerifyEmail(t *testing.T) {
 		}
 		err := userBusiness.VerifyEmail(newUser)
 		assert.Nil(t, err)
-		
-	})
 
+	})
 
 	t.Run("Failed Test Verify Email When Email Invalid", func(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newUser := users.Core{
 			Name:     "alta",
-			Email: "alta",
+			Email:    "alta",
 			Password: "qwerty",
 		}
 		err := userBusiness.VerifyEmail(newUser)
@@ -468,7 +461,7 @@ func TestVerifyEmail(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		newUser := users.Core{
 			Name:     "alta1",
-			Email: "alta@mail.com",
+			Email:    "alta@mail.com",
 			Password: "qwerty",
 		}
 		err := userBusiness.VerifyEmail(newUser)
@@ -492,13 +485,13 @@ func TestConfirmEmail(t *testing.T) {
 		userBusiness := NewUserBusiness(mockUserData{})
 		err := userBusiness.ConfirmEmail(encrypt)
 		assert.Nil(t, err)
-		
+
 	})
 	t.Run("Failed Test Delete Data", func(t *testing.T) {
 		encrypt := "d86a98f985e4c6388996bf1a8e6322382d6b6f4d136cdaea78585f7c5678529c3eed34015d59cf4c6b3ce86711fe6d63598a346a2ae78b468f6fff8fb87926d33d890cc7e97a3e47ac6fe7f3dee10b"
 		userBusiness := NewUserBusiness(mockUserDataFailed{})
 		err := userBusiness.ConfirmEmail(encrypt)
 		assert.NotNil(t, err)
-		
+
 	})
 }

@@ -16,35 +16,47 @@ type Core struct {
 }
 
 type Event struct {
-	ID          int
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Name        string
-	EventName   string
-	EventDetail string
-	Url         string
-	Date        time.Time
-	Performers  string
-	HostedBy    string
-	City        string
-	Location    string
-	UserID      int
-	User        User
+	ID        int
+	Image     string
+	Document  string
+	Name      string
+	HostedBy  string
+	Phone     string
+	StartDate time.Time
+	EndDate   time.Time
+	City      string
+	Location  string
+	Detail    string
+	Price     int
+	Status    string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type User struct {
-	ID     int
-	Name   string
-	Email  string
-	Avatar string
+	ID          int
+	Name        string
+	Email       string
+	Password    string
+	Image       string
+	StoreName   string
+	Phone       string
+	Owner       string
+	City        string
+	Address     string
+	Document    string
+	RoleID      int
+	StoreStatus string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type Business interface {
-	AddComment(data Core) (row int, err error)
+	AddComment(dataEvent Core) (err error)
 	GetCommentByIdEvent(limit, offset, event_id int) (data []Core, count int64, err error)
 }
 
 type Data interface {
-	Insert(data Core) (row int, err error)
+	Insert(dataEvent Core) (err error)
 	GetComment(limit, offset, event_id int) (data []Core, count int64, err error)
 }

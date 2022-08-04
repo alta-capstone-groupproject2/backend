@@ -40,12 +40,9 @@ func (h *CommentHandler) Add(c echo.Context) error {
 	commentCore := _request_comment.ToCore(comment)
 	commentCore.UserID = userID_token
 
-	row, err := h.commentBusiness.AddComment(commentCore)
+	err := h.commentBusiness.AddComment(commentCore)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, helper.ResponseFailedServer("failed insert your comment"))
-	}
-	if row == 0 {
-		return c.JSON(http.StatusBadRequest, helper.ResponseFailedBadRequest("failed insert your comment"))
 	}
 	return c.JSON(http.StatusOK, helper.ResponseSuccessCreate("success insert your comment"))
 }

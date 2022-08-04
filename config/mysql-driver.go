@@ -40,26 +40,24 @@ func InitDB() *gorm.DB {
 }
 
 func InitDBTest() *gorm.DB {
-
 	config := map[string]string{
-		"DB_Username": "alfin",
-		"DB_Password": "123",
+		"DB_Username": "root",
+		"DB_Password": "toor",
 		"DB_Port":     "3306",
 		"DB_Host":     "127.0.0.1",
 		"DB_Name":     "capstone_test",
 	}
 
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=UTC",
+	connectionStringTest := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=UTC",
 		config["DB_Username"],
 		config["DB_Password"],
 		config["DB_Host"],
 		config["DB_Port"],
 		config["DB_Name"])
 
-	db, e := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+	db, e := gorm.Open(mysql.Open(connectionStringTest), &gorm.Config{})
 	if e != nil {
 		panic(e)
 	}
-
 	return db
 }
